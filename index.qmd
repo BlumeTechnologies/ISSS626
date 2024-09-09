@@ -1,0 +1,19 @@
+---
+title: "Pelle Knegjes"
+image: Gallery/Profile.jpeg
+about:
+  template: jolla
+  image-width: 20em
+  image-shape: round
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: https://linkedin.com/p/pelleknegjes
+    - icon: github
+      text: Github
+      href: https://github.com/BlumeTechnologies
+---
+
+Welcome to the portfolio of Pelle Knegjes
+
+I am a motivated MSc Business Information Management student at Rotterdam School of Management, Erasmus University with a background in functional consulting. With experience in collaborating with diverse teams and conducting research, I am skilled in identifying and addressing the needs of organizations. My interests lie in exploring cooperations and contributing to the development of smart and sustainable cities.
