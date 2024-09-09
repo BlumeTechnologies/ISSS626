@@ -1,0 +1,169 @@
+---
+title: "Ch.16 - Organizational Structure and Change"
+author: "Pelle Knegjes"
+---
+
+## Learning Outcomes:
+
+1.  What are mechanistic versus organic organizational structures
+2.  What are the fundamental dimensions of change?
+3.  How do managers deal with change?
+
+## What are mechanistic versus organic organizational structures
+
+-   **What is an organizational structure?**
+
+    -   An organizational structure is a system for organizing and connecting the activities within a work organization. It defines how work is divided, how employees' work supports or relies on others, and how these activities contribute to the overall purpose of the organization.
+
+-   **What are different types of organizational structures?**
+
+    -   The text outlines two fundamental types of organizational structures:
+
+        -   **Formal Organization:** This refers to the officially defined set of relationships, responsibilities, and connections across an organization. It is typically depicted through hierarchical organizational charts, specifying roles, responsibilities, and communication paths.
+
+        -   **Informal Organization:** This represents the network of interpersonal relationships that naturally form among employees. It is emergent, complex, and influences how work gets done beyond the formal structure.
+
+-   **What is organizational design?**
+
+    -   Organizational design is the process of establishing and structuring organizational structures to address the needs of the organization and manage the complexity involved in achieving its business objectives. It involves creating systems that determine how activities are coordinated and managed.
+
+**What concepts should guide decisions about how to design structures?**
+
+-   Decisions about designing organizational structures should be guided by several concepts:
+
+    -   **Specialization:** The degree to which tasks are divided among roles based on expertise.
+
+    -   **Command-and-Control:** The structure for oversight and reporting within the organization.
+
+    -   **Span of Control:** The number of employees a manager is responsible for.
+
+    -   **Centralization:** How resources and decision-making authority are distributed within the organization.
+
+    -   **Formalization:** The extent to which roles, responsibilities, and procedures are clearly defined.
+
+    -   The design should also consider whether a mechanistic structure (highly hierarchical and standardized) or an organic structure (more flexible and decentralized) is more appropriate, depending on the organization's needs and environment.
+
+## What are the fundamental dimensions of change?
+
+-   **What is organizational change?**
+
+    -   Organizational change refers to the process through which an organization evolves and adapts in response to internal or external factors. It involves modifications to various aspects of the organization, including its structure, technology, and culture, to better align with its goals or to respond to shifts in its environment.
+
+-   **What are the fundamental dimensions of change?**
+
+    -   The fundamental dimensions of change are:
+
+        -   **Scope of Change:** This refers to how extensive the change is and how much it disrupts existing patterns. It can be:
+
+            -   **Incremental Change:** Small adjustments or improvements that refine existing practices without significantly altering the current system.
+
+            -   **Transformational Change:** Major shifts that significantly alter the organization’s structure, processes, or culture, often leading to substantial disruption.
+
+        -   **Level of Change:** This denotes the breadth of the impact of the change within the organization. It can be:
+
+            -   **Individual-Level Change:** Changes focused on improving individual performance or knowledge.
+
+            -   **Group-Level Change:** Changes aimed at enhancing how groups or teams work together, such as team development or teambuilding.
+
+            -   **Organization-Level Change:** Changes affecting the entire organization or multiple units, such as strategic planning and implementation.
+
+        -   **Intentionality of Change:** This relates to how purposefully the change is designed and implemented. It can be:
+
+            -   **Planned Change:** Deliberate activities designed to achieve specific goals, often involving clear objectives and a structured approach.
+
+            -   **Unplanned Change:** Spontaneous or informal changes that occur without explicit planning, often arising from employee initiatives or unintended consequences of planned changes.
+
+### **1. What are organizational development (OD) and change management?**
+
+**Organizational Development (OD):**\
+OD is a specialized field focused on designing and managing change within organizations. It involves understanding and applying various practices and methodologies to develop organizations and manage change effectively. OD consultants, whether internal (employees within the organization) or external (hired specialists), bring expertise in change management processes to help organizations navigate and implement change.
+
+**Change Management:**\
+Change management is the process of designing and implementing change within an organization. It involves understanding the factors that necessitate change, planning the dimensions of change needed, and applying different approaches to ensure the change is successfully implemented. Most leaders are responsible for some degree of change management in their roles.
+
+### **2. What questions may be used to guide OD and change management?**
+
+Several questions can guide the OD and change management process:
+
+-   **Starting Place for Change:** Is the organization in a state of deficiency that needs significant fixing, or is it in a state of high performance that requires refining and tweaking?
+
+-   **Mechanisms of Change:** What are our assumptions about how to create change? Should we use a top-down approach or a bottom-up approach?
+
+-   **Mindset for Change:** What are our fundamental beliefs about people and change? Do we assume people resist change and need to be managed (conventional mindset), or do we believe people will embrace change if they are respected and involved (positive/appreciative mindset)?
+
+### **3. What are the common models of OD and change management?**
+
+The text describes four common models of OD and change management:
+
+-   **Lewin’s Change Model:** This model involves three phases—unfreezing, changing, and refreezing. It explains that organizational change occurs by disrupting existing norms and routines, introducing new changes, and then reinforcing the new norms and practices.
+
+-   **Kotter’s Change Model:** An eight-step model that relies on a top-down approach. The steps include establishing a sense of urgency, forming a powerful guiding coalition, creating a vision, communicating the vision, removing obstacles, creating small wins, consolidating improvements, and anchoring the changes.
+
+-   **Appreciative Inquiry (AI):** A bottom-up, positive approach that involves a 5-D cycle: define, discover, dream, design, and destiny. It focuses on creating change by fostering appreciative conversations and developing a positive vision for the future through participatory dialogue.
+
+-   **Complex Adaptive Systems (CAS):** This model views organizations as constantly adapting to their environment. It emphasizes bottom-up, emergent change and focuses on self-organizing among employees. Techniques like Open Space Technology are used to facilitate broad stakeholder involvement and self-organizing processes.
+
+### **4. How do managers deal with change?**
+
+Managers deal with change by understanding and applying various models and approaches to change management. They need to:
+
+-   **Assess the Need for Change:** Determine whether the organization requires transformational or incremental change based on its current state.
+
+-   **Choose the Right Approach:** Decide between top-down or bottom-up approaches based on the organization's structure and the nature of the change.
+
+-   **Engage Employees:** Involve employees in the change process to increase their investment and participation. This can be done through participatory management and appreciative inquiry.
+
+-   **Communicate Effectively:** Clearly communicate the vision for change, the reasons behind it, and how it will unfold. This helps in reducing resistance and gaining support.
+
+-   **Facilitate Self-Organizing:** Create conditions that empower employees to act as change agents, strengthen relationships, and improve flows of information and energy within the organization.
+
+-   **Monitor and Adjust:** Continuously monitor the progress of change, celebrate small wins, and make necessary adjustments to ensure successful implementation and consolidation of the change.
+
+By combining these strategies, managers can effectively navigate and implement change within their organizations.
+
+**Organizational Structures and Design**
+
+*1. What are mechanistic versus organic organizational structures?*
+
+\
+The organizational structure is designed from both the mechanistic and the organic points of view, and the\
+structure depends upon the extent to which it is rigid or flexible. Flexible structures are also viewed as more\
+humanistic than mechanistic structures. The mechanistic organizational structure is similar to Max Weber’s\
+bureaucratic organization. Organic structures are more flexible in order to cope with rapidly changing\
+environments. These structures are more effective if the environment is dynamic, requiring frequent changes\
+within the organization in order to adjust to change. It is also considered to be a better form of organization\
+when employees seek autonomy, openness, change, support for creativity and innovation, and opportunities\
+to try new approaches.\
+All organizations need structures to accomplish their work, and they need an ability to change in order to\
+sustain and renew themselves over time
+
+**Organizational Change**
+
+*2. What are the fundamental dimensions of change?*
+
+\
+It is often said that the only constant is change. Managers need to have the ability to understand the\
+dimensions of change, know what drives change, and know how to implement changes to meet and exceed\
+organizational goals. The three types of change are structural, technological, and culture changes. Managers\
+need to understand change as organizations evolve and grow over time.\
+One of the key responsibilities of management is to design organizational structures that will allow an\
+organization to accomplish its primary objectives. The structure should always match the need for\
+coordination. Often, managers cannot tell what form the organization should take until they experience the\
+informal organization that determines how work is actually accomplished. Only then can they understand how\
+to draw on the concepts of bureaucracy to appropriately design a structure that will maximize the likelihood of\
+organizational success.
+
+**Managing Change**
+
+*3. How do managers deal with change?*
+
+\
+As an organization grows and matures, change becomes necessary to its sustained viability. Thus, another key\
+responsibility for most leaders is the task of designing and managing change. We have reviewed several\
+questions that should be considered when designing a change process, and we have explored several\
+approaches that may be used to guide the development of organizational change.\
+The field of knowledge about how to change and develop organizations is vast and can be somewhat\
+confusing to the novice learner. The material presented in this chapter provides an overview of key ideas, but\
+there is so much more to learn. Should you wish to become an influential leader of change, it is important to\
+learn more about this very important field of research and practice.
+\

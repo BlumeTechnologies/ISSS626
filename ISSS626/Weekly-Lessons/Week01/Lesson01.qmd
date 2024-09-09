@@ -1,0 +1,53 @@
+---
+title: "Lesson 1: Introduction to Geospatial Analytics"
+author: "Pelle Knegjes"
+date: "Aug 26 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+This lesson consists of three parts. First, it provides an overview of geospatial analytics. Second, R objects used to import, integrate, wrangle, process geospatial data will be discussed. The discussion will focus on `sf`package. Other R packages for storing (i.e. sp), transforming (i.e. rgdal), and processing (i.e. rgeos) geospatial data will be discussed briefly too. Lastly, the basic principles and concepts of thematic mapping and geovisualisation will be introduced. You will also gain hands-on experience on using [**tmap**](https://r-tmap.github.io/tmap/) package to build cartographic quality thematic maps.
+
+## **Content**
+
+-   Introduction to Geospatial Analytics
+
+    -   Demystifying Geospatial Analytics
+
+    -   Motivation of Geospatial Analytics
+
+    -   A Tour Through the Geospatial Analytics Zoo
+
+    -   Geospatial Analytics and Social Consciousness
+
+-   Fundamentals of Geospatial Data and sf Methods
+
+    -   An overview of Geospatial Data Models
+
+    -   Map Projection and Georeferencing
+
+    -   Geocoding
+
+    -   Classes of Spatial Data in R: Simple features class
+
+    -   sf methods
+
+-   Fundamentals of Geospatial Data Visualisation and tmap Methods
+
+    -   Classification of maps
+
+    -   Principles of map design
+
+    -   Thematic mapping techniques
+
+    -   tmap methods
+
+## **Hands-on Exercise**
+
+-   Hands-on Exercise 1: [Geospatial Data Wrangling with R](Geospatial_Data_Wrangling.html)
+
+-   Hands-on Exercise 1: [Choropleth Mapping with R](Choropleth_Mapping.html)

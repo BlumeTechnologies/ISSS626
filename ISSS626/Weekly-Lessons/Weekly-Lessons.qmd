@@ -1,0 +1,30 @@
+---
+title: "Weekly Lesson Plan"
+author: "Pelle Knegjes"
+format: html
+editor: visual
+date: "June 20 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+## Weekly Lesson Plan
+
+To access each weekly lesson please click on the topic. These pages also contain the "Hands-on Exercises."
+
+| Week | Date       | Topic                                            |
+|------|------------|--------------------------------------------------|
+| 1    | 26/8/2024  | Introduction to Geospatial Analytics             |
+| 2    | 2/9/2024   | Spatial Point Patterns Analysis (SPAA)           |
+| 3    | 9/9/2024   | Advanced SPAA                                    |
+| 4    | 16/9/2024  | Spatial Weights and Applications                 |
+| 5    | 23/9/2024  | Global and Local Measures of Spatial Association |
+| 6    | 30/9/2024  | Geographic Segmentation                          |
+| 7    | 14/10/2024 | Geographically Weighted Explanatory Models       |
+| 8    | 21/10/2024 | Geographically Weighted Predictive Models        |
+| 9    | 28/10/2024 | Spatial Interaction Models                       |
+| 10   | 4/11/2024  | Modelling Geographic of Accessibility            |

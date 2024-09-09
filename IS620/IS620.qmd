@@ -1,0 +1,6 @@
+---
+title: "Digital Organization and Change Management"
+author: "Pelle Knegjes"
+---
+
+[Chapter 16: Organizational Structure and Change](Chapters\CH16.html)

@@ -1,0 +1,13 @@
+---
+title: "Take Home Exercises"
+author: "Pelle Knegjes"
+format: html
+editor: visual
+date: "June 20 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---

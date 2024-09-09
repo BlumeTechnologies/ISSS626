@@ -1,0 +1,25 @@
+---
+title: "In-Class Exercises"
+author: "Pelle Knegjes"
+format: html
+editor: visual
+date: "June 20 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+## In-class Exercises
+
+[In Class Page](In-Class_Exercises/In-Class_Exercises.html) [In-class Exercise 1: Geospatial Data Science with R](In-Class_Exercises/In-Class_Exercise01/In-Class_Ex01.html)
+
+In-class Exercise 2:
+
+In-class Exercise 3:
+
+In-class Exercise 4:
+
+In-class Exercise 5:

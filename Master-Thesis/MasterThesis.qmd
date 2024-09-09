@@ -1,0 +1,17 @@
+---
+title: "Towards Self-Regulation in Cities"
+author: "Pelle Knegjes"
+date: "June 20 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+<iframe
+  width= "1000"
+  height= "1500"
+  src="MasterThesisPelle.pdf">
+</iframe>  
+  

@@ -1,0 +1,49 @@
+---
+title: "Lesson 3: Advanced Spatial Point Patterns Analysis"
+author: "Pelle Knegjes"
+date: "Aug 29 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+In this lesson, you will learn two advanced spatial point patterns analysis methods, they are: spatiotemporal KDE and the Network Constrained KDE. Using real-world use cases, you will also gain hands-on experience on using [spNetwork](https://jeremygelb.github.io/spNetwork/index.html) to analyse spatial point patterns and temporal spatial point event along networks.
+
+## **Content**
+
+-   Spatiotemporal Kernel Density Estimation
+
+-   Network Constrained Kernel Density Estimation (NCKDE)
+
+    -   Basic concepts of network constrained spatial point patterns
+
+    -   Network Constrained KDE methods
+
+    -   The Three versions of Network Constrained KDE
+
+-   Temporal Network Kernel Density Estimation (TNKED)
+
+    -   Temporal dimension
+
+    -   Spatial dimension
+
+    -   Spatiotemporal point patterns
+
+    -   The Temporal Network Kernel Density Estimation method
+
+### **Lesson Slides and Hands-on Notes**
+
+-   [Lesson 3](https://isss626-ay2024-25aug.netlify.app/lesson/lesson03/lesson03-advanced_sppa) slides
+
+-   [Hands-on Exercise 3: Network Constrained Spatial Point Patterns Analysis](NetworkConstrainedSpatialPointPatternsAnalysis.html).
+
+## **References**
+
+-   ATSUYUKI OKABE, TOSHIAKI SATOH & KOKICHI SUGIHARA (2009) “A kernel density estimation method for networks, its computational method and a GIS-based tool”, *International Journal of Geographical Information Science*, Vol. 23, No. 1, January 2009, pp. 7–32.
+
+-   Ikuho Yamada & Jean-Claude Thill (2007) “Local Indicators of Network-Constrained Clusters in Spatial Point Patterns”, *Geographical Analysis*, Vol. 39, pp 268–292.
+
+-   Jérémy Gelb & Philippe Apparicio (2023) [“Temporal Network Kernel Density Estimation”](https://onlinelibrary.wiley.com/doi/full/10.1111/gean.12368), Geographical Analysis. (Online open access version)

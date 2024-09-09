@@ -1,0 +1,51 @@
+---
+title: "ISSS626 Geospatial Analytics and Applications"
+author: "Pelle Knegjes"
+date: "Aug 26 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+# Welcome to ISSS626 Geospatial Analytics and Applications
+
+From this page, everything on the course will be accessible.
+
+Instructor: [Dr. Kam Tin Seong](https://www.smu.edu.sg/faculty/profile/9618/KAM-Tin-Seong), Associate Professor of Information Systems (Practice)
+
+## Weekly Lesson Plan
+
+To access each weekly lesson please click on the topic. These pages also contain the "Hands-on Exercises."
+
+| Week | Date       | Topic                                            |
+|------|------------|--------------------------------------------------|
+| 1    | 26/8/2024  | [Introduction to Geospatial Analytics](Weekly-Lessons/Week01/Lesson01.html)             |
+| 2    | 2/9/2024   | [Spatial Point Patterns Analysis (SPAA)](Weekly-Lessons/Week02/Lesson02.html)          |
+| 3    | 9/9/2024   | [Advanced SPAA](Weekly-Lessons/Week03/Lesson03.html)                                    |
+| 4    | 16/9/2024  | [Spatial Weights and Applications](Weekly-Lessons/Week03/Lesson03.html)                 |
+| 5    | 23/9/2024  | [Global and Local Measures of Spatial Association]() |
+| 6    | 30/9/2024  | [Geographic Segmentation]()                          |
+| 7    | 14/10/2024 | [Geographically Weighted Explanatory Models]()       |
+| 8    | 21/10/2024 | [Geographically Weighted Predictive Models]()        |
+| 9    | 28/10/2024 | [Spatial Interaction Models]()                       |
+| 10   | 4/11/2024  | [Modelling Geographic of Accessibility]()            |
+
+## In-class Exercises
+[In Class Page](In-Class_Exercises/In-Class_Exercises.html)
+
+[In-class Exercise 1: Geospatial Data Science with R](In-Class_Exercises/In-Class_Exercise01/In-Class_Ex01.html)
+
+In-class Exercise 2:
+
+In-class Exercise 3:
+
+In-class Exercise 4:
+
+In-class Exercise 5:
+
+## Take-home Exercises
+[Take-home Exercise 1: Geospatial Analytics for Public Good](Take-Home_Exercises/Take-Home_Exercise01/Take-Home_Exercise01.html)
+## 
