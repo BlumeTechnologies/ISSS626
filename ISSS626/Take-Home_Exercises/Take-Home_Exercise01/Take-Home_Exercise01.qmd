@@ -10,6 +10,7 @@ execute:
   echo: true
   message: false
   freeze: true
+  warning: false
 ---
 
 # **Take-home Exercise 1: Geospatial Analytics for Public Good**
@@ -75,18 +76,16 @@ WGS 84 UTM zone 47N EPSG code of bangkok: 32647
 The code chunk below uses pacman to install and load the sf, raster, spatstat, tmap, tidyverse and ......... tools
 
 ```{r}
-pacman::p_load(sf, raster, spatstat, tmap, tidyverse)
+pacman::p_load(sf, raster, spatstat, sparr, tmap, tidyverse, spNetwork)
 ```
 
 Explanations for the imported library:
 
--   [tmap](https://cran.r-project.org/web/packages/tmap/) for visualizing geospatial
-
 -   [sf](https://r-spatial.github.io/sf/) for handling geospatial data
 
--   [tidyverse](https://www.tidyverse.org/) for handling aspatial data
+-   [spatstat](empty)
 
--   [sfdep](https://sfdep.josiahparry.com/) for computing spatial weights, global and local spatial autocorrelation statistics, and
+-   [tmap](https://cran.r-project.org/web/packages/tmap/) for visualizing geospatial
 
 -   [knitr](https://www.rdocumentation.org/packages/knitr/versions/1.45) for creating html tables
 
@@ -95,6 +94,14 @@ Explanations for the imported library:
 -   [mapview](https://cran.r-project.org/web/packages/mapview/) for interactive map backgrouds
 
 -   [DT](https://rstudio.github.io/DT/) library to create interactive html tables
+
+-   [**raster**](https://rspatial.org/raster/) for handling raster data in R,
+
+-   [**spatstat**](https://cran.r-project.org/web/packages/spatstat/index.html) for performing Spatial Point Patterns Analysis such as kcross, Lcross, etc.,
+
+-   [**sparr**](https://tilmandavies.github.io/sparr/index.html) provides functions to estimate fixed and adaptive kernel-smoothed spatial relative risk surfaces via the density-ratio method and perform subsequent inference. Fixed-bandwidth spatiotemporal density and relative risk estimation is also supported
+
+-   [**tidyverse**](https://www.tidyverse.org/), a family of R packages that provide functions to perform common data science tasks including and not limited to data import, data transformation, data wrangling and data visualisation.
 
 # 3 Data Preparation
 
@@ -110,22 +117,662 @@ The following data sets have been used in this exercise and can be downloaded by
 
 ## 3.2 Importing the data in R
 
+Make csv sf geometry must be linestring not multipleline detect driver behavior detect enviromental behavior use to subset point events accident causes accident data point
+
+select different regions from wikipedia of the region do the analysis of the regions like the previous exercise rds folder, make subsets in rds date time field posix incident datetime
+
 ::: panel-tabset
 ## Aspatial
 
+EVAL USE WHEN DONT WANT TO RERUN CODE Because ppp object only accept numerical or character as mark. The code chunk below is used to convert data type of acq_date to numeric.
+
 ```{r}
 #| eval: false
-rdacc_sf = read_csv("data/thai_road_accident_2019_2022.csv") %>%
+rdacc_sf = read_csv("data/rawdata/thai_road_accident_2019_2022.csv") %>%
   filter(!is.na(longitude) & longitude != "",
          !is.na(latitude) & latitude != "") %>%
   st_as_sf(coords = c(
     "longitude", "latitude"),
     crs=4326) %>%
-  st_transform(crs = 32647)
+  st_transform(crs = 32647) %>%
+  mutate(HourOfDay = hour(incident_datetime))%>%
+  mutate(Month_num = month(incident_datetime)) %>%
+  mutate(Month_fac = month(incident_datetime,
+                       label = TRUE,
+                       abbr = TRUE)) %>%
+  mutate(dayofweek_num = weekdays(incident_datetime))%>%
+mutate(dayofweek_fac = as.numeric(format(incident_datetime, "%u")))
   
 
 ```
+
+## Administrative area
+
+tha_admbnda_adm3_rtsd_20220121
+
+```{r}
+#| eval: false
+adm = st_read(dsn = "data/rawdata/", 
+                  layer = "tha_admbnda_adm3_rtsd_20220121")
+```
+
+Transform the data to the right CRS
+
+```{r}
+#| eval: false
+adm = st_transform(adm, 32647)
+```
+
+```{r}
+#| eval: false
+adm
+```
+
+## Roads
+
+```{r}
+#| eval: false
+roads = st_read(dsn = "data/rawdata/", 
+                  layer = "hotosm_tha_roads_lines_shp")
+  
+```
 :::
+
+MAKING RDS FILES
+
+::: panel-tabset
+## Accidents
+
+```{r}
+#| eval: false
+write_rds(rdacc_sf, "data/rds/rdacc_sf.rds")
+```
+
+```{r}
+rdacc_sf = read_rds("data/rds/rdacc_sf.rds")
+```
+
+## Adm
+
+```{r}
+#| eval: false
+write_rds(adm, "data/rds/adm.rds")
+```
+
+```{r}
+adm = read_rds("data/rds/adm.rds")
+```
+
+## Roads
+
+```{r}
+#| eval: false
+write_rds(roads, "data/rds/roads.rds")
+```
+
+```{r}
+#| eval: false
+roads = read_rds("data/rds/roads.rds")
+```
+:::
+
+Taking a "glimpse" at the data
+
+::: panel-tabset
+## Accidents
+
+```{r}
+glimpse(rdacc_sf)
+```
+
+## Administrative Area
+
+```{r}
+glimpse(adm)
+```
+
+## Roads
+
+```{r}
+#| eval: false
+glimpse(roads)
+```
+:::
+
+## Thailand
+
+```{r}
+#| eval: false
+plot(adm$geometry)
+```
+
+our data still has all the provinces of thailand which we dont need, we only need the bankok metropolitan region. This means we will have to exclude some of the data.
+
+First we create a list of the Bankok Metropolan area
+
+```{r}
+BMRC = c("Bangkok", "Nakhon Pathom", "Nonthaburi", "Pathum Thani", "Samut Prakan", "Samut Sakhon")
+```
+
+then we create a subset of the dataset to focus our data to our use case
+
+```{r}
+BMR = subset(adm, ADM1_EN %in% BMRC)
+```
+
+We can do the same for the accidents dataset since we don't need the data from outside the region of study
+
+```{r}
+BMRACC = subset(rdacc_sf, province_en %in% BMRC)
+```
+
+And we write both smaller data sets to our rds folder BMR
+
+```{r}
+#| eval: false
+write_rds(BMR, "data/rds/BMR.rds")
+```
+
+Accidents
+
+```{r}
+#| eval: false
+write_rds(BMRACC, "data/rds/BMRACC.rds")
+```
+
+##The Bankok Metropolitan Region
+
+```{r}
+plot(st_geometry(BMR))
+```
+
+Different parts of the region
+
+```{r}
+plot(BMR["ADM1_EN"])
+```
+
+We can also make sub sets of the different parts of the region
+
+```{r}
+bk <- BMR %>%
+  filter(ADM1_EN == "Bangkok")
+nhb <- BMR %>%
+  filter(ADM1_EN == "Nonthaburi")
+np <- BMR %>%
+  filter(ADM1_EN == "Nakhon Pathom")
+pt <- BMR %>%
+  filter(ADM1_EN == "Pathum Thani")
+sp <- BMR %>%
+  filter(ADM1_EN == "Samut Prakan")
+ss <- BMR %>%
+  filter(ADM1_EN == "Samut Sakhon")
+```
+
+::: panel-tabset
+## Bangkok
+
+```{r}
+plot(st_geometry(bk))
+```
+
+```{r}
+plot(bk["ADM2_EN"])
+```
+
+## Nonthaburi
+
+```{r}
+plot(st_geometry(nhb))
+```
+
+## Pathum Thani
+
+```{r}
+plot(st_geometry(pt))
+```
+
+## Samut Praka
+
+```{r}
+plot(st_geometry(sp))
+```
+
+## Samut Sakhon
+
+```{r}
+plot(st_geometry(ss))
+```
+:::
+
+Now we look at the different accidents in the BMR
+
+```{r}
+tmap_mode('plot')
+tm_shape(BMR)+
+  tm_polygons() +
+tm_shape(BMRACC) +
+  tm_dots(size = 0.1) 
+
+```
+
+And the interactive map
+
+```{r}
+tmap_mode('view')
+tm_shape(BMRACC)+
+  tm_dots()
+```
+
+```{r}
+tmap_mode('plot')
+```
+
+# Spatio-Temporal Point Patterns Analysis
+
+## Overview
+
+### The research questions
+
+The specific questions we would like to answer are:
+
+are the locations of the traffic accidents in Bangkok Metropolitan Region spatial and spatio-temporally independent? if the answer is NO, where and when the observed traffic accidents locations tend to cluster?
+
+### Converting OWIN
+
+Next, as.owin() is used to convert BMR into an owin object.
+
+```{r}
+bmr_owin = as.owin(BMR)
+bmr_owin
+```
+
+Next, class() is used to confirm if the output is indeed an owin object.
+
+```{r}
+class(bmr_owin)
+```
+
+## Preparing Traffic Accident Data
+
+Above we already have imported the traffic accident data and made it focus on our study area
+
+## Visualising the Traffic Accidents
+
+### Overall Plot
+
+This plot shows all traffic accidents in the region
+
+```{r}
+tmap_mode('plot')
+tm_shape(BMR)+
+  tm_polygons() +
+tm_shape(BMRACC) +
+  tm_dots()
+```
+
+### Visuaising geographic distribution of traffic accidents by month
+
+```{r}
+tm_shape(BMR)+
+  tm_polygons() +
+tm_shape(BMRACC) +
+  tm_dots(size = 0.1) +
+tm_facets(by="Month_fac", 
+            free.coords=FALSE, 
+            drop.units = TRUE)
+```
+
+## Computing STKDE by Month/Season
+
+In this section, we will compute STKDE by using spattemp.density() of sparr package.
+
+Meteorological Seasons
+Spring: March-May
+Summer: June-August
+Autumn: September-November
+Winter: December-February
+
+::: panel-tabset
+### Extracting traffic accidents by month
+
+The code chunk below is used to remove the unwanted fields from fire_sf sf data.frame. This is because as.ppp() only need the mark field and geometry field from the input sf data.frame.
+
+```{r}
+acc_month <- BMRACC %>%
+  select(Month_num)
+```
+
+### Creating ppp
+
+The code chunk below is used to derive a ppp object called acc_month from acc_month sf data.frame.
+
+```{r}
+acc_month_ppp = as.ppp(acc_month)
+acc_month_ppp
+```
+
+```{r}
+summary(acc_month_ppp)
+```
+
+```{r}
+any(duplicated(acc_month_ppp))
+```
+
+```{r}
+sum(multiplicity(acc_month_ppp) > 1)
+```
+
+JITTERING
+
+```{r}
+acc_month_ppp_jit = rjitter(acc_month_ppp,
+                            retry =TRUE,
+                            nsim=1,
+                            drop=TRUE)
+```
+
+```{r}
+any(duplicated(acc_month_ppp_jit))
+```
+
+### Including Owin Object
+
+The code chunk below is used to combine ppp and owin objects into one.
+
+```{r}
+acc_month_owin = acc_month_ppp[bmr_owin]
+summary(acc_month_owin)
+```
+
+As a good practice, plot() is used to plot ff_owin so that we can examine the correctness of the output object.
+
+```{r}
+plot(acc_month_owin)
+```
+
+### Computing Spatio-temporal KDE
+
+Next, spatttemp.density() of sparr package is used to compute the STKDE.
+
+```{r}
+st_kde = spattemp.density(acc_month_owin)
+summary(st_kde)
+```
+
+### Plotting the spatio-temporal KDE object
+
+In the code chunk below, plot() of R base is used to the KDE
+### Spring
+```{r}
+tims <- c(3,4,5)
+#par(mfcol=c(4,3))
+for(i in tims){ 
+  plot(st_kde, i, 
+       override.par=FALSE, 
+       fix.range=TRUE, 
+       main=paste("KDE at month",i))
+}
+
+```
+### Summer
+```{r}
+tims <- c(6,7,8)
+#par(mfcol=c(2,3))
+for(i in tims){ 
+  plot(st_kde, i, 
+       override.par=FALSE, 
+       fix.range=TRUE, 
+       main=paste("KDE at month",i))
+}
+
+```
+### Autumn
+```{r}
+tims <- c(9,10,11)
+#par(mfcol=c(2,3))
+for(i in tims){ 
+  plot(st_kde, i, 
+       override.par=FALSE, 
+       fix.range=TRUE, 
+       main=paste("KDE at month",i))
+}
+
+```
+### Winter
+```{r}
+tims <- c(12,1,2)
+#par(mfcol=c(2,3))
+for(i in tims){ 
+  plot(st_kde, i, 
+       override.par=FALSE, 
+       fix.range=TRUE, 
+       main=paste("KDE at month",i))
+}
+
+```
+:::
+
+
+
+
+
+## Computing STKDE by traffic accidents by day of week
+
+In this section, we will compute the STKDE of traffic accidents by 
+
+### Creating ppp object
+
+In the code chunk below, DayofWeek field is included in the output ppp object.
+
+```{r}
+acc_wday_ppp <- BMRACC %>% 
+  select(dayofweek_fac) %>%
+  as.ppp()
+```
+
+### Including Owin object
+
+Next, code chunk below is used to combine the ppp object and the owin object.
+
+```{r}
+acc_wday_owin <- acc_wday_ppp[bmr_owin]
+summary(acc_wday_owin)
+```
+
+```{r}
+kde_wday <- spattemp.density(
+  acc_wday_owin)
+summary(kde_wday)
+```
+
+```{r}
+plot(kde_wday)
+```
+
+## Computing STKDE by Day of Year: Improved method
+
+One of the nice function provides in sparr package is BOOT.spattemp(). It support bandwidth selection for standalone spatiotemporal density/intensity based on bootstrap estimation of the MISE, providing an isotropic scalar spatial bandwidth and a scalar temporal bandwidth.
+
+Code chunk below uses BOOT.spattemp() to determine both the spatial bandwidth and the scalar temporal bandwidth.
+
+```{r}
+#| eval: false
+set.seed(1234)
+BOOT.spattemp(acc_yday_owin) 
+```
+
+### Computing Spatio-temporal KDE
+
+Now, the STKDE will be derived by using h and lambda values derive in previous step.
+
+```{r}
+#| eval: false
+kde_yday = spattempt.density(
+  acc_yday_owin,
+  h = GETAL,
+  lambda = GETAL )
+summary(kde_yday)
+)
+```
+
+### Plotting the output spatio-temporal KDE
+
+last, plot() of sparr package is used to plot the output as shown below.
+
+```{r}
+#| eval: false
+plot(kde_yday)
+```
+
+Geospatial data wrangling
+
+Converting from sf format into spatstat’s ppp format
+
+```{r}
+BMRACC_ppp = as.ppp(BMRACC)
+BMRACC_ppp
+```
+
+```{r}
+plot(BMRACC_ppp)
+```
+
+```{r}
+summary(BMRACC_ppp)
+```
+
+```{r}
+any(duplicated(BMRACC_ppp))
+```
+
+```{r}
+multiplicity(BMRACC_ppp)
+```
+
+```{r}
+sum(multiplicity(BMRACC_ppp) > 1)
+```
+
+```{r}
+bmr_owin = as.owin(BMR)
+```
+
+```{r}
+plot(bmr_owin)
+```
+
+```{r}
+summary(bmr_owin)
+```
+
+```{r}
+BMRACCMAP_ppp = BMRACC_ppp[bmr_owin] 
+```
+
+```{r}
+summary(BMRACCMAP_ppp)
+```
+
+```{r}
+plot(BMRACCMAP_ppp)
+```
+
+```{r}
+bk_owin = as.owin(bk)
+nhb_owin = as.owin(nhb)
+np_owin = as.owin(np)
+pt_owin = as.owin(pt)
+sp_owin = as.owin(sp)
+ss_owin = as.owin(ss)
+```
+
+```{r}
+accidents_bk_ppp = BMRACC_ppp[bk_owin] 
+accidents_nhb_ppp = BMRACC_ppp[nhb_owin]
+accidents_np_ppp = BMRACC_ppp[np_owin] 
+accidents_pt_ppp = BMRACC_ppp[pt_owin] 
+accidents_sp_ppp = BMRACC_ppp[sp_owin]
+accidents_ss_ppp = BMRACC_ppp[ss_owin]
+```
+
+```{r}
+plot(accidents_bk_ppp)
+```
+
+```{r}
+plot(accidents_bk_ppp, main="Bangkok" )
+plot(accidents_nhb_ppp, main="Nonthaburi")
+plot(accidents_np_ppp, main="Nakhon Pathom")  
+plot(accidents_pt_ppp, main="Pathum Thani") 
+plot(accidents_sp_ppp, main="Samut Prakan")
+plot(accidents_ss_ppp, main="Samut Sakhon")
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
 
 ```{r}
 
