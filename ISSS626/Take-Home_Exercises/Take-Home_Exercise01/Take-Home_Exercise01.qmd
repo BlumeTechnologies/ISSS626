@@ -71,6 +71,9 @@ Study Area is Bangkok Metropolitan Region
 
 WGS 84 UTM zone 47N EPSG code of bangkok: 32647
 
+
+
+
 ## 2.3 Loading the tools needed in R
 
 The code chunk below uses pacman to install and load the sf, raster, spatstat, tmap, tidyverse and ......... tools
@@ -171,10 +174,39 @@ adm
 ## Roads
 
 ```{r}
-#| eval: false
-roads = st_read(dsn = "data/rawdata/", 
-                  layer = "hotosm_tha_roads_lines_shp")
+##| eval: false
+#roads = st_read(dsn = "data/rawdata/", 
+#                 layer = "hotosm_tha_roads_lines_shp")
   
+#st_set_crs(roads, 32647)
+
+
+
+```
+
+```{r}
+#useroads = c("motorway", "trunk","primary","secondary","tertiary","unclassified","residential","service")
+#network = subset(roads, highway %in% useroads)
+#network <- subset(network, select = -c(name, surface, smoothness, width, lanes, oneway, bridge, layer, source, name_th))
+
+```
+```{r}
+#st_crs(network) = 32647
+```
+```{r}
+#u = st_union(BMR)
+#plot(u)
+```
+st_crs(network) = 32647
+```{r}
+
+# assume 'roads' is your multilinestring data and 'study_area' is your polygon data
+#roads_clipped <- st_intersection(network, u)
+```
+```{r}
+# now 'roads_clipped' will only contain the roads that are within your study area
+#network_clipped2 = network[st_within(network, u, sparse = FALSE),]
+
 ```
 :::
 
@@ -206,13 +238,13 @@ adm = read_rds("data/rds/adm.rds")
 ## Roads
 
 ```{r}
-#| eval: false
-write_rds(roads, "data/rds/roads.rds")
+##| eval: false
+#write_rds(roads, "data/rds/roads.rds")
 ```
 
 ```{r}
-#| eval: false
-roads = read_rds("data/rds/roads.rds")
+##| eval: false
+#roads = read_rds("data/rds/roads.rds")
 ```
 :::
 
@@ -234,8 +266,8 @@ glimpse(adm)
 ## Roads
 
 ```{r}
-#| eval: false
-glimpse(roads)
+##| eval: false
+#glimpse(roads)
 ```
 :::
 
@@ -359,9 +391,10 @@ tm_shape(BMRACC) +
 And the interactive map
 
 ```{r}
-tmap_mode('view')
+tmap_mode('plot')
 tm_shape(BMRACC)+
   tm_dots()
+
 ```
 
 ```{r}
@@ -377,6 +410,7 @@ tmap_mode('plot')
 The specific questions we would like to answer are:
 
 are the locations of the traffic accidents in Bangkok Metropolitan Region spatial and spatio-temporally independent? if the answer is NO, where and when the observed traffic accidents locations tend to cluster?
+
 
 ### Converting OWIN
 
@@ -427,11 +461,7 @@ tm_facets(by="Month_fac",
 
 In this section, we will compute STKDE by using spattemp.density() of sparr package.
 
-Meteorological Seasons
-Spring: March-May
-Summer: June-August
-Autumn: September-November
-Winter: December-February
+Meteorological Seasons Spring: March-May Summer: June-August Autumn: September-November Winter: December-February
 
 ::: panel-tabset
 ### Extracting traffic accidents by month
@@ -503,8 +533,8 @@ summary(st_kde)
 
 ### Plotting the spatio-temporal KDE object
 
-In the code chunk below, plot() of R base is used to the KDE
-### Spring
+In the code chunk below, plot() of R base is used to the KDE ### Spring
+
 ```{r}
 tims <- c(3,4,5)
 #par(mfcol=c(4,3))
@@ -516,7 +546,9 @@ for(i in tims){
 }
 
 ```
+
 ### Summer
+
 ```{r}
 tims <- c(6,7,8)
 #par(mfcol=c(2,3))
@@ -528,7 +560,9 @@ for(i in tims){
 }
 
 ```
+
 ### Autumn
+
 ```{r}
 tims <- c(9,10,11)
 #par(mfcol=c(2,3))
@@ -540,7 +574,9 @@ for(i in tims){
 }
 
 ```
+
 ### Winter
+
 ```{r}
 tims <- c(12,1,2)
 #par(mfcol=c(2,3))
@@ -554,13 +590,9 @@ for(i in tims){
 ```
 :::
 
-
-
-
-
 ## Computing STKDE by traffic accidents by day of week
 
-In this section, we will compute the STKDE of traffic accidents by 
+In this section, we will compute the STKDE of traffic accidents by
 
 ### Creating ppp object
 
@@ -591,40 +623,97 @@ summary(kde_wday)
 plot(kde_wday)
 ```
 
-## Computing STKDE by Day of Year: Improved method
 
-One of the nice function provides in sparr package is BOOT.spattemp(). It support bandwidth selection for standalone spatiotemporal density/intensity based on bootstrap estimation of the MISE, providing an isotropic scalar spatial bandwidth and a scalar temporal bandwidth.
+## Computing STKDE by time of day
 
-Code chunk below uses BOOT.spattemp() to determine both the spatial bandwidth and the scalar temporal bandwidth.
+In this section, we will compute STKDE by using spattemp.density() of sparr package.
+
+
+::: panel-tabset
+### Extracting traffic accidents by Time of day
+
+The code chunk below is used to remove the unwanted fields from hod_sf sf data.frame. This is because as.ppp() only need the mark field and geometry field from the input sf data.frame.
 
 ```{r}
-#| eval: false
-set.seed(1234)
-BOOT.spattemp(acc_yday_owin) 
+acc_hod <- BMRACC %>%
+  select(HourOfDay)
+```
+
+### Creating ppp
+
+The code chunk below is used to derive a ppp object called acc_month from acc_month sf data.frame.
+
+```{r}
+acc_hod_ppp = as.ppp(acc_hod)
+acc_hod_ppp
+```
+
+```{r}
+summary(acc_hod_ppp)
+```
+
+```{r}
+any(duplicated(acc_hod_ppp))
+```
+
+```{r}
+sum(multiplicity(acc_hod_ppp) > 1)
+```
+
+JITTERING
+
+```{r}
+acc_hod_ppp_jit = rjitter(acc_hod_ppp,
+                            retry =TRUE,
+                            nsim=1,
+                            drop=TRUE)
+```
+
+```{r}
+any(duplicated(acc_hod_ppp_jit))
+```
+
+### Including Owin Object
+
+The code chunk below is used to combine ppp and owin objects into one.
+
+```{r}
+acc_hod_owin = acc_hod_ppp[bmr_owin]
+summary(acc_hod_owin)
+```
+
+As a good practice, plot() is used to plot ff_owin so that we can examine the correctness of the output object.
+
+```{r}
+plot(acc_hod_owin)
 ```
 
 ### Computing Spatio-temporal KDE
 
-Now, the STKDE will be derived by using h and lambda values derive in previous step.
+Next, spatttemp.density() of sparr package is used to compute the STKDE.
 
 ```{r}
-#| eval: false
-kde_yday = spattempt.density(
-  acc_yday_owin,
-  h = GETAL,
-  lambda = GETAL )
-summary(kde_yday)
-)
+st_kdehod = spattemp.density(acc_hod_owin)
+summary(st_kdehod)
 ```
 
-### Plotting the output spatio-temporal KDE
+### Plotting the spatio-temporal KDE object
 
-last, plot() of sparr package is used to plot the output as shown below.
+In the code chunk below, plot() of R base is used to the KDE
 
 ```{r}
-#| eval: false
-plot(kde_yday)
+tims <- c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
+par(mfcol=c(2,3))
+for(i in tims){ 
+  plot(st_kdehod, i, 
+       override.par=FALSE, 
+       fix.range=TRUE, 
+       main=paste("KDE at Hour",i))
+}
+
 ```
+
+
 
 Geospatial data wrangling
 
@@ -714,9 +803,17 @@ plot(accidents_ss_ppp, main="Samut Sakhon")
 
 ```
 
-```{r}
 
-```
+## Network constraint Spatial Point Pattern Analysis
+
+Network constrained Spatial Point Patterns Analysis (NetSPAA) is a collection of spatial point patterns analysis methods special developed for analysing spatial point event occurs on or alongside network. The spatial point event can be locations of traffic accident or childcare centre for example. The network, on the other hand can be a road network or river network.
+
+In this hands-on exercise, you are going to gain hands-on experience on using appropriate functions of spNetwork package:
+
+to derive network kernel density estimation (NKDE), and
+to perform network G-function and k-function analysis
+
+
 
 ```{r}
 

@@ -17,6 +17,7 @@ execute:
 Welcome to In-Class Exercise 2
 
 Installing Maptools
+
 ```{r}
 #| eval: false
 install.packages("maptools", repos = "https://packagemanager.posit.co/cran/2023-10-13")
@@ -28,52 +29,39 @@ in sf package therea re 2 function sallow us to combine multiple simple features
 
 ST_Union()
 
-sg_sf = mpsz_sf %>%
-  st_union()
-
-
+sg_sf = mpsz_sf %\>% st_union()
 
 ```{r}
 
 ```
 
+```{r}
+
+```
 
 ```{r}
 
 ```
 
+```{r}
+
+```
 
 ```{r}
 
 ```
 
+```{r}
+
+```
 
 ```{r}
 
 ```
 
-
 ```{r}
 
 ```
-
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
 
 ```{r}
 

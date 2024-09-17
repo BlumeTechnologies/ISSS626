@@ -157,7 +157,7 @@ Notice that all the geospatial layers are within the same map extend. This shows
 Alternatively, we can also prepare a pin map by using the code chunk below.
 
 ```{r}
-tmap_mode("view")
+tmap_mode("plot")
 tm_shape(childcare_sf) +
   tm_dots()
 ```
@@ -275,7 +275,7 @@ The output shows that there are 128 duplicated point events. (??????)
 To view the locations of these duplicate point events, we will plot `childcare` data by using the code chunk below.
 
 ```{r}
-tmap_mode('view')
+tmap_mode('plot')
 tm_shape(childcare) +
   tm_dots(alpha=0.4, 
           size=0.05)
