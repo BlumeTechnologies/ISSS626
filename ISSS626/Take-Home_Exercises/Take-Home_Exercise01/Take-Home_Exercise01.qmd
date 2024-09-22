@@ -72,11 +72,9 @@ Study Area is Bangkok Metropolitan Region
 WGS 84 UTM zone 47N EPSG code of bangkok: 32647
 
 
-
-
 ## 2.3 Loading the tools needed in R
 
-The code chunk below uses pacman to install and load the sf, raster, spatstat, tmap, tidyverse and ......... tools
+The code chunk below uses pacman to install and load the sf, raster, spatstat, tmap, tidyverse, sparr, and spNetwork tools
 
 ```{r}
 pacman::p_load(sf, raster, spatstat, sparr, tmap, tidyverse, spNetwork)
@@ -94,7 +92,6 @@ Explanations for the imported library:
 
 -   [Hmisc](https://www.rdocumentation.org/packages/Hmisc/versions/5.1-1) for summary statistics
 
--   [mapview](https://cran.r-project.org/web/packages/mapview/) for interactive map backgrouds
 
 -   [DT](https://rstudio.github.io/DT/) library to create interactive html tables
 
@@ -125,9 +122,8 @@ Make csv sf geometry must be linestring not multipleline detect driver behavior 
 select different regions from wikipedia of the region do the analysis of the regions like the previous exercise rds folder, make subsets in rds date time field posix incident datetime
 
 ::: panel-tabset
-## Aspatial
-
-EVAL USE WHEN DONT WANT TO RERUN CODE Because ppp object only accept numerical or character as mark. The code chunk below is used to convert data type of acq_date to numeric.
+## Accident Data
+Here we import the accident data and wrangle it so it can be used for our analytics.
 
 ```{r}
 #| eval: false
@@ -150,8 +146,7 @@ mutate(dayofweek_fac = as.numeric(format(incident_datetime, "%u")))
 ```
 
 ## Administrative area
-
-tha_admbnda_adm3_rtsd_20220121
+We import the following dataset as it contains all sub sections of the administrative area aswell: tha_admbnda_adm3_rtsd_20220121
 
 ```{r}
 #| eval: false
@@ -159,59 +154,34 @@ adm = st_read(dsn = "data/rawdata/",
                   layer = "tha_admbnda_adm3_rtsd_20220121")
 ```
 
-Transform the data to the right CRS
+And we transform the data to the right CRS
 
 ```{r}
 #| eval: false
 adm = st_transform(adm, 32647)
 ```
 
+Here we show the dataset
 ```{r}
 #| eval: false
 adm
 ```
 
 ## Roads
-
+And the roads.
 ```{r}
-##| eval: false
-#roads = st_read(dsn = "data/rawdata/", 
-#                 layer = "hotosm_tha_roads_lines_shp")
-  
-#st_set_crs(roads, 32647)
-
+#| eval: false
+roads = st_read(dsn = "data/rawdata/", 
+                 layer = "hotosm_tha_roads_lines_shp")
 
 
 ```
 
-```{r}
-#useroads = c("motorway", "trunk","primary","secondary","tertiary","unclassified","residential","service")
-#network = subset(roads, highway %in% useroads)
-#network <- subset(network, select = -c(name, surface, smoothness, width, lanes, oneway, bridge, layer, source, name_th))
 
-```
-```{r}
-#st_crs(network) = 32647
-```
-```{r}
-#u = st_union(BMR)
-#plot(u)
-```
-st_crs(network) = 32647
-```{r}
-
-# assume 'roads' is your multilinestring data and 'study_area' is your polygon data
-#roads_clipped <- st_intersection(network, u)
-```
-```{r}
-# now 'roads_clipped' will only contain the roads that are within your study area
-#network_clipped2 = network[st_within(network, u, sparse = FALSE),]
-
-```
 :::
 
-MAKING RDS FILES
-
+## MAKING RDS FILES
+Now we are creating and reading RDS files for different datasets, specifically for accidents, administrative boundaries, and roads. Also we're performing some data manipulation on the roads dataset, such as filtering and selecting specific columns, and setting the coordinate reference system (CRS) to 4326.
 ::: panel-tabset
 ## Accidents
 
@@ -221,6 +191,7 @@ write_rds(rdacc_sf, "data/rds/rdacc_sf.rds")
 ```
 
 ```{r}
+
 rdacc_sf = read_rds("data/rds/rdacc_sf.rds")
 ```
 
@@ -238,15 +209,29 @@ adm = read_rds("data/rds/adm.rds")
 ## Roads
 
 ```{r}
-##| eval: false
-#write_rds(roads, "data/rds/roads.rds")
+#| eval: false
+write_rds(roads, "data/rds/roads.rds")
 ```
 
 ```{r}
-##| eval: false
-#roads = read_rds("data/rds/roads.rds")
+#| eval: false
+roads = read_rds("data/rds/roads.rds")
 ```
+
+
+```{r}
+#| eval: false
+useroads = c("motorway","primary","secondary")
+network = subset(roads, highway %in% useroads)
+network <- subset(network, select = -c(name, surface, smoothness, width, lanes, oneway, bridge, layer, source, name_th))
+network <- st_set_crs(network, 4326)
+
+
+```
+
+
 :::
+
 
 Taking a "glimpse" at the data
 
@@ -254,6 +239,7 @@ Taking a "glimpse" at the data
 ## Accidents
 
 ```{r}
+#| eval: false
 glimpse(rdacc_sf)
 ```
 
@@ -266,12 +252,12 @@ glimpse(adm)
 ## Roads
 
 ```{r}
-##| eval: false
-#glimpse(roads)
+#| eval: false
+glimpse(network)
 ```
 :::
 
-## Thailand
+# Thailand
 
 ```{r}
 #| eval: false
@@ -304,21 +290,50 @@ And we write both smaller data sets to our rds folder BMR
 #| eval: false
 write_rds(BMR, "data/rds/BMR.rds")
 ```
+```{r}
+read_rds("data/rds/BMR.rds")
+```
+## fixing roads
+We use st union on the administrative boundary to get the outline of the BMR
+```{r}
+u = st_union(BMR)
+u = st_transform(u, 4326)
+plot(u)
+```
 
-Accidents
+```{r}
+#| eval: false
+# assume 'roads' is your multilinestring data and 'study_area' is your polygon data
+network <- st_intersection(network , u)
+```
+
+```{r}
+#| eval: false
+write_rds(network, "data/rds/network.rds")
+```
+
+```{r}
+##| eval: false
+network = read_rds("data/rds/network.rds")
+```
+
+## Roads plotted
+```{r}
+plot(network$geometry)
+```
+
+## Accidents
 
 ```{r}
 #| eval: false
 write_rds(BMRACC, "data/rds/BMRACC.rds")
 ```
 
-##The Bankok Metropolitan Region
-
-```{r}
-plot(st_geometry(BMR))
-```
+## The Bangkok Metropolitan Region
+The Bangkok Metropolitan Region is the urban region surrounding the metropolis of Bangkok. The area covers an area of 7,762 km2 and has a population of 17,400,000.
 
 Different parts of the region
+There region consists out of 6 subregions named: Bangkok, Nothaburi, Nakhon Pathom, Pathum Thani, Samut Prakan, and Samut Sakhon
 
 ```{r}
 plot(BMR["ADM1_EN"])
@@ -348,23 +363,22 @@ ss <- BMR %>%
 plot(st_geometry(bk))
 ```
 
-```{r}
-plot(bk["ADM2_EN"])
-```
-
 ## Nonthaburi
 
 ```{r}
 plot(st_geometry(nhb))
 ```
-
+## Nakhon Pathom
+```{r}
+plot(st_geometry(np))
+```
 ## Pathum Thani
 
 ```{r}
 plot(st_geometry(pt))
 ```
 
-## Samut Praka
+## Samut Prakan
 
 ```{r}
 plot(st_geometry(sp))
@@ -384,21 +398,43 @@ tmap_mode('plot')
 tm_shape(BMR)+
   tm_polygons() +
 tm_shape(BMRACC) +
-  tm_dots(size = 0.1) 
+  tm_dots(size = 0.1, col = "red") 
 
 ```
+Re-assigning the EPSG code
+::: pannel-tabset
+## BMR
+```{r}
+BMR32647 <- st_set_crs(BMR, 32647)
+BMR32647 = st_transform(BMR32647, crs = 32647)
+```
+## ACC
+```{r}
+BMRACC32647 <- st_set_crs(BMRACC, 32647)
+BMRACC32647 = st_transform(BMRACC32647, crs = 32647)
+```
+## Network
+```{r}
+network32647 <- st_set_crs(network, 32647)
+network32647 = st_transform(network32647, crs = 32647)
 
-And the interactive map
+```
+:::
 
 ```{r}
-tmap_mode('plot')
-tm_shape(BMRACC)+
-  tm_dots()
-
+BMR_ACC = st_join(BMR32647, BMRACC32647, by = c("ADM1_EN" = "province_en"))
 ```
 
 ```{r}
-tmap_mode('plot')
+tmap_mode("plot")
+qtm(BMR_ACC, 
+    fill = "number_of_injuries")
+```
+
+```{r}
+tm_shape(BMR_ACC)+
+  tm_polygons("number_of_vehicles_involved")
+
 ```
 
 # Spatio-Temporal Point Patterns Analysis
@@ -533,7 +569,8 @@ summary(st_kde)
 
 ### Plotting the spatio-temporal KDE object
 
-In the code chunk below, plot() of R base is used to the KDE ### Spring
+In the code chunk below, plot() of R base is used to the KDE 
+### Spring
 
 ```{r}
 tims <- c(3,4,5)
@@ -737,6 +774,7 @@ any(duplicated(BMRACC_ppp))
 ```
 
 ```{r}
+#| eval: false
 multiplicity(BMRACC_ppp)
 ```
 
@@ -799,16 +837,12 @@ plot(accidents_sp_ppp, main="Samut Prakan")
 plot(accidents_ss_ppp, main="Samut Sakhon")
 ```
 
-```{r}
 
-```
 
 
 ## Network constraint Spatial Point Pattern Analysis
 
 Network constrained Spatial Point Patterns Analysis (NetSPAA) is a collection of spatial point patterns analysis methods special developed for analysing spatial point event occurs on or alongside network. The spatial point event can be locations of traffic accident or childcare centre for example. The network, on the other hand can be a road network or river network.
-
-In this hands-on exercise, you are going to gain hands-on experience on using appropriate functions of spNetwork package:
 
 to derive network kernel density estimation (NKDE), and
 to perform network G-function and k-function analysis
@@ -816,41 +850,195 @@ to perform network G-function and k-function analysis
 
 
 ```{r}
+# |eval: false
+# loading the road network
+
+tm_shape(network) + 
+  tm_lines(col = "black") + 
+  tm_shape(BMRACC) + 
+  tm_dots(col = "red", size = 0.1)+
+  tm_shape(BMR)+
+  tm_polygons()
+```
+First we plot the road network and the accidents
+```{r}
+plot(st_geometry(network))+
+plot(BMRACC,add=T,col='red',pch = 19)
+```
+Then we need to change the network geometry to line string to enable the nkde to be possible.
+
+```{r}
+network <- st_cast(network, "LINESTRING")
+```
+Now we will create the lixels.
+```{r}
+lixels <- lixelize_lines(network, 
+                         700, 
+                         mindist = 375)
+```
+
+Continuing we create the variable samples.
+```{r}
+samples <- lines_center(lixels) 
+```
+And we make sure the data sets are in the same CRS.
+```{r}
+samples = st_transform(samples, 32647)
+```
+```{r}
+network = st_transform(network, 32647)
+```
+
+
+Now we render the NKDE
+Due to the limited processing power of my laptop this process is not fully possible on my system.
+```{r}
+densities <- nkde(network, 
+                  events = BMRACC,
+                  w = rep(1, nrow(BMRACC)),
+                  samples = samples,
+                  kernel_name = "quartic",
+                  bw = 300, 
+                  div= "bw", 
+                  method = "simple", 
+                  digits = 1, 
+                  tol = 1,
+                  grid_shape = c(1,1), 
+                  max_depth = 8,
+                  agg = 100,
+                  sparse = TRUE,
+                  verbose = FALSE)
+```
+
+```{r}
+samples$density <- densities
+lixels$density <- densities
+```
+
+rescaling to help the mapping
+
+```{r}
+
+# rescaling to help the mapping
+samples$density <- samples$density*10000
+lixels$density <- lixels$density*10000
+```
+Now we plot the NKDE and we see the heatmap on the network roadmap
+
+```{r}
+tmap_mode('plot')
+tm_shape(BMR)+
+  tm_polygons(col = "ADM1_EN", lwd = 0.5, title = "Province")+
+tm_shape(lixels)+
+  tm_lines(col="density", lwd = 2, title.col = "Per km2", palette = "-inferno")+
+  tm_shape(filter(lixels, density == 0)) +
+  tm_lines(col="grey", lwd = 2, alpha = 0.2)+
+  tm_scale_bar() +
+  tm_grid(alpha =0.2) +
+tm_layout(title = "Traffic accidents density map",legend.outside = TRUE)
 
 ```
+::: panel-tabset
+## Per month
+```{r}
+tmap_mode('plot')
+tm_shape(BMR)+
+  tm_polygons(col = "ADM1_EN", lwd = 0.5, title = "Province")+
+tm_shape(BMRACC) +
+  tm_dots(size = 0.01)  +
+tm_facets(by="Month_fac", 
+            free.coords=FALSE, 
+            drop.units = TRUE)+
+tm_shape(lixels)+
+  tm_lines(col="density", lwd = 2, title.col = "Per km2", palette = "-inferno")+
+  tm_shape(filter(lixels, density == 0)) +
+  tm_lines(col="grey", lwd = 2, alpha = 0.2)+
+  tm_scale_bar() +
+  tm_grid(alpha =0.2) +
+tm_layout(title = "Traffic accidents density map",legend.outside = TRUE)
+```
+## Per Hour of Day
+```{r}
+tmap_mode('plot')
+tm_shape(BMR)+
+  tm_polygons(col = "ADM1_EN", lwd = 0.5, title = "Province")+
+tm_shape(BMRACC) +
+  tm_dots(size = 0.01)  +
+tm_facets(by="HourOfDay", 
+            free.coords=FALSE, 
+            drop.units = TRUE)+
+tm_shape(lixels)+
+  tm_lines(col="density", lwd = 2, title.col = "Per km2", palette = "-inferno")+
+  tm_shape(filter(lixels, density == 0)) +
+  tm_lines(col="grey", lwd = 2, alpha = 0.2)+
+  tm_scale_bar() +
+  tm_grid(alpha =0.2) +
+tm_layout(title = "Traffic accidents density map",legend.outside = TRUE)
+```
+
+## Per Day of Week
+```{r}
+
+
+tmap_mode('plot')
+tm_shape(BMR)+
+  tm_polygons(col = "ADM1_EN", lwd = 0.5, title = "Province")+
+tm_shape(BMRACC) +
+  tm_dots(size = 0.01)  +
+tm_facets(by="dayofweek_num", 
+            free.coords=FALSE, 
+            drop.units = TRUE)+
+tm_shape(lixels)+
+  tm_lines(col="density", lwd = 2, title.col = "Per km2", palette = "-inferno")+
+  tm_shape(filter(lixels, density == 0)) +
+  tm_lines(col="grey", lwd = 2, alpha = 0.2)+
+  tm_scale_bar() +
+  tm_grid(alpha =0.2) +
+tm_layout(title = "Traffic accidents density map",legend.outside = TRUE)
+```
+:::
+# Network Constrained G- and K-Function Analysis
+In this section, we are going to perform complete spatial randomness (CSR) test by using kfunctions() of spNetwork package. The null hypothesis is defined as:
+
+Ho: The observed spatial point events (i.e distribution of accidents) are uniformly distributed over a street network in Bangkok Metropolitan Region.
+
+NOTE: due to the following error i was not able to finish the last section: Error in kfunctions(network, BMRACC, start = 0, end = 1000, agg = 2e+05,  : 
+  After snapping the points on the network, some of them share the same location.
+         To correct it, please consider setting or increasing the value of the parameter agg.
+         They will be merged and their weights added)
+
+```{r}
+#| eval: false
+kfun_BMRACC <- kfunctions(network, 
+                             BMRACC,
+                             start = 0, 
+                             end = 1000, 
+                             agg = 200000,
+                             step = 50, 
+                             width = 50, 
+                             nsim = 50, 
+                             resolution = 50,
+                             verbose = FALSE, 
+                             conf_int = 0.05)
+
+```
+
+
+```{r}
+#| eval: false
+kfun_BMRACC$plotk
+```
+
+
+The blue line is the empirical network K-function of the accidents in Bangkok Metropolitan Region. The gray envelop represents the results of the 50 simulations in the interval 2.5% - 97.5%. Because the blue line between the distance of 250m-400m are below the gray area, we can infer that the traffic accidents in bmr area resemble regular pattern at the distance of 250m-400m.
 
 ```{r}
 
 ```
+# Conclusion
+We have used different techniques to explore and analyse the different road accidents in the Bangkok metropolitan region. From this we can see that most accidents tend to happen at night as well as in the winter months. 
 
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
+By using the network constrained methods, we can see that most accidents also occur on the bigger roads connecting Bankok with 
 ```{r}
 
 ```
