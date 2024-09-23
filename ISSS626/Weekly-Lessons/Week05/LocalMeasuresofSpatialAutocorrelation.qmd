@@ -1,0 +1,11 @@
+---
+title: "Hands-on Exercise 5: Local Measures of Spatial Autocorrelation"
+author: "Pelle Knegjes"
+date: "Sep 23 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---

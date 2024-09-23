@@ -1,0 +1,308 @@
+---
+title: "In-Class Exercise 05"
+author: "Pelle Knegjes"
+format: html
+editor: visual
+date: "Aug 23 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+```{r}
+pacman::p_load(sf, spdep, tmap, tidyverse, sfdep)
+```
+
+```{r}
+hunan <- st_read(dsn = "data/geospatial", 
+                 layer = "Hunan")
+```
+
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+```{r}
+hunan <- left_join(hunan,hunan2012) %>%
+  select(1:4, 7, 15)
+```
+```{r}
+equal <- tm_shape(hunan) +
+  tm_fill("GDPPC",
+          n = 5,
+          style = "equal", palette = "Blues") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Equal interval classification")
+
+quantile <- tm_shape(hunan) +
+  tm_fill("GDPPC",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Equal quantile classification")
+
+tmap_arrange(equal, 
+             quantile, 
+             asp=1, 
+             ncol=2)
+```
+
+```{r}
+set.seed(1234)
+```
+
+```{r}
+wm_q = hunan %>%
+  mutate(nb = st_contiguity(geometry),
+         wt = st_weights(nb,
+                         style = "W"),
+         .before = 1)
+```
+
+```{r}
+moranI = global_moran_test(wm_q$GDPPC,
+                           wm_q$nb,
+                           wm_q$wt)
+```
+
+
+```{r}
+global_moran_perm(wm_q$GDPPC,
+                  wm_q$nb,
+                  wm_q$wt,
+                  nsim = 99)
+```
+
+
+```{r}
+lisa = wm_q %>%
+  mutate(local_moran = local_moran(
+    GDPPC, nb , wt, nsim = 99),
+    .before = 1) %>%
+  unnest(local_moran)
+```
+
+
+
+```{r}
+map1 = tm_shape(lisa)+
+  tm_fill("ii")+
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8))+
+  tm_layout(main.title = "local Moran's O pf GDPPC",
+            main.title.size = 2)
+
+map2 = tm_shape(lisa) +
+  tm_fill("p_ii",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+            labels = c("0", "0.001", "0.01", "0.05", "1")
+          )
+
+
+
+tmap_arrange(map1, map2, ncol = 2)
+```
+
+
+GETTING SIGNIF
+
+#```{r}
+lisa_sig = lisa %>%
+  filter(p_ii < 0.05)
+tm_shape(lisa)+
+  tm_fill
+tm_shape(lisa_sig)
+
+#```
+
+
+#```{r}
+HCSA = wm_idw %>%
+  mutate(local_Gi = local_gstar_perm(
+    GDPPC, nb, wt, nsim = 99),
+    .before = 1) %>%
+  unnest(local_Gi)
+HCSA
+  
+#```
+ERROR AT VIS HOT SPOT AT FILL G_STAR
+should be tm_fill("cluster")
+
+#```{r}
+tm_shape = 
+#```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
