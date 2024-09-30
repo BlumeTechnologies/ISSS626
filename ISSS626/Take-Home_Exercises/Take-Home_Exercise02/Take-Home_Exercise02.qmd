@@ -49,3 +49,17 @@ For the purpose of this take-home exercise, two data sets shall be used, they ar
 -   [Thailand Domestic Tourism Statistics](https://www.kaggle.com/datasets/thaweewatboy/thailand-domestic-tourism-statistics) at Kaggle. You are required to use **version 2** of the data set.
 
 -   [Thailand - Subnational Administrative Boundaries](https://data.humdata.org/dataset/cod-ab-tha?) at HDX. You are required to use the province boundary data set.
+
+need to combine small islands to make sure the centroid is not in the ocean
+
+look at multiple key indicators of trousism
+
+space time cross sectional before covid, during covid, after covid
+
+keep time series at month year level
+
+How to interpet:
+
+Look at articles
+
+spacetimebox needs to be interger for months

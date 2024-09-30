@@ -177,11 +177,11 @@ roads = st_read(dsn = "data/rawdata/",
 
 ```
 
-
 :::
 
 ## MAKING RDS FILES
 Now we are creating and reading RDS files for different datasets, specifically for accidents, administrative boundaries, and roads. Also we're performing some data manipulation on the roads dataset, such as filtering and selecting specific columns, and setting the coordinate reference system (CRS) to 4326.
+
 ::: panel-tabset
 ## Accidents
 
@@ -228,7 +228,6 @@ network <- st_set_crs(network, 4326)
 
 
 ```
-
 
 :::
 
@@ -402,7 +401,9 @@ tm_shape(BMRACC) +
 
 ```
 Re-assigning the EPSG code
+
 ::: pannel-tabset
+
 ## BMR
 ```{r}
 BMR32647 <- st_set_crs(BMR, 32647)
@@ -583,7 +584,8 @@ for(i in tims){
 }
 
 ```
-
+:::
+::: panel-tabset
 ### Summer
 
 ```{r}
@@ -929,10 +931,11 @@ Now we plot the NKDE and we see the heatmap on the network roadmap
 tmap_mode('plot')
 tm_shape(BMR)+
   tm_polygons(col = "ADM1_EN", lwd = 0.5, title = "Province")+
+tm_shape(filter(lixels, density == 0)) +
+  tm_lines(col="grey", lwd = 2, alpha = 0.2)+
 tm_shape(lixels)+
   tm_lines(col="density", lwd = 2, title.col = "Per km2", palette = "-inferno")+
-  tm_shape(filter(lixels, density == 0)) +
-  tm_lines(col="grey", lwd = 2, alpha = 0.2)+
+  
   tm_scale_bar() +
   tm_grid(alpha =0.2) +
 tm_layout(title = "Traffic accidents density map",legend.outside = TRUE)
