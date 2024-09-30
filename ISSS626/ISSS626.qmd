@@ -34,7 +34,6 @@ To access each weekly lesson please click on the topic. These pages also contain
 | 10   | 4/11/2024  | [Modelling Geographic of Accessibility]()            |
 
 ## In-class Exercises
-[In Class Page](In-Class_Exercises/In-Class_Exercises.html)
 
 In-class Exercise 1: [Geospatial Data Science with R](In-Class_Exercises/In-Class_Exercise01/In-Class_Ex01.html)
 
@@ -47,6 +46,7 @@ In-class Exercise 4: [Geographically Weighted Summary Statistics](In-Class_Exerc
 In-class Exercise 5:[Global and Local Measures of Spatial Association](In-Class_Exercises/In-Class_Exercise05/In-Class_Exercise05.html)
 
 In-class Exercise 6:[Global and Local Measures of Spatial Association](In-Class_Exercises/In-Class_Exercise06/In-Class_Exercise06.html)
+
 ## Take-home Exercises
 
 Take-home Exercise 1: [Geospatial Analytics for Public Good](Take-Home_Exercises/Take-Home_Exercise01/Take-Home_Exercise01.html)
