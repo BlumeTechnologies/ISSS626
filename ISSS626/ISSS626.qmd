@@ -51,3 +51,4 @@ In-class Exercise 6:[Global and Local Measures of Spatial Association](In-Class_
 
 Take-home Exercise 1: [Geospatial Analytics for Public Good](Take-Home_Exercises/Take-Home_Exercise01/Take-Home_Exercise01.html)
 
+Take-home Exercise 2: [Discovering impacts of COVID-19 on Thailand tourism economy at the province level using spatial and spatio-temporal statistics](Take-Home_Exercises/Take-Home_Exercise02/Take_Home_Exercise02.html)
