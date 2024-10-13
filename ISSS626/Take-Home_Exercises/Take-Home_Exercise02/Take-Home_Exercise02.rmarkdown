@@ -10,6 +10,7 @@ execute:
   freeze: true
 ---
 
+
 ## **Setting the Scene**
 
 Tourism is one of Thailand’s largest industries, accounting for some 20% of the gross domestic product (GDP). In 2019, Thailand earned 90 billion US\$ from domestic and international tourism, but the COVID-19 pandemic caused revenues to crash to 24 billion US\$ in 2020.
@@ -64,6 +65,7 @@ Look at articles
 
 spacetimebox needs to be interger for months
 
+
 ```{r}
 pacman::p_load(spdep, tmap, sf, ClustGeo, 
                ggpubr, cluster, factoextra, NbClust,
@@ -71,8 +73,10 @@ pacman::p_load(spdep, tmap, sf, ClustGeo,
 ```
 
 
+
 # Data wrangling
 first we load the geo data
+
 ```{r}
 
 admRAW = st_read(dsn = "data/rawdata/", 
@@ -80,25 +84,31 @@ admRAW = st_read(dsn = "data/rawdata/",
   select(1:3, 11, 17)
   names(admRAW)[names(admRAW) == 'ADM1_EN'] <- "province_eng"
 ```
+
 Then we load the tourism data
+
 ```{r}
 
 TourismRAW <- read_csv("data/rawdata/thailand_domestic_tourism_2019_2023_ver2.csv") %>%
    mutate(Year = year(date))%>%
    mutate(Month = month(date))
 ```
+
 # variable selection
 now we pick two variables to further look at
 
 ## Revenue
 This variable shows all revenue from tourism
+
 ```{r}
 
 # Create a subset for a specific variable
 revallRAW <- TourismRAW %>%
   filter(variable == "revenue_all")
 ```
+
 ## Number of tourists
+
 ```{r}
 
 # Create a subset for a specific variable
@@ -107,8 +117,10 @@ touristRAW <- TourismRAW %>%
 ```
 
 
+
 ## Creating time periods
 we create pre covid(Pre), during covid(Cov) and post covid(Post) time periods to see the difference between them.
+
 
 ```{r}
 
@@ -122,7 +134,6 @@ postcovnum <- touristRAW %>%
    filter(Year >= 2022 & Year <= 2023)
   
 ```
-
 
 ```{r}
 # Aggregate values for each period per province
@@ -139,18 +150,22 @@ postcovnum <- postcovnum %>%
   summarise(value = sum(value))
 ```
 
+
 ::: panel-tabset
 
 ## Pre
+
 ```{r}
 
 Pre <- left_join(admRAW,precovnum)
   
 ```
+
 ```{r}
 
 Pre <- Pre[!is.na(Pre$value), ]
 ```
+
 ```{r}
 equal <- tm_shape(Pre) +
   tm_fill("value",
@@ -172,16 +187,20 @@ tmap_arrange(equal,
              ncol=2)
 
 ```
+
 ## Cov
+
 ```{r}
 
 Cov <- left_join(admRAW,covnum)
   
 ```
+
 ```{r}
 
 Cov <- Cov[!is.na(Cov$value), ]
 ```
+
 ```{r}
 equal <- tm_shape(Cov) +
   tm_fill("value",
@@ -203,7 +222,9 @@ tmap_arrange(equal,
              ncol=2)
 
 ```
+
 ## Post
+
 ```{r}
 
 Post <- left_join(admRAW,postcovnum)
@@ -214,6 +235,7 @@ Post <- left_join(admRAW,postcovnum)
 
 Post <- Post[!is.na(Post$value), ]
 ```
+
 ```{r}
 equal <- tm_shape(Post) +
   tm_fill("value",
@@ -235,6 +257,7 @@ tmap_arrange(equal,
              ncol=2)
 
 ```
+
 :::
 
 
@@ -247,6 +270,7 @@ Before we can compute the global spatial autocorrelation statistics, we need to 
 In the code chunk below, [`poly2nb()`](https://r-spatial.github.io/spdep/reference/poly2nb.html) of **spdep** package is used to compute contiguity weight matrices for the study area. This function builds a neighbours list based on regions with contiguous boundaries. If you look at the documentation you will see that you can pass a “queen” argument that takes TRUE or FALSE as options. If you do not specify this argument the default is set to TRUE, that is, if you don’t specify queen = FALSE this function will return a list of first order neighbours using the Queen criteria.
 
 More specifically, the code chunk below is used to compute Queen contiguity weight matrix.
+
 
 ```{r}
 wm_q1 <- poly2nb(Pre, 
@@ -270,6 +294,7 @@ summary(wm_q3)
 ```
 
 
+
 ### **Row-standardised weights matrix**
 
 Next, we need to assign weights to each neighboring polygon. In our case, each neighboring polygon will be assigned equal weight (style=“W”). This is accomplished by assigning the fraction 1/(#ofneighbors) to each neighboring county then summing the weighted income values. While this is the most intuitive way to summaries the neighbors’ values it has one drawback in that polygons along the edges of the study area will base their lagged values on fewer polygons thus potentially over- or under-estimating the true nature of the spatial autocorrelation in the data. For this example, we’ll stick with the style=“W” option for simplicity’s sake but note that other more robust options are available, notably style=“B”.
@@ -277,6 +302,7 @@ Next, we need to assign weights to each neighboring polygon. In our case, each n
 ::: panel-tabset
 
 ## Pre
+
 ```{r}
 rswm_q1 <- nb2listw(wm_q1, 
                    style="W", 
@@ -284,7 +310,9 @@ rswm_q1 <- nb2listw(wm_q1,
 rswm_q1
 
 ```
+
 ## Cov
+
 ```{r}
 rswm_q2 <- nb2listw(wm_q2, 
                    style="W", 
@@ -292,7 +320,9 @@ rswm_q2 <- nb2listw(wm_q2,
 rswm_q2
 
 ```
+
 ## Post
+
 ```{r}
 rswm_q3 <- nb2listw(wm_q3, 
                    style="W", 
@@ -300,6 +330,7 @@ rswm_q3 <- nb2listw(wm_q3,
 rswm_q3
 
 ```
+
 :::
 
 ## **Global Measures of Spatial Autocorrelation: Moran’s I**
@@ -312,6 +343,7 @@ The code chunk below performs Moran’s I statistical testing using [`moran.test
 
 ### Pre
 
+
 ```{r}
 moran.test(Pre$value, 
            listw=rswm_q1, 
@@ -320,9 +352,11 @@ moran.test(Pre$value,
 
 ```
 
+
 Question: What statistical conclusion can you draw from the output above?
 
 ### COV
+
 ```{r}
 moran.test(Cov$value, 
            listw=rswm_q2, 
@@ -331,13 +365,16 @@ moran.test(Cov$value,
 
 ```
 
+
 ### Post
+
 ```{r}
 moran.test(Post$value, 
            listw=rswm_q3, 
            zero.policy = TRUE, 
            na.action=na.omit)
 ```
+
 :::
 
 ### **Computing Monte Carlo Moran’s I**
@@ -347,6 +384,7 @@ The code chunk below performs permutation test for Moran’s I statistic by usin
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 set.seed(1234)
 bperm1= moran.mc(Pre$value, 
@@ -357,7 +395,9 @@ bperm1= moran.mc(Pre$value,
 bperm1
 
 ```
+
 ### Cov
+
 ```{r}
 
 bperm2= moran.mc(Cov$value, 
@@ -368,7 +408,9 @@ bperm2= moran.mc(Cov$value,
 bperm2
 
 ```
+
 ### Post
+
 ```{r}
 
 bperm3= moran.mc(Post$value, 
@@ -379,6 +421,7 @@ bperm3= moran.mc(Post$value,
 bperm3
 
 ```
+
 :::
 
 ### **Visualising Monte Carlo Moran’s I**
@@ -390,18 +433,22 @@ In the code chunk below [`hist()`](https://www.rdocumentation.org/packages/graph
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 mean(bperm1$res[1:999])
 
 ```
+
 ```{r}
 
 var(bperm1$res[1:999])
 ```
+
 ```{r}
 summary(bperm1$res[1:999])
 
 ```
+
 ```{r}
 hist(bperm1$res, 
      freq=TRUE, 
@@ -412,19 +459,24 @@ abline(v=0,
 
 ```
 
+
 ### COV
+
 ```{r}
 mean(bperm2$res[1:999])
 
 ```
+
 ```{r}
 
 var(bperm2$res[1:999])
 ```
+
 ```{r}
 summary(bperm2$res[1:999])
 
 ```
+
 ```{r}
 hist(bperm2$res, 
      freq=TRUE, 
@@ -434,7 +486,9 @@ abline(v=0,
        col="red") 
 
 ```
+
 ### Post
+
 
 ```{r}
 mean(bperm3$res[1:999])
@@ -446,11 +500,11 @@ mean(bperm3$res[1:999])
 var(bperm3$res[1:999])
 ```
 
-
 ```{r}
 summary(bperm3$res[1:999])
 
 ```
+
 ```{r}
 hist(bperm3$res, 
      freq=TRUE, 
@@ -460,6 +514,7 @@ abline(v=0,
        col="red") 
 
 ```
+
 
 :::
 
@@ -473,24 +528,30 @@ The code chunk below performs Geary’s C test for spatial autocorrelation by us
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 geary.test(Pre$value, listw=rswm_q1, na.action=na.omit)
 
 ```
 
+
 ### Cov
+
 ```{r}
 geary.test(Cov$value, listw=rswm_q2, na.action=na.omit)
 
 ```
 
+
 ### Post
+
 
 
 ```{r}
 geary.test(Post$value, listw=rswm_q3, na.action=na.omit)
 
 ```
+
 :::
 
 
@@ -501,6 +562,7 @@ The code chunk below performs permutation test for Geary’s C statistic by usin
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 set.seed(1234)
 bperm11=geary.mc(Pre$value, 
@@ -510,7 +572,9 @@ bperm11=geary.mc(Pre$value,
 bperm11
 
 ```
+
 ### Cov
+
 ```{r}
 set.seed(1234)
 bperm22=geary.mc(Cov$value, 
@@ -520,7 +584,9 @@ bperm22=geary.mc(Cov$value,
 bperm22
 
 ```
+
 ### Post
+
 
 ```{r}
 set.seed(1234)
@@ -531,6 +597,7 @@ bperm33=geary.mc(Post$value,
 bperm33
 
 ```
+
 :::
 ### **Visualising the Monte Carlo Geary’s C**
 
@@ -539,6 +606,7 @@ Next, we will plot a histogram to reveal the distribution of the simulated value
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 mean(bperm11$res[1:999])
 
@@ -560,7 +628,9 @@ abline(v=1, col="red")
 
 ```
 
+
 ### Cov
+
 
 
 ```{r}
@@ -584,7 +654,9 @@ abline(v=1, col="red")
 
 ```
 
+
 ### Post
+
 
 
 ```{r}
@@ -607,6 +679,7 @@ hist(bperm33$res, freq=TRUE, breaks=20, xlab="Simulated Geary c")
 abline(v=1, col="red") 
 
 ```
+
 :::
 
 ## **Spatial Correlogram**
@@ -629,6 +702,7 @@ Now, we are going to prepare a basemap and a choropleth map showing the distribu
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 equal <- tm_shape(Pre) +
   tm_fill("value",
@@ -649,7 +723,9 @@ tmap_arrange(equal,
              asp=1, 
              ncol=2)
 ```
+
 ### Cov
+
 ```{r}
 equal <- tm_shape(Cov) +
   tm_fill("value",
@@ -670,7 +746,9 @@ tmap_arrange(equal,
              asp=1, 
              ncol=2)
 ```
+
 ### Post
+
 ```{r}
 equal <- tm_shape(Post) +
   tm_fill("value",
@@ -692,6 +770,7 @@ tmap_arrange(equal,
              ncol=2)
 ```
 
+
 :::
 
 ## **Local Indicators of Spatial Association(LISA)**
@@ -710,23 +789,29 @@ More specifically, the code chunk below is used to compute Queen contiguity weig
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 localwm_q1 <- poly2nb(Pre, 
                 queen=TRUE)
 summary(localwm_q1)
 ```
+
 ### Cov
+
 ```{r}
 localwm_q2 <- poly2nb(Cov, 
                 queen=TRUE)
 summary(localwm_q2)
 ```
+
 ### Post
+
 ```{r}
 localwm_q3 <- poly2nb(Post, 
                 queen=TRUE)
 summary(localwm_q3)
 ```
+
 :::
 
 The summary report above shows that there are 69 area units in thailand. The most connected area unit has 9 neighbours.
@@ -737,6 +822,7 @@ Next, we need to assign weights to each neighboring polygon. In our case, each n
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 rswm_qlocal1 <- nb2listw(localwm_q1, 
                    style="W", 
@@ -744,7 +830,9 @@ rswm_qlocal1 <- nb2listw(localwm_q1,
 rswm_qlocal1
 ```
 
+
 ### Cov
+
 
 ```{r}
 rswm_qlocal2 <- nb2listw(localwm_q2, 
@@ -753,18 +841,22 @@ rswm_qlocal2 <- nb2listw(localwm_q2,
 rswm_qlocal2
 ```
 
+
 ### Post
+
 ```{r}
 rswm_qlocal3 <- nb2listw(localwm_q3, 
                    style="W", 
                    zero.policy = TRUE)
 rswm_qlocal3
 ```
+
 :::
 
 ### **Computing local Moran’s I**
 
 To compute local Moran’s I, the [*localmoran()*](https://r-spatial.github.io/spdep/reference/localmoran.html) function of **spdep** will be used. It computes *Ii* values, given a set of *zi* values and a listw object providing neighbour weighting information for the polygon associated with the zi values.
+
 
 
 ```{r}
@@ -773,19 +865,18 @@ localMI1 <- localmoran(Pre$value, rswm_qlocal1)
 head(localMI1)
 ```
 
-
 ```{r}
 fips2 <- order(Cov$value)
 localMI2 <- localmoran(Cov$value, rswm_qlocal2)
 head(localMI2)
 ```
 
-
 ```{r}
 fips3 <- order(Post$value)
 localMI3 <- localmoran(Post$value, rswm_qlocal3)
 head(localMI3)
 ```
+
 *localmoran()* function returns a matrix of values whose columns are:
 
 -   Ii: the local Moran’s I statistics
@@ -803,13 +894,16 @@ The code chunk below list the content of the local Moran matrix derived by using
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 printCoefmat(data.frame(
   localMI1[fips1,], 
   row.names=Pre$value[fips1]),
   check.names=FALSE)
 ```
+
 ### Cov
+
 ```{r}
 printCoefmat(data.frame(
   localMI2[fips2,], 
@@ -817,13 +911,16 @@ printCoefmat(data.frame(
   check.names=FALSE)
 ```
 
+
 ### Post
+
 ```{r}
 printCoefmat(data.frame(
   localMI3[fips3,], 
   row.names=Post$value[fips3]),
   check.names=FALSE)
 ```
+
 
 :::
 
@@ -834,21 +931,27 @@ Before mapping the local Moran’s I map, it is wise to append the local Moran�
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 Pre.localMI <- cbind(Pre,localMI1) %>%
   rename(Pr.Ii = Pr.z....E.Ii..)
 ```
+
 ### Cov
+
 ```{r}
 Cov.localMI <- cbind(Cov,localMI2) %>%
   rename(Pr.Ii = Pr.z....E.Ii..)
 ```
 
+
 ### Post
+
 ```{r}
 Post.localMI <- cbind(Post,localMI3) %>%
   rename(Pr.Ii = Pr.z....E.Ii..)
 ```
+
 :::
 #### Mapping local Moran’s I values
 
@@ -857,6 +960,7 @@ Using choropleth mapping functions of **tmap** package, we can plot the local Mo
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 tm_shape(Pre.localMI) +
   tm_fill(col = "Ii", 
@@ -866,7 +970,9 @@ tm_shape(Pre.localMI) +
   tm_borders(alpha = 0.5)
 ```
 
+
 ### Cov
+
 ```{r}
 tm_shape(Cov.localMI) +
   tm_fill(col = "Ii", 
@@ -876,7 +982,9 @@ tm_shape(Cov.localMI) +
   tm_borders(alpha = 0.5)
 ```
 
+
 ### Post
+
 ```{r}
 tm_shape(Post.localMI) +
   tm_fill(col = "Ii", 
@@ -885,6 +993,7 @@ tm_shape(Post.localMI) +
           title = "local moran statistics") +
   tm_borders(alpha = 0.5)
 ```
+
 :::
 #### Mapping local Moran’s I p-values
 
@@ -895,6 +1004,7 @@ The code chunks below produce a choropleth map of Moran’s I p-values by using 
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 tm_shape(Pre.localMI) +
   tm_fill(col = "Pr.Ii", 
@@ -903,7 +1013,9 @@ tm_shape(Pre.localMI) +
           title = "local Moran's I p-values") +
   tm_borders(alpha = 0.5)
 ```
+
 ### Cov
+
 ```{r}
 tm_shape(Cov.localMI) +
   tm_fill(col = "Pr.Ii", 
@@ -912,7 +1024,9 @@ tm_shape(Cov.localMI) +
           title = "local Moran's I p-values") +
   tm_borders(alpha = 0.5)
 ```
+
 ### Post
+
 ```{r}
 tm_shape(Post.localMI) +
   tm_fill(col = "Pr.Ii", 
@@ -921,6 +1035,7 @@ tm_shape(Post.localMI) +
           title = "local Moran's I p-values") +
   tm_borders(alpha = 0.5)
 ```
+
 :::
 
 ## **Creating a LISA Cluster Map**
@@ -936,26 +1051,32 @@ The code chunk below plots the Moran scatterplot of Tourism by using [*moran.plo
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 ncipre <- moran.plot(Pre$value, rswm_qlocal1,
                   labels=as.character(Pre$province_eng), 
                   xlab="Tourists", 
                   ylab="Spatially Lag tourists")
 ```
+
 ### Cov
+
 ```{r}
 ncicov <- moran.plot(Cov$value, rswm_qlocal2,
                   labels=as.character(Cov$province_eng), 
                   xlab="Tourists", 
                   ylab="Spatially Lag tourists")
 ```
+
 ### Post
+
 ```{r}
 ncipost <- moran.plot(Post$value, rswm_qlocal3,
                   labels=as.character(Post$province_eng), 
                   xlab="Tourists", 
                   ylab="Spatially Lag tourists")
 ```
+
 :::
 Notice that the plots are split in 4 quadrants. The top right corner belongs to areas that have high tourism numbers and are surrounded by other areas that have the average level of toursism.
 
@@ -967,6 +1088,7 @@ The code chunks below show the steps to prepare a LISA cluster map.
 ::: panel-tabset
 
 ### Pre
+
 
 ```{r}
 quadrantpre <- vector(mode="numeric",length=nrow(localMI1))
@@ -981,7 +1103,9 @@ quadrantpre[DV1 >0 & LM_IPre>0] <- 4
 quadrantpre[localMI1[,5]>signif] <- 0
 ```
 
+
 ### Cov
+
 ```{r}
 quadrantcov <- vector(mode="numeric",length=nrow(localMI2))
 Cov$lag_value <- lag.listw(rswm_qlocal2, Cov$value)
@@ -994,7 +1118,9 @@ quadrantcov[DV2 <0 & LM_ICov<0] <- 3
 quadrantcov[DV2 >0 & LM_ICov>0] <- 4    
 quadrantcov[localMI2[,5]>signif] <- 0
 ```
+
 ### Post
+
 ```{r}
 quadrantpost <- vector(mode="numeric",length=nrow(localMI3))
 Post$lag_value <- lag.listw(rswm_qlocal3, Post$value)
@@ -1007,6 +1133,7 @@ quadrantpost[DV3 <0 & LM_IPost<0] <- 3
 quadrantpost[DV3 >0 & LM_IPost>0] <- 4    
 quadrantpost[localMI3[,5]>signif] <- 0
 ```
+
 :::
 ### **Plotting LISA map**
 
@@ -1015,6 +1142,7 @@ Now, we can build the LISA map by using the code chunks below.
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 Pre.localMI$quadrantpre <- quadrantpre
 colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
@@ -1030,7 +1158,9 @@ tm_shape(Pre.localMI) +
   tm_borders(alpha=0.5)
 ```
 
+
 ### Cov
+
 ```{r}
 Cov.localMI$quadrantcov <- quadrantcov
 colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
@@ -1045,7 +1175,9 @@ tm_shape(Cov.localMI) +
   tm_view(set.zoom.limits = c(11,17)) +
   tm_borders(alpha=0.5)
 ```
+
 ### Post
+
 ```{r}
 Post.localMI$quadrantpost <- quadrantpost
 colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
@@ -1060,6 +1192,7 @@ tm_shape(Post.localMI) +
   tm_view(set.zoom.limits = c(11,17)) +
   tm_borders(alpha=0.5)
 ```
+
 :::
 
 
@@ -1100,55 +1233,73 @@ To get our longitude values we map the *st_centroid()* function over the geometr
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 longitude1 <- map_dbl(Pre$geometry, ~st_centroid(.x)[[1]])
 ```
 
+
 We do the same for latitude with one key difference. We access the second value per each centroid with \[\[2\]\].
+
 
 ```{r}
 latitude1 <- map_dbl(Pre$geometry, ~st_centroid(.x)[[2]])
 ```
 
+
 Now that we have latitude and longitude, we use cbind to put longitude and latitude into the same object.
+
 
 ```{r}
 coords1 <- cbind(longitude1, latitude1)
 ```
 
+
 ### Cov
+
 
 ```{r}
 longitude2 <- map_dbl(Cov$geometry, ~st_centroid(.x)[[1]])
 ```
 
+
 We do the same for latitude with one key difference. We access the second value per each centroid with \[\[2\]\].
+
 
 ```{r}
 latitude2 <- map_dbl(Cov$geometry, ~st_centroid(.x)[[2]])
 ```
 
+
 Now that we have latitude and longitude, we use cbind to put longitude and latitude into the same object.
+
 
 ```{r}
 coords2 <- cbind(longitude2, latitude2)
 ```
+
 ### Post
+
 ```{r}
 longitude3 <- map_dbl(Post$geometry, ~st_centroid(.x)[[1]])
 ```
 
+
 We do the same for latitude with one key difference. We access the second value per each centroid with \[\[2\]\].
+
 
 ```{r}
 latitude3 <- map_dbl(Post$geometry, ~st_centroid(.x)[[2]])
 ```
 
+
 Now that we have latitude and longitude, we use cbind to put longitude and latitude into the same object.
+
 
 ```{r}
 coords3 <- cbind(longitude3, latitude3)
 ```
+
 :::
 #### Determine the cut-off distance
 
@@ -1165,26 +1316,32 @@ Firstly, we need to determine the upper limit for distance band by using the ste
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 
 k1pre <- knn2nb(knearneigh(coords1))
 k1distspre <- unlist(nbdists(k1pre, coords1, longlat = TRUE))
 summary(k1distspre)
 ```
+
 ### Cov
+
 ```{r}
 
 k1cov <- knn2nb(knearneigh(coords2))
 k1distscov <- unlist(nbdists(k1cov, coords2, longlat = TRUE))
 summary(k1distscov)
 ```
+
 ### Post
+
 ```{r}
 
 k1post <- knn2nb(knearneigh(coords3))
 k1distspost <- unlist(nbdists(k1post, coords3, longlat = TRUE))
 summary(k1distspost)
 ```
+
 :::
 The summary report shows that the largest first nearest neighbour distance is 61.79 km, so using this as the upper threshold gives certainty that all units will have at least one neighbour.
 
@@ -1192,17 +1349,21 @@ The summary report shows that the largest first nearest neighbour distance is 61
 
 Now, we will compute the distance weight matrix by using [*dnearneigh()*](https://r-spatial.github.io/spdep/reference/dnearneigh.html) as shown in the code chunk below.
 
+
 ```{r}
 wm_d53 <- dnearneigh(coords1, 0, 53, longlat = TRUE)
 wm_d53
 ```
 
+
 Next, *nb2listw()* is used to convert the nb object into spatial weights object.
+
 
 ```{r}
 wm53_lw <- nb2listw(wm_d53, style = 'B', zero.policy = TRUE)
 summary(wm53_lw)
 ```
+
 
 The output spatial weights object is called `wm53_lw`.
 
@@ -1212,21 +1373,26 @@ One of the characteristics of fixed distance weight matrix is that more densely 
 
 It is possible to control the numbers of neighbours directly using k-nearest neighbours, either accepting asymmetric neighbours or imposing symmetry as shown in the code chunk below.
 
+
 ```{r}
 knn <- knn2nb(knearneigh(coords1, k=8))
 knn
 ```
 
+
 Next, *nb2listw()* is used to convert the nb object into spatial weights object.
+
 
 ```{r}
 knn_lw <- nb2listw(knn, style = 'B')
 summary(knn_lw)
 ```
 
+
 ## **Computing Gi statistics**
 
 ### **Gi statistics using fixed distance**
+
 
 ```{r}
 fips11 <- order(Pre$province_eng)
@@ -1238,6 +1404,7 @@ gi.fixedCov
 gi.fixedPost
 ```
 
+
 The output of localG() is a vector of G or Gstar values, with attributes “gstari” set to TRUE or FALSE, “call” set to the function call, and class “localG”.
 
 The Gi statistics is represented as a Z-score. Greater values represent a greater intensity of clustering and the direction (positive or negative) indicates high or low clusters.
@@ -1247,20 +1414,26 @@ Next, we will join the Gi values to their corresponding tourism sf data frame by
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 Pre.gi <- cbind(Pre, as.matrix(gi.fixedPre)) %>%
   rename(gstat_fixed = as.matrix.gi.fixedPre.)
 ```
+
 ### Cov
+
 ```{r}
 Cov.gi <- cbind(Cov, as.matrix(gi.fixedCov)) %>%
   rename(gstat_fixed = as.matrix.gi.fixedCov.)
 ```
+
 ### Post
+
 ```{r}
 Post.gi <- cbind(Post, as.matrix(gi.fixedPost)) %>%
   rename(gstat_fixed = as.matrix.gi.fixedPost.)
 ```
+
 :::
 In fact, the code chunk above performs three tasks. First, it convert the output vector (i.e. *gi.fixed*) into r matrix object by using *as.matrix()*.
 
@@ -1271,6 +1444,7 @@ The code chunk below shows the functions used to map the Gi values derived using
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 TourismPre <- qtm(Pre, "value")
 
@@ -1284,7 +1458,9 @@ Gimap1 <-tm_shape(Pre.gi) +
 tmap_arrange(TourismPre, Gimap1, asp=1, ncol=2)
 ```
 
+
 ### Cov
+
 ```{r}
 TourismCov <- qtm(Cov, "value")
 
@@ -1298,7 +1474,9 @@ Gimap2 <-tm_shape(Cov.gi) +
 tmap_arrange(TourismCov, Gimap2, asp=1, ncol=2)
 ```
 
+
 ### Post
+
 ```{r}
 TourismPost <- qtm(Post, "value")
 
@@ -1311,38 +1489,46 @@ Gimap3 <-tm_shape(Post.gi) +
 
 tmap_arrange(TourismPost, Gimap3, asp=1, ncol=2)
 ```
+
 :::
 ### **Gi statistics using adaptive distance**
 
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 fips1 <- order(Pre$province_eng)
 gi.adaptive1 <- localG(Pre$value, knn_lw)
 Pre.gi1 <- cbind(Pre, as.matrix(gi.adaptive1)) %>%
   rename(gstat_adaptive = as.matrix.gi.adaptive1.)
 ```
+
 ### Cov
+
 ```{r}
 fips2 <- order(Cov$province_eng)
 gi.adaptive2 <- localG(Cov$value, knn_lw)
 Cov.gi2 <- cbind(Cov, as.matrix(gi.adaptive2)) %>%
   rename(gstat_adaptive = as.matrix.gi.adaptive2.)
 ```
+
 ### Post
+
 ```{r}
 fips3 <- order(Post$province_eng)
 gi.adaptive3 <- localG(Post$value, knn_lw)
 Post.gi3 <- cbind(Post, as.matrix(gi.adaptive3)) %>%
   rename(gstat_adaptive = as.matrix.gi.adaptive3.)
 ```
+
 :::
 ### **Mapping Gi values with adaptive distance weights**
 
 It is time for us to visualise the locations of hot spot and cold spot areas. The choropleth mapping functions of **tmap** package will be used to map the Gi values.
 
 The code chunk below shows the functions used to map the Gi values derived using fixed distance weight matrix.
+
 
 ```{r}
 Gimap1 <- tm_shape(Pre.gi1) + 
@@ -1373,7 +1559,9 @@ tmap_arrange(
              asp=1, 
              ncol=3)
 ```
+
 # Cold hot map tourism
+
 
 ```{r}
 TouristAll = touristRAW 
@@ -1398,10 +1586,10 @@ tourist_st <- spacetime(
 is_spacetime_cube(tourist_st)
 ```
 
-
 ```{r}
 set.seed(1234)
 ```
+
 ```{r}
 ehsa = emerging_hotspot_analysis(
   x = tourist_st,
@@ -1410,6 +1598,7 @@ ehsa = emerging_hotspot_analysis(
   nsim = 99
 )
 ```
+
 ```{r}
 ggplot(data = ehsa,
        aes(x = classification))+
@@ -1434,10 +1623,12 @@ tm_shape(ehsa_sig) +
   tm_borders(alpha = 0.4)
 ```
 
+
 ----------------------------------------------------------------------------------
 
 # Revenue analysis
 This variable shows all revenue from tourism
+
 ```{r}
 
 # Create a subset for a specific variable
@@ -1445,8 +1636,10 @@ revallRAW <- TourismRAW %>%
   filter(variable == "revenue_all")
 ```
 
+
 ## Creating time periods
 we create pre covid(Pre), during covid(Cov) and post covid(Post) time periods to see the difference between them.
+
 
 ```{r}
 
@@ -1460,7 +1653,6 @@ postcovnum <- revallRAW %>%
    filter(Year >= 2022 & Year <= 2023)
   
 ```
-
 
 ```{r}
 # Aggregate values for each period per province
@@ -1477,18 +1669,22 @@ postcovnum <- postcovnum %>%
   summarise(value = sum(value))
 ```
 
+
 ::: panel-tabset
 
 ## Pre
+
 ```{r}
 
 Pre <- left_join(admRAW,precovnum)
   
 ```
+
 ```{r}
 
 Pre <- Pre[!is.na(Pre$value), ]
 ```
+
 ```{r}
 equal <- tm_shape(Pre) +
   tm_fill("value",
@@ -1510,16 +1706,20 @@ tmap_arrange(equal,
              ncol=2)
 
 ```
+
 ## Cov
+
 ```{r}
 
 Cov <- left_join(admRAW,covnum)
   
 ```
+
 ```{r}
 
 Cov <- Cov[!is.na(Cov$value), ]
 ```
+
 ```{r}
 equal <- tm_shape(Cov) +
   tm_fill("value",
@@ -1541,7 +1741,9 @@ tmap_arrange(equal,
              ncol=2)
 
 ```
+
 ## Post
+
 ```{r}
 
 Post <- left_join(admRAW,postcovnum)
@@ -1552,6 +1754,7 @@ Post <- left_join(admRAW,postcovnum)
 
 Post <- Post[!is.na(Post$value), ]
 ```
+
 ```{r}
 equal <- tm_shape(Post) +
   tm_fill("value",
@@ -1573,6 +1776,7 @@ tmap_arrange(equal,
              ncol=2)
 
 ```
+
 :::
 
 
@@ -1585,6 +1789,7 @@ Before we can compute the global spatial autocorrelation statistics, we need to 
 In the code chunk below, [`poly2nb()`](https://r-spatial.github.io/spdep/reference/poly2nb.html) of **spdep** package is used to compute contiguity weight matrices for the study area. This function builds a neighbours list based on regions with contiguous boundaries. If you look at the documentation you will see that you can pass a “queen” argument that takes TRUE or FALSE as options. If you do not specify this argument the default is set to TRUE, that is, if you don’t specify queen = FALSE this function will return a list of first order neighbours using the Queen criteria.
 
 More specifically, the code chunk below is used to compute Queen contiguity weight matrix.
+
 
 ```{r}
 wm_q1 <- poly2nb(Pre, 
@@ -1608,6 +1813,7 @@ summary(wm_q3)
 ```
 
 
+
 ### **Row-standardised weights matrix**
 
 Next, we need to assign weights to each neighboring polygon. In our case, each neighboring polygon will be assigned equal weight (style=“W”). This is accomplished by assigning the fraction 1/(#ofneighbors) to each neighboring county then summing the weighted income values. While this is the most intuitive way to summaries the neighbors’ values it has one drawback in that polygons along the edges of the study area will base their lagged values on fewer polygons thus potentially over- or under-estimating the true nature of the spatial autocorrelation in the data. For this example, we’ll stick with the style=“W” option for simplicity’s sake but note that other more robust options are available, notably style=“B”.
@@ -1615,6 +1821,7 @@ Next, we need to assign weights to each neighboring polygon. In our case, each n
 ::: panel-tabset
 
 ## Pre
+
 ```{r}
 rswm_q1 <- nb2listw(wm_q1, 
                    style="W", 
@@ -1622,7 +1829,9 @@ rswm_q1 <- nb2listw(wm_q1,
 rswm_q1
 
 ```
+
 ## Cov
+
 ```{r}
 rswm_q2 <- nb2listw(wm_q2, 
                    style="W", 
@@ -1630,7 +1839,9 @@ rswm_q2 <- nb2listw(wm_q2,
 rswm_q2
 
 ```
+
 ## Post
+
 ```{r}
 rswm_q3 <- nb2listw(wm_q3, 
                    style="W", 
@@ -1638,6 +1849,7 @@ rswm_q3 <- nb2listw(wm_q3,
 rswm_q3
 
 ```
+
 :::
 
 ## **Global Measures of Spatial Autocorrelation: Moran’s I**
@@ -1650,6 +1862,7 @@ The code chunk below performs Moran’s I statistical testing using [`moran.test
 
 ### Pre
 
+
 ```{r}
 moran.test(Pre$value, 
            listw=rswm_q1, 
@@ -1660,7 +1873,9 @@ moran.test(Pre$value,
 
 
 
+
 ### COV
+
 ```{r}
 moran.test(Cov$value, 
            listw=rswm_q2, 
@@ -1669,13 +1884,16 @@ moran.test(Cov$value,
 
 ```
 
+
 ### Post
+
 ```{r}
 moran.test(Post$value, 
            listw=rswm_q3, 
            zero.policy = TRUE, 
            na.action=na.omit)
 ```
+
 :::
 
 ### **Computing Monte Carlo Moran’s I**
@@ -1685,6 +1903,7 @@ The code chunk below performs permutation test for Moran’s I statistic by usin
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 set.seed(1234)
 bperm1= moran.mc(Pre$value, 
@@ -1695,7 +1914,9 @@ bperm1= moran.mc(Pre$value,
 bperm1
 
 ```
+
 ### Cov
+
 ```{r}
 
 bperm2= moran.mc(Cov$value, 
@@ -1706,7 +1927,9 @@ bperm2= moran.mc(Cov$value,
 bperm2
 
 ```
+
 ### Post
+
 ```{r}
 
 bperm3= moran.mc(Post$value, 
@@ -1717,6 +1940,7 @@ bperm3= moran.mc(Post$value,
 bperm3
 
 ```
+
 :::
 
 ### **Visualising Monte Carlo Moran’s I**
@@ -1728,18 +1952,22 @@ In the code chunk below [`hist()`](https://www.rdocumentation.org/packages/graph
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 mean(bperm1$res[1:999])
 
 ```
+
 ```{r}
 
 var(bperm1$res[1:999])
 ```
+
 ```{r}
 summary(bperm1$res[1:999])
 
 ```
+
 ```{r}
 hist(bperm1$res, 
      freq=TRUE, 
@@ -1750,19 +1978,24 @@ abline(v=0,
 
 ```
 
+
 ### COV
+
 ```{r}
 mean(bperm2$res[1:999])
 
 ```
+
 ```{r}
 
 var(bperm2$res[1:999])
 ```
+
 ```{r}
 summary(bperm2$res[1:999])
 
 ```
+
 ```{r}
 hist(bperm2$res, 
      freq=TRUE, 
@@ -1772,7 +2005,9 @@ abline(v=0,
        col="red") 
 
 ```
+
 ### Post
+
 
 ```{r}
 mean(bperm3$res[1:999])
@@ -1784,11 +2019,11 @@ mean(bperm3$res[1:999])
 var(bperm3$res[1:999])
 ```
 
-
 ```{r}
 summary(bperm3$res[1:999])
 
 ```
+
 ```{r}
 hist(bperm3$res, 
      freq=TRUE, 
@@ -1798,6 +2033,7 @@ abline(v=0,
        col="red") 
 
 ```
+
 
 :::
 
@@ -1811,24 +2047,30 @@ The code chunk below performs Geary’s C test for spatial autocorrelation by us
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 geary.test(Pre$value, listw=rswm_q1, na.action=na.omit)
 
 ```
 
+
 ### Cov
+
 ```{r}
 geary.test(Cov$value, listw=rswm_q2, na.action=na.omit)
 
 ```
 
+
 ### Post
+
 
 
 ```{r}
 geary.test(Post$value, listw=rswm_q3, na.action=na.omit)
 
 ```
+
 :::
 
 
@@ -1839,6 +2081,7 @@ The code chunk below performs permutation test for Geary’s C statistic by usin
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 set.seed(1234)
 bperm11=geary.mc(Pre$value, 
@@ -1848,7 +2091,9 @@ bperm11=geary.mc(Pre$value,
 bperm11
 
 ```
+
 ### Cov
+
 ```{r}
 set.seed(1234)
 bperm22=geary.mc(Cov$value, 
@@ -1858,7 +2103,9 @@ bperm22=geary.mc(Cov$value,
 bperm22
 
 ```
+
 ### Post
+
 
 ```{r}
 set.seed(1234)
@@ -1869,6 +2116,7 @@ bperm33=geary.mc(Post$value,
 bperm33
 
 ```
+
 :::
 ### **Visualising the Monte Carlo Geary’s C**
 
@@ -1877,6 +2125,7 @@ Next, we will plot a histogram to reveal the distribution of the simulated value
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 mean(bperm11$res[1:999])
 
@@ -1898,7 +2147,9 @@ abline(v=1, col="red")
 
 ```
 
+
 ### Cov
+
 
 
 ```{r}
@@ -1922,7 +2173,9 @@ abline(v=1, col="red")
 
 ```
 
+
 ### Post
+
 
 
 ```{r}
@@ -1945,6 +2198,7 @@ hist(bperm33$res, freq=TRUE, breaks=20, xlab="Simulated Geary c")
 abline(v=1, col="red") 
 
 ```
+
 :::
 
 ## **Spatial Correlogram**
@@ -1968,6 +2222,7 @@ Now, we are going to prepare a basemap and a choropleth map showing the distribu
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 equal <- tm_shape(Pre) +
   tm_fill("value",
@@ -1988,7 +2243,9 @@ tmap_arrange(equal,
              asp=1, 
              ncol=2)
 ```
+
 ### Cov
+
 ```{r}
 equal <- tm_shape(Cov) +
   tm_fill("value",
@@ -2009,7 +2266,9 @@ tmap_arrange(equal,
              asp=1, 
              ncol=2)
 ```
+
 ### Post
+
 ```{r}
 equal <- tm_shape(Post) +
   tm_fill("value",
@@ -2031,6 +2290,7 @@ tmap_arrange(equal,
              ncol=2)
 ```
 
+
 :::
 
 ## **Local Indicators of Spatial Association(LISA)**
@@ -2049,23 +2309,29 @@ More specifically, the code chunk below is used to compute Queen contiguity weig
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 localwm_q1 <- poly2nb(Pre, 
                 queen=TRUE)
 summary(localwm_q1)
 ```
+
 ### Cov
+
 ```{r}
 localwm_q2 <- poly2nb(Cov, 
                 queen=TRUE)
 summary(localwm_q2)
 ```
+
 ### Post
+
 ```{r}
 localwm_q3 <- poly2nb(Post, 
                 queen=TRUE)
 summary(localwm_q3)
 ```
+
 :::
 
 
@@ -2076,6 +2342,7 @@ Next, we need to assign weights to each neighboring polygon. In our case, each n
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 rswm_qlocal1 <- nb2listw(localwm_q1, 
                    style="W", 
@@ -2083,7 +2350,9 @@ rswm_qlocal1 <- nb2listw(localwm_q1,
 rswm_qlocal1
 ```
 
+
 ### Cov
+
 
 ```{r}
 rswm_qlocal2 <- nb2listw(localwm_q2, 
@@ -2092,18 +2361,22 @@ rswm_qlocal2 <- nb2listw(localwm_q2,
 rswm_qlocal2
 ```
 
+
 ### Post
+
 ```{r}
 rswm_qlocal3 <- nb2listw(localwm_q3, 
                    style="W", 
                    zero.policy = TRUE)
 rswm_qlocal3
 ```
+
 :::
 
 ### **Computing local Moran’s I**
 
 To compute local Moran’s I, the [*localmoran()*](https://r-spatial.github.io/spdep/reference/localmoran.html) function of **spdep** will be used. It computes *Ii* values, given a set of *zi* values and a listw object providing neighbour weighting information for the polygon associated with the zi values.
+
 
 
 ```{r}
@@ -2112,19 +2385,18 @@ localMI1 <- localmoran(Pre$value, rswm_qlocal1)
 head(localMI1)
 ```
 
-
 ```{r}
 fips2 <- order(Cov$value)
 localMI2 <- localmoran(Cov$value, rswm_qlocal2)
 head(localMI2)
 ```
 
-
 ```{r}
 fips3 <- order(Post$value)
 localMI3 <- localmoran(Post$value, rswm_qlocal3)
 head(localMI3)
 ```
+
 *localmoran()* function returns a matrix of values whose columns are:
 
 -   Ii: the local Moran’s I statistics
@@ -2142,13 +2414,16 @@ The code chunk below list the content of the local Moran matrix derived by using
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 printCoefmat(data.frame(
   localMI1[fips1,], 
   row.names=Pre$value[fips1]),
   check.names=FALSE)
 ```
+
 ### Cov
+
 ```{r}
 printCoefmat(data.frame(
   localMI2[fips2,], 
@@ -2156,13 +2431,16 @@ printCoefmat(data.frame(
   check.names=FALSE)
 ```
 
+
 ### Post
+
 ```{r}
 printCoefmat(data.frame(
   localMI3[fips3,], 
   row.names=Post$value[fips3]),
   check.names=FALSE)
 ```
+
 
 :::
 
@@ -2173,21 +2451,27 @@ Before mapping the local Moran’s I map, it is wise to append the local Moran�
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 Pre.localMI <- cbind(Pre,localMI1) %>%
   rename(Pr.Ii = Pr.z....E.Ii..)
 ```
+
 ### Cov
+
 ```{r}
 Cov.localMI <- cbind(Cov,localMI2) %>%
   rename(Pr.Ii = Pr.z....E.Ii..)
 ```
 
+
 ### Post
+
 ```{r}
 Post.localMI <- cbind(Post,localMI3) %>%
   rename(Pr.Ii = Pr.z....E.Ii..)
 ```
+
 :::
 #### Mapping local Moran’s I values
 
@@ -2196,6 +2480,7 @@ Using choropleth mapping functions of **tmap** package, we can plot the local Mo
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 tm_shape(Pre.localMI) +
   tm_fill(col = "Ii", 
@@ -2205,7 +2490,9 @@ tm_shape(Pre.localMI) +
   tm_borders(alpha = 0.5)
 ```
 
+
 ### Cov
+
 ```{r}
 tm_shape(Cov.localMI) +
   tm_fill(col = "Ii", 
@@ -2215,7 +2502,9 @@ tm_shape(Cov.localMI) +
   tm_borders(alpha = 0.5)
 ```
 
+
 ### Post
+
 ```{r}
 tm_shape(Post.localMI) +
   tm_fill(col = "Ii", 
@@ -2224,6 +2513,7 @@ tm_shape(Post.localMI) +
           title = "local moran statistics") +
   tm_borders(alpha = 0.5)
 ```
+
 :::
 #### Mapping local Moran’s I p-values
 
@@ -2234,6 +2524,7 @@ The code chunks below produce a choropleth map of Moran’s I p-values by using 
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 tm_shape(Pre.localMI) +
   tm_fill(col = "Pr.Ii", 
@@ -2242,7 +2533,9 @@ tm_shape(Pre.localMI) +
           title = "local Moran's I p-values") +
   tm_borders(alpha = 0.5)
 ```
+
 ### Cov
+
 ```{r}
 tm_shape(Cov.localMI) +
   tm_fill(col = "Pr.Ii", 
@@ -2251,7 +2544,9 @@ tm_shape(Cov.localMI) +
           title = "local Moran's I p-values") +
   tm_borders(alpha = 0.5)
 ```
+
 ### Post
+
 ```{r}
 tm_shape(Post.localMI) +
   tm_fill(col = "Pr.Ii", 
@@ -2260,6 +2555,7 @@ tm_shape(Post.localMI) +
           title = "local Moran's I p-values") +
   tm_borders(alpha = 0.5)
 ```
+
 :::
 
 ## **Creating a LISA Cluster Map**
@@ -2275,26 +2571,32 @@ The code chunk below plots the Moran scatterplot by using [*moran.plot()*](https
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 ncipre <- moran.plot(Pre$value, rswm_qlocal1,
                   labels=as.character(Pre$province_eng), 
                   xlab="Tourists", 
                   ylab="Spatially Lag tourists")
 ```
+
 ### Cov
+
 ```{r}
 ncicov <- moran.plot(Cov$value, rswm_qlocal2,
                   labels=as.character(Cov$province_eng), 
                   xlab="Tourists", 
                   ylab="Spatially Lag tourists")
 ```
+
 ### Post
+
 ```{r}
 ncipost <- moran.plot(Post$value, rswm_qlocal3,
                   labels=as.character(Post$province_eng), 
                   xlab="Tourists", 
                   ylab="Spatially Lag tourists")
 ```
+
 :::
 Notice that the plots are split in 4 quadrants. The top right corner belongs to areas that have high tourism numbers and are surrounded by other areas that have the average level of revenue.
 
@@ -2306,6 +2608,7 @@ The code chunks below show the steps to prepare a LISA cluster map.
 ::: panel-tabset
 
 ### Pre
+
 
 ```{r}
 quadrantpre <- vector(mode="numeric",length=nrow(localMI1))
@@ -2320,7 +2623,9 @@ quadrantpre[DV1 >0 & LM_IPre>0] <- 4
 quadrantpre[localMI1[,5]>signif] <- 0
 ```
 
+
 ### Cov
+
 ```{r}
 quadrantcov <- vector(mode="numeric",length=nrow(localMI2))
 Cov$lag_value <- lag.listw(rswm_qlocal2, Cov$value)
@@ -2333,7 +2638,9 @@ quadrantcov[DV2 <0 & LM_ICov<0] <- 3
 quadrantcov[DV2 >0 & LM_ICov>0] <- 4    
 quadrantcov[localMI2[,5]>signif] <- 0
 ```
+
 ### Post
+
 ```{r}
 quadrantpost <- vector(mode="numeric",length=nrow(localMI3))
 Post$lag_value <- lag.listw(rswm_qlocal3, Post$value)
@@ -2346,6 +2653,7 @@ quadrantpost[DV3 <0 & LM_IPost<0] <- 3
 quadrantpost[DV3 >0 & LM_IPost>0] <- 4    
 quadrantpost[localMI3[,5]>signif] <- 0
 ```
+
 :::
 ### **Plotting LISA map**
 
@@ -2354,6 +2662,7 @@ Now, we can build the LISA map by using the code chunks below.
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 Pre.localMI$quadrantpre <- quadrantpre
 colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
@@ -2369,7 +2678,9 @@ tm_shape(Pre.localMI) +
   tm_borders(alpha=0.5)
 ```
 
+
 ### Cov
+
 ```{r}
 Cov.localMI$quadrantcov <- quadrantcov
 colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
@@ -2384,7 +2695,9 @@ tm_shape(Cov.localMI) +
   tm_view(set.zoom.limits = c(11,17)) +
   tm_borders(alpha=0.5)
 ```
+
 ### Post
+
 ```{r}
 Post.localMI$quadrantpost <- quadrantpost
 colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
@@ -2399,6 +2712,7 @@ tm_shape(Post.localMI) +
   tm_view(set.zoom.limits = c(11,17)) +
   tm_borders(alpha=0.5)
 ```
+
 :::
 
 
@@ -2439,55 +2753,73 @@ To get our longitude values we map the *st_centroid()* function over the geometr
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 longitude1 <- map_dbl(Pre$geometry, ~st_centroid(.x)[[1]])
 ```
 
+
 We do the same for latitude with one key difference. We access the second value per each centroid with \[\[2\]\].
+
 
 ```{r}
 latitude1 <- map_dbl(Pre$geometry, ~st_centroid(.x)[[2]])
 ```
 
+
 Now that we have latitude and longitude, we use cbind to put longitude and latitude into the same object.
+
 
 ```{r}
 coords1 <- cbind(longitude1, latitude1)
 ```
 
+
 ### Cov
+
 
 ```{r}
 longitude2 <- map_dbl(Cov$geometry, ~st_centroid(.x)[[1]])
 ```
 
+
 We do the same for latitude with one key difference. We access the second value per each centroid with \[\[2\]\].
+
 
 ```{r}
 latitude2 <- map_dbl(Cov$geometry, ~st_centroid(.x)[[2]])
 ```
 
+
 Now that we have latitude and longitude, we use cbind to put longitude and latitude into the same object.
+
 
 ```{r}
 coords2 <- cbind(longitude2, latitude2)
 ```
+
 ### Post
+
 ```{r}
 longitude3 <- map_dbl(Post$geometry, ~st_centroid(.x)[[1]])
 ```
 
+
 We do the same for latitude with one key difference. We access the second value per each centroid with \[\[2\]\].
+
 
 ```{r}
 latitude3 <- map_dbl(Post$geometry, ~st_centroid(.x)[[2]])
 ```
 
+
 Now that we have latitude and longitude, we use cbind to put longitude and latitude into the same object.
+
 
 ```{r}
 coords3 <- cbind(longitude3, latitude3)
 ```
+
 :::
 #### Determine the cut-off distance
 
@@ -2504,26 +2836,32 @@ Firstly, we need to determine the upper limit for distance band by using the ste
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 
 k1pre <- knn2nb(knearneigh(coords1))
 k1distspre <- unlist(nbdists(k1pre, coords1, longlat = TRUE))
 summary(k1distspre)
 ```
+
 ### Cov
+
 ```{r}
 
 k1cov <- knn2nb(knearneigh(coords2))
 k1distscov <- unlist(nbdists(k1cov, coords2, longlat = TRUE))
 summary(k1distscov)
 ```
+
 ### Post
+
 ```{r}
 
 k1post <- knn2nb(knearneigh(coords3))
 k1distspost <- unlist(nbdists(k1post, coords3, longlat = TRUE))
 summary(k1distspost)
 ```
+
 :::
 The summary report shows that the largest first nearest neighbour distance is 53 km, so using this as the upper threshold gives certainty that all units will have at least one neighbour.
 
@@ -2531,17 +2869,21 @@ The summary report shows that the largest first nearest neighbour distance is 53
 
 Now, we will compute the distance weight matrix by using [*dnearneigh()*](https://r-spatial.github.io/spdep/reference/dnearneigh.html) as shown in the code chunk below.
 
+
 ```{r}
 wm_d53 <- dnearneigh(coords1, 0, 53, longlat = TRUE)
 wm_d53
 ```
 
+
 Next, *nb2listw()* is used to convert the nb object into spatial weights object.
+
 
 ```{r}
 wm53_lw <- nb2listw(wm_d53, style = 'B', zero.policy = TRUE)
 summary(wm53_lw)
 ```
+
 
 The output spatial weights object is called `wm53_lw`.
 
@@ -2551,21 +2893,26 @@ One of the characteristics of fixed distance weight matrix is that more densely 
 
 It is possible to control the numbers of neighbours directly using k-nearest neighbours, either accepting asymmetric neighbours or imposing symmetry as shown in the code chunk below.
 
+
 ```{r}
 knn <- knn2nb(knearneigh(coords1, k=8))
 knn
 ```
 
+
 Next, *nb2listw()* is used to convert the nb object into spatial weights object.
+
 
 ```{r}
 knn_lw <- nb2listw(knn, style = 'B')
 summary(knn_lw)
 ```
 
+
 ## **Computing Gi statistics**
 
 ### **Gi statistics using fixed distance**
+
 
 ```{r}
 fips11 <- order(Pre$province_eng)
@@ -2577,6 +2924,7 @@ gi.fixedCov
 gi.fixedPost
 ```
 
+
 The output of localG() is a vector of G or Gstar values, with attributes “gstari” set to TRUE or FALSE, “call” set to the function call, and class “localG”.
 
 The Gi statistics is represented as a Z-score. Greater values represent a greater intensity of clustering and the direction (positive or negative) indicates high or low clusters.
@@ -2586,20 +2934,26 @@ Next, we will join the Gi values to their corresponding tourist sf data frame by
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 Pre.gi <- cbind(Pre, as.matrix(gi.fixedPre)) %>%
   rename(gstat_fixed = as.matrix.gi.fixedPre.)
 ```
+
 ### Cov
+
 ```{r}
 Cov.gi <- cbind(Cov, as.matrix(gi.fixedCov)) %>%
   rename(gstat_fixed = as.matrix.gi.fixedCov.)
 ```
+
 ### Post
+
 ```{r}
 Post.gi <- cbind(Post, as.matrix(gi.fixedPost)) %>%
   rename(gstat_fixed = as.matrix.gi.fixedPost.)
 ```
+
 :::
 In fact, the code chunk above performs three tasks. First, it convert the output vector (i.e. *gi.fixed*) into r matrix object by using *as.matrix()*. Next, *cbind()* is used to join data and *gi.fixed* matrix to produce a new SpatialPolygonDataFrame called *pre/cov/pre.gi*. Lastly, the field name of the gi values is renamed to *gstat_fixed* by using *rename()*.
 
@@ -2610,6 +2964,7 @@ The code chunk below shows the functions used to map the Gi values derived using
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 RevenuePre <- qtm(Pre, "value")
 
@@ -2623,7 +2978,9 @@ Gimap1 <-tm_shape(Pre.gi) +
 tmap_arrange(RevenuePre, Gimap1, asp=1, ncol=2)
 ```
 
+
 ### Cov
+
 ```{r}
 RevenueCov <- qtm(Cov, "value")
 
@@ -2637,7 +2994,9 @@ Gimap2 <-tm_shape(Cov.gi) +
 tmap_arrange(RevenueCov, Gimap2, asp=1, ncol=2)
 ```
 
+
 ### Post
+
 ```{r}
 RevenuePost <- qtm(Post, "value")
 
@@ -2650,38 +3009,46 @@ Gimap3 <-tm_shape(Post.gi) +
 
 tmap_arrange(RevenuePost, Gimap3, asp=1, ncol=2)
 ```
+
 :::
 ### **Gi statistics using adaptive distance**
 
 ::: panel-tabset
 
 ### Pre
+
 ```{r}
 fips1 <- order(Pre$province_eng)
 gi.adaptive1 <- localG(Pre$value, knn_lw)
 Pre.gi1 <- cbind(Pre, as.matrix(gi.adaptive1)) %>%
   rename(gstat_adaptive = as.matrix.gi.adaptive1.)
 ```
+
 ### Cov
+
 ```{r}
 fips2 <- order(Cov$province_eng)
 gi.adaptive2 <- localG(Cov$value, knn_lw)
 Cov.gi2 <- cbind(Cov, as.matrix(gi.adaptive2)) %>%
   rename(gstat_adaptive = as.matrix.gi.adaptive2.)
 ```
+
 ### Post
+
 ```{r}
 fips3 <- order(Post$province_eng)
 gi.adaptive3 <- localG(Post$value, knn_lw)
 Post.gi3 <- cbind(Post, as.matrix(gi.adaptive3)) %>%
   rename(gstat_adaptive = as.matrix.gi.adaptive3.)
 ```
+
 :::
 ### **Mapping Gi values with adaptive distance weights**
 
 It is time for us to visualise the locations of hot spot and cold spot areas. The choropleth mapping functions of **tmap** package will be used to map the Gi values.
 
 The code chunk below shows the functions used to map the Gi values derived using fixed distance weight matrix.
+
 
 ```{r}
 Gimap1 <- tm_shape(Pre.gi1) + 
@@ -2713,7 +3080,9 @@ tmap_arrange(
              ncol=3)
 ```
 
+
 # Cold hot map Revenue
+
 
 ```{r}
 RevenueAll = revallRAW 
@@ -2738,8 +3107,6 @@ Revenue_st <- spacetime(
 is_spacetime_cube(Revenue_st)
 ```
 
-
-
 ```{r}
 Revenue_nb = Revenue_st %>%
   activate("geometry") %>%
@@ -2754,6 +3121,7 @@ Revenue_nb = Revenue_st %>%
   set_wts("wt")
   
 ```
+
 ```{r}
 #RevenueAll$YYYYMM <- as.numeric(as.character(RevenueAll$YYYYMM))
 ```
@@ -2781,6 +3149,7 @@ Revenue_nb = Revenue_st %>%
 ```{r}
 set.seed(1234)
 ```
+
 ```{r}
 ehsa = emerging_hotspot_analysis(
   x = Revenue_st,
@@ -2789,6 +3158,7 @@ ehsa = emerging_hotspot_analysis(
   nsim = 99
 )
 ```
+
 ```{r}
 ggplot(data = ehsa,
        aes(x = classification))+
@@ -2856,10 +3226,6 @@ tm_shape(ehsa_sig) +
 ```{r}
 
 ```
-
-
-
-
 
 ```{r}
 
