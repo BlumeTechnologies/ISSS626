@@ -28,7 +28,7 @@ To access each weekly lesson please click on the topic. These pages also contain
 | 4    | 16/9/2024  | [Spatial Weights and Applications](Weekly-Lessons/Week04/Lesson04.html)                 |
 | 5    | 23/9/2024  | [Global and Local Measures of Spatial Association](Weekly-Lessons/Week05/Lesson05.html) |
 | 6    | 30/9/2024  | [Geographic Segmentation](Weekly-Lessons/Week06/Lesson06.html)                          |
-| 7    | 14/10/2024 | [Geographically Weighted Explanatory Models]()       |
+| 7    | 14/10/2024 | [Geographically Weighted Explanatory Models](Weekly-Lessons/Week07/Lesson07.html)       |
 | 8    | 21/10/2024 | [Geographically Weighted Predictive Models]()        |
 | 9    | 28/10/2024 | [Spatial Interaction Models]()                       |
 | 10   | 4/11/2024  | [Modelling Geographic of Accessibility]()            |
@@ -46,6 +46,9 @@ In-class Exercise 4: [Geographically Weighted Summary Statistics](In-Class_Exerc
 In-class Exercise 5:[Global and Local Measures of Spatial Association](In-Class_Exercises/In-Class_Exercise05/In-Class_Exercise05.html)
 
 In-class Exercise 6:[Global and Local Measures of Spatial Association](In-Class_Exercises/In-Class_Exercise06/In-Class_Exercise06.html)
+
+In-class Exercise 7:[PLACEHOLDER](In-Class_Exercises/In-Class_Exercise07/In-Class_Exercise07.html)
+
 
 ## Take-home Exercises
 

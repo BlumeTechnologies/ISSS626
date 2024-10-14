@@ -1,0 +1,220 @@
+---
+title: "In-Class Exercise 07"
+author: "Pelle Knegjes"
+format: html
+editor: visual
+date: "Okt 14 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+```{r}
+pacman::p_load(olsrr, corrplot, performance, ggpubr, sf, spdep, sfdep, GWmodel, tmap, tidyverse, glue, gtsummary, ggstatsplot)
+```
+
+```{r}
+mpsz = st_read(dsn = "data/geospatial", layer = "MP14_SUBZONE_WEB_PL")
+```
+
+```{r}
+mpsz_svy21 <- st_transform(mpsz, 3414)
+```
+
+```{r}
+condo_resale = read_csv("data/aspatial/Condo_resale_2015.csv")
+```
+
+```{r}
+glimpse(condo_resale)
+```
+
+```{r}
+condo_resale.sf <- st_as_sf(condo_resale,
+                            coords = c("LONGITUDE", "LATITUDE"),
+                            crs=4326) %>%
+  st_transform(crs=3414)
+```
+
+To turn multi into single poly
+
+TMSHAPE
+
+sf_polygon = prov_sf
+
+st(cast (polygon
+
+mutate area = st_area(.))
+
+prov_vleaned = sfpolygon
+
+groupby province
+
+filter area == max(area
+
+ungroup()
+
+select(-area)
+
+select(province)
+
+```{r}
+corrplot(cor(condo_resale[, 5:23]), diag = FALSE, order = "AOE",
+         tl.pos = "td", tl.cex = 0.5, method = "number", type = "upper")
+
+```
+
+```{r}
+#| fig-width: 12
+#| fig-height: 10
+ggcorrmat(condo_resale[, 5:23])
+```
+
+```{r}
+condo.mlr <- lm(formula = SELLING_PRICE ~ AREA_SQM + AGE + 
+                   PROX_CBD + PROX_CHILDCARE + PROX_ELDERLYCARE +
+                   PROX_URA_GROWTH_AREA + PROX_MRT  + PROX_PARK + 
+                   PROX_PRIMARY_SCH + PROX_SHOPPING_MALL    + PROX_BUS_STOP + 
+                   NO_Of_UNITS + FAMILY_FRIENDLY + FREEHOLD + LEASEHOLD_99YR,
+                 data=condo_resale.sf)
+ols_regress(condo.mlr)
+
+```
+
+EXCLUDE STATISTICLAYY INSIGNIFICANT IN RESUTLS\
+Sign \<0.5
+
+VIF between 0 and 5 no problem
+
+above 5 meh
+
+above 10 no go
+
+```{r}
+ols_vif_tol(condo.mlr)
+```
+
+### variable selection
+
+```{r}
+condo_fw_mlr = ols_step_forward_p(
+  condo.mlr,
+  p_val = 0.05,
+  details = TRUE
+)
+```
+
+```{r}
+plot(condo_fw_mlr)
+```
+
+```{r}
+ols_plot_resid_fit(condo_fw_mlr$model)
+```
+
+```{r}
+ols_plot_resid_hist(condo_fw_mlr$model)
+```
+
+```{r}
+ols_test_normality(condo_fw_mlr$model)
+```
+
+```{r}
+mlr_output = as.data.frame(condo_fw_mlr$model$residuals)%>%
+  rename('FW_MLR_RES' = 'condo_fw_mlr$model$residuals')
+```
+
+```{r}
+condo_resale_sf = cbind(condo_resale.sf,
+                        mlr_output$FW_MLR_RES) %>%
+  rename('MLR_RES' = 'mlr_output.FW_MLR_RES')
+```
+
+```{r}
+tmap_mode("plot")
+tmap_options(check.and.fix = TRUE)
+tm_shape(mpsz)+
+  tmap_options(check.and.fix = TRUE) +
+  tm_polygons(alpha = 0.4) +
+  tm_shape(condo_resale_sf) +
+  tm_dots(col = "MLR_RES",
+          alpha = 0.6,
+          style = "quantile")
+
+  
+```
+
+```{r}
+tmap_mode("plot")
+```
+
+```{r}
+condo_resale_sf = condo_resale_sf %>%
+  mutate(nb = st_knn(geometry, k=6,
+                     longlat = FALSE),
+         wt = st_weights(nb,
+                         style = "W"),
+         .before = 1)
+```
+
+```{r}
+global_moran_perm(condo_resale_sf$MLR_RES,
+                  condo_resale_sf$nb,
+                  condo_resale_sf$wt,
+                  alternative = "two.sided",
+                  nsim = 99)
+```
+
+Null hypothesis that its random is rejected so there is clustering
+
+```{r}
+bw_fixed = bw.gwr(formula = SELLING_PRICE ~ AREA_SQM + AGE + PROX_CBD + PROX_CHILDCARE + PROX_ELDERLYCARE + PROX_URA_GROWTH_AREA + PROX_MRT + PROX_PARK + PROX_PRIMARY_SCH + PROX_SHOPPING_MALL + PROX_BUS_STOP + NO_Of_UNITS + FAMILY_FRIENDLY + FREEHOLD,
+                  data=condo_resale_sf,
+                  approach = "CV",
+                  kernel = "gaussian",
+                  adaptive = FALSE,
+                  longlat = FALSE)
+
+```
+
+use the bandwith in the calibration
+
+```{r}
+gwr_fixed = gwr.basic(formula = SELLING_PRICE ~ AREA_SQM + AGE + PROX_CBD + PROX_CHILDCARE + PROX_ELDERLYCARE + PROX_URA_GROWTH_AREA + PROX_MRT + PROX_PARK + PROX_PRIMARY_SCH + PROX_SHOPPING_MALL + PROX_BUS_STOP + NO_Of_UNITS + FAMILY_FRIENDLY + FREEHOLD,
+                  data=condo_resale_sf,
+                  bw=bw_fixed,
+                  kernel = "gaussian",
+                  longlat = FALSE)
+```
+
+```{r}
+gwr_fixed
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
