@@ -103,7 +103,7 @@ ols_vif_tol(condo.mlr)
 condo_fw_mlr = ols_step_forward_p(
   condo.mlr,
   p_val = 0.05,
-  details = TRUE
+  details = FALSE
 )
 ```
 

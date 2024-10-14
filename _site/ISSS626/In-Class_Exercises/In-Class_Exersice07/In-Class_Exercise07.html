@@ -402,340 +402,11 @@ Sign &lt;0.5</p>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>condo_fw_mlr <span class="ot">=</span> <span class="fu">ols_step_forward_p</span>(</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  condo.mlr,</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">p_val =</span> <span class="fl">0.05</span>,</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">details =</span> <span class="cn">TRUE</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">details =</span> <span class="cn">FALSE</span></span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Forward Selection Method 
-------------------------
-
-Candidate Terms: 
-
-1. AREA_SQM 
-2. AGE 
-3. PROX_CBD 
-4. PROX_CHILDCARE 
-5. PROX_ELDERLYCARE 
-6. PROX_URA_GROWTH_AREA 
-7. PROX_MRT 
-8. PROX_PARK 
-9. PROX_PRIMARY_SCH 
-10. PROX_SHOPPING_MALL 
-11. PROX_BUS_STOP 
-12. NO_Of_UNITS 
-13. FAMILY_FRIENDLY 
-14. FREEHOLD 
-15. LEASEHOLD_99YR 
-
-
-Step   =&gt; 0 
-Model  =&gt; SELLING_PRICE ~ 1 
-R2     =&gt; 0 
-
-Initiating stepwise selection... 
-
-                          Selection Metrics Table                            
-----------------------------------------------------------------------------
-Predictor               Pr(&gt;|t|)    R-Squared    Adj. R-Squared       AIC    
-----------------------------------------------------------------------------
-AREA_SQM                 0.00000        0.452             0.451    43587.753 
-PROX_CBD                 0.00000        0.243             0.242    44051.772 
-FREEHOLD                 0.00000        0.082             0.081    44328.539 
-LEASEHOLD_99YR           0.00000        0.066             0.065    44353.172 
-PROX_PARK                0.00000        0.049             0.048    44378.817 
-NO_Of_UNITS              0.00000        0.048             0.048    44380.124 
-PROX_PRIMARY_SCH         0.00000        0.032             0.032    44403.847 
-PROX_CHILDCARE           0.00000        0.021             0.021    44420.298 
-PROX_ELDERLYCARE         0.00000        0.021             0.020    44420.546 
-PROX_BUS_STOP            0.00000        0.021             0.020    44420.742 
-PROX_SHOPPING_MALL       0.00154        0.007             0.006    44441.023 
-FAMILY_FRIENDLY          0.00907        0.005             0.004    44444.248 
-PROX_MRT                 0.01071        0.005             0.004    44444.545 
-PROX_URA_GROWTH_AREA     0.13510        0.002             0.001    44448.832 
-AGE                      0.52978        0.000             0.000    44450.673 
-----------------------------------------------------------------------------
-
-Step      =&gt; 1 
-Selected  =&gt; AREA_SQM 
-Model     =&gt; SELLING_PRICE ~ AREA_SQM 
-R2        =&gt; 0.452 
-
-                          Selection Metrics Table                            
-----------------------------------------------------------------------------
-Predictor               Pr(&gt;|t|)    R-Squared    Adj. R-Squared       AIC    
-----------------------------------------------------------------------------
-PROX_CBD                 0.00000        0.569             0.569    43243.523 
-FREEHOLD                 0.00000        0.487             0.487    43493.627 
-PROX_PARK                0.00000        0.478             0.478    43518.542 
-LEASEHOLD_99YR           0.00000        0.475             0.474    43527.150 
-AGE                      0.00000        0.471             0.470    43538.063 
-PROX_SHOPPING_MALL       0.00000        0.467             0.466    43549.216 
-PROX_MRT                 0.00000        0.465             0.464    43556.097 
-NO_Of_UNITS              0.00000        0.464             0.463    43557.089 
-PROX_PRIMARY_SCH           3e-05        0.458             0.458    43572.418 
-PROX_ELDERLYCARE           5e-05        0.458             0.457    43573.203 
-PROX_URA_GROWTH_AREA       9e-05        0.458             0.457    43574.292 
-FAMILY_FRIENDLY          0.00026        0.457             0.456    43576.392 
-PROX_CHILDCARE           0.00275        0.455             0.455    43580.768 
-PROX_BUS_STOP            0.00381        0.455             0.454    43581.362 
-----------------------------------------------------------------------------
-
-Step      =&gt; 2 
-Selected  =&gt; PROX_CBD 
-Model     =&gt; SELLING_PRICE ~ AREA_SQM + PROX_CBD 
-R2        =&gt; 0.569 
-
-                          Selection Metrics Table                            
-----------------------------------------------------------------------------
-Predictor               Pr(&gt;|t|)    R-Squared    Adj. R-Squared       AIC    
-----------------------------------------------------------------------------
-PROX_PARK                0.00000        0.589             0.588    43177.691 
-AGE                      0.00000        0.586             0.585    43188.935 
-FREEHOLD                 0.00000        0.579             0.578    43213.005 
-PROX_ELDERLYCARE         0.00000        0.578             0.577    43216.850 
-LEASEHOLD_99YR           0.00000        0.576             0.575    43224.500 
-PROX_SHOPPING_MALL         8e-05        0.574             0.573    43229.948 
-PROX_MRT                 0.00613        0.572             0.571    43237.989 
-NO_Of_UNITS              0.01059        0.571             0.570    43238.970 
-PROX_PRIMARY_SCH         0.04530        0.570             0.570    43241.503 
-PROX_BUS_STOP            0.06634        0.570             0.569    43242.142 
-FAMILY_FRIENDLY          0.11212        0.570             0.569    43242.991 
-PROX_CHILDCARE           0.29768        0.570             0.569    43244.435 
-PROX_URA_GROWTH_AREA     0.78658        0.569             0.568    43245.450 
-----------------------------------------------------------------------------
-
-Step      =&gt; 3 
-Selected  =&gt; PROX_PARK 
-Model     =&gt; SELLING_PRICE ~ AREA_SQM + PROX_CBD + PROX_PARK 
-R2        =&gt; 0.589 
-
-                          Selection Metrics Table                            
-----------------------------------------------------------------------------
-Predictor               Pr(&gt;|t|)    R-Squared    Adj. R-Squared       AIC    
-----------------------------------------------------------------------------
-FREEHOLD                 0.00000        0.604             0.603    43125.474 
-AGE                      0.00000        0.602             0.601    43132.534 
-LEASEHOLD_99YR           0.00000        0.601             0.600    43138.902 
-PROX_ELDERLYCARE         0.00000        0.596             0.595    43153.932 
-NO_Of_UNITS              0.00013        0.593             0.592    43164.977 
-PROX_SHOPPING_MALL       0.00015        0.593             0.592    43165.286 
-PROX_MRT                 0.00250        0.592             0.591    43170.516 
-FAMILY_FRIENDLY          0.02445        0.591             0.589    43174.609 
-PROX_URA_GROWTH_AREA     0.14518        0.590             0.589    43177.560 
-PROX_CHILDCARE           0.31093        0.589             0.588    43178.660 
-PROX_PRIMARY_SCH         0.34515        0.589             0.588    43178.796 
-PROX_BUS_STOP            0.47898        0.589             0.588    43179.188 
-----------------------------------------------------------------------------
-
-Step      =&gt; 4 
-Selected  =&gt; FREEHOLD 
-Model     =&gt; SELLING_PRICE ~ AREA_SQM + PROX_CBD + PROX_PARK + FREEHOLD 
-R2        =&gt; 0.604 
-
-                          Selection Metrics Table                            
-----------------------------------------------------------------------------
-Predictor               Pr(&gt;|t|)    R-Squared    Adj. R-Squared       AIC    
-----------------------------------------------------------------------------
-AGE                      0.00000        0.620             0.619    43069.222 
-PROX_SHOPPING_MALL       0.00000        0.611             0.609    43104.195 
-PROX_ELDERLYCARE           5e-05        0.609             0.608    43111.036 
-PROX_MRT                 0.00345        0.607             0.605    43118.882 
-PROX_BUS_STOP            0.09204        0.605             0.604    43124.623 
-FAMILY_FRIENDLY          0.11599        0.605             0.604    43124.992 
-PROX_PRIMARY_SCH         0.21752        0.605             0.603    43125.946 
-NO_Of_UNITS              0.25242        0.605             0.603    43126.158 
-PROX_URA_GROWTH_AREA     0.27640        0.605             0.603    43126.284 
-LEASEHOLD_99YR           0.49846        0.605             0.603    43127.014 
-PROX_CHILDCARE           0.82289        0.604             0.603    43127.424 
-----------------------------------------------------------------------------
-
-Step      =&gt; 5 
-Selected  =&gt; AGE 
-Model     =&gt; SELLING_PRICE ~ AREA_SQM + PROX_CBD + PROX_PARK + FREEHOLD + AGE 
-R2        =&gt; 0.62 
-
-                          Selection Metrics Table                            
-----------------------------------------------------------------------------
-Predictor               Pr(&gt;|t|)    R-Squared    Adj. R-Squared       AIC    
-----------------------------------------------------------------------------
-PROX_ELDERLYCARE         0.00000        0.627             0.625    43046.515 
-PROX_SHOPPING_MALL       0.00014        0.624             0.622    43056.710 
-PROX_MRT                 0.00118        0.623             0.621    43060.651 
-NO_Of_UNITS              0.03614        0.621             0.620    43066.808 
-PROX_PRIMARY_SCH         0.04454        0.621             0.620    43067.165 
-PROX_URA_GROWTH_AREA     0.05538        0.621             0.619    43067.532 
-FAMILY_FRIENDLY          0.06368        0.621             0.619    43067.765 
-PROX_BUS_STOP            0.09258        0.621             0.619    43068.378 
-LEASEHOLD_99YR           0.33191        0.620             0.619    43070.276 
-PROX_CHILDCARE           0.76117        0.620             0.619    43071.129 
-----------------------------------------------------------------------------
-
-Step      =&gt; 6 
-Selected  =&gt; PROX_ELDERLYCARE 
-Model     =&gt; SELLING_PRICE ~ AREA_SQM + PROX_CBD + PROX_PARK + FREEHOLD + AGE + PROX_ELDERLYCARE 
-R2        =&gt; 0.627 
-
-                          Selection Metrics Table                            
-----------------------------------------------------------------------------
-Predictor               Pr(&gt;|t|)    R-Squared    Adj. R-Squared       AIC    
-----------------------------------------------------------------------------
-PROX_SHOPPING_MALL       0.00000        0.634             0.632    43020.990 
-PROX_MRT                 0.00000        0.633             0.631    43024.733 
-PROX_CHILDCARE           0.00320        0.629             0.627    43039.776 
-FAMILY_FRIENDLY          0.04001        0.628             0.626    43044.273 
-PROX_URA_GROWTH_AREA     0.06111        0.628             0.626    43044.987 
-NO_Of_UNITS              0.21750        0.627             0.625    43046.985 
-LEASEHOLD_99YR           0.33225        0.627             0.625    43047.569 
-PROX_PRIMARY_SCH         0.72554        0.627             0.625    43048.391 
-PROX_BUS_STOP            0.73834        0.627             0.625    43048.403 
-----------------------------------------------------------------------------
-
-Step      =&gt; 7 
-Selected  =&gt; PROX_SHOPPING_MALL 
-Model     =&gt; SELLING_PRICE ~ AREA_SQM + PROX_CBD + PROX_PARK + FREEHOLD + AGE + PROX_ELDERLYCARE + PROX_SHOPPING_MALL 
-R2        =&gt; 0.634 
-
-                          Selection Metrics Table                            
-----------------------------------------------------------------------------
-Predictor               Pr(&gt;|t|)    R-Squared    Adj. R-Squared       AIC    
-----------------------------------------------------------------------------
-PROX_URA_GROWTH_AREA       2e-04        0.637             0.635    43009.092 
-PROX_MRT                 0.00038        0.637             0.635    43010.278 
-FAMILY_FRIENDLY          0.09004        0.634             0.632    43020.098 
-NO_Of_UNITS              0.09561        0.634             0.632    43020.195 
-PROX_BUS_STOP            0.10105        0.634             0.632    43020.284 
-PROX_CHILDCARE           0.16782        0.634             0.632    43021.075 
-PROX_PRIMARY_SCH         0.20169        0.634             0.632    43021.349 
-LEASEHOLD_99YR           0.41342        0.634             0.632    43022.317 
-----------------------------------------------------------------------------
-
-Step      =&gt; 8 
-Selected  =&gt; PROX_URA_GROWTH_AREA 
-Model     =&gt; SELLING_PRICE ~ AREA_SQM + PROX_CBD + PROX_PARK + FREEHOLD + AGE + PROX_ELDERLYCARE + PROX_SHOPPING_MALL + PROX_URA_GROWTH_AREA 
-R2        =&gt; 0.637 
-
-                        Selection Metrics Table                          
-------------------------------------------------------------------------
-Predictor           Pr(&gt;|t|)    R-Squared    Adj. R-Squared       AIC    
-------------------------------------------------------------------------
-PROX_MRT             0.00055        0.640             0.638    42999.058 
-NO_Of_UNITS          0.04357        0.638             0.636    43006.989 
-PROX_BUS_STOP        0.07301        0.638             0.636    43007.854 
-FAMILY_FRIENDLY      0.07751        0.638             0.636    43007.953 
-PROX_CHILDCARE       0.17683        0.638             0.635    43009.255 
-LEASEHOLD_99YR       0.26341        0.638             0.635    43009.832 
-PROX_PRIMARY_SCH     0.60814        0.637             0.635    43010.827 
-------------------------------------------------------------------------
-
-Step      =&gt; 9 
-Selected  =&gt; PROX_MRT 
-Model     =&gt; SELLING_PRICE ~ AREA_SQM + PROX_CBD + PROX_PARK + FREEHOLD + AGE + PROX_ELDERLYCARE + PROX_SHOPPING_MALL + PROX_URA_GROWTH_AREA + PROX_MRT 
-R2        =&gt; 0.64 
-
-                        Selection Metrics Table                          
-------------------------------------------------------------------------
-Predictor           Pr(&gt;|t|)    R-Squared    Adj. R-Squared       AIC    
-------------------------------------------------------------------------
-PROX_BUS_STOP          6e-05        0.644             0.642    42984.951 
-PROX_PRIMARY_SCH     0.01738        0.642             0.639    42995.355 
-NO_Of_UNITS          0.04105        0.641             0.639    42996.851 
-FAMILY_FRIENDLY      0.06468        0.641             0.639    42997.618 
-LEASEHOLD_99YR       0.16895        0.641             0.638    42999.151 
-PROX_CHILDCARE       0.71809        0.640             0.638    43000.927 
-------------------------------------------------------------------------
-
-Step      =&gt; 10 
-Selected  =&gt; PROX_BUS_STOP 
-Model     =&gt; SELLING_PRICE ~ AREA_SQM + PROX_CBD + PROX_PARK + FREEHOLD + AGE + PROX_ELDERLYCARE + PROX_SHOPPING_MALL + PROX_URA_GROWTH_AREA + PROX_MRT + PROX_BUS_STOP 
-R2        =&gt; 0.644 
-
-                        Selection Metrics Table                          
-------------------------------------------------------------------------
-Predictor           Pr(&gt;|t|)    R-Squared    Adj. R-Squared       AIC    
-------------------------------------------------------------------------
-FAMILY_FRIENDLY      0.01590        0.646             0.643    42981.085 
-PROX_CHILDCARE       0.02032        0.646             0.643    42981.519 
-NO_Of_UNITS          0.03658        0.645             0.643    42982.543 
-PROX_PRIMARY_SCH     0.06688        0.645             0.642    42983.563 
-LEASEHOLD_99YR       0.10015        0.645             0.642    42984.224 
-------------------------------------------------------------------------
-
-Step      =&gt; 11 
-Selected  =&gt; FAMILY_FRIENDLY 
-Model     =&gt; SELLING_PRICE ~ AREA_SQM + PROX_CBD + PROX_PARK + FREEHOLD + AGE + PROX_ELDERLYCARE + PROX_SHOPPING_MALL + PROX_URA_GROWTH_AREA + PROX_MRT + PROX_BUS_STOP + FAMILY_FRIENDLY 
-R2        =&gt; 0.646 
-
-                        Selection Metrics Table                          
-------------------------------------------------------------------------
-Predictor           Pr(&gt;|t|)    R-Squared    Adj. R-Squared       AIC    
-------------------------------------------------------------------------
-NO_Of_UNITS          0.00533        0.648             0.645    42975.246 
-PROX_CHILDCARE       0.01908        0.647             0.644    42977.539 
-PROX_PRIMARY_SCH     0.06018        0.647             0.644    42979.519 
-LEASEHOLD_99YR       0.06704        0.647             0.644    42979.699 
-------------------------------------------------------------------------
-
-Step      =&gt; 12 
-Selected  =&gt; NO_Of_UNITS 
-Model     =&gt; SELLING_PRICE ~ AREA_SQM + PROX_CBD + PROX_PARK + FREEHOLD + AGE + PROX_ELDERLYCARE + PROX_SHOPPING_MALL + PROX_URA_GROWTH_AREA + PROX_MRT + PROX_BUS_STOP + FAMILY_FRIENDLY + NO_Of_UNITS 
-R2        =&gt; 0.648 
-
-                        Selection Metrics Table                          
-------------------------------------------------------------------------
-Predictor           Pr(&gt;|t|)    R-Squared    Adj. R-Squared       AIC    
-------------------------------------------------------------------------
-PROX_CHILDCARE       0.02092        0.649             0.646    42971.858 
-PROX_PRIMARY_SCH     0.05496        0.649             0.645    42973.525 
-LEASEHOLD_99YR       0.16053        0.648             0.645    42975.257 
-------------------------------------------------------------------------
-
-Step      =&gt; 13 
-Selected  =&gt; PROX_CHILDCARE 
-Model     =&gt; SELLING_PRICE ~ AREA_SQM + PROX_CBD + PROX_PARK + FREEHOLD + AGE + PROX_ELDERLYCARE + PROX_SHOPPING_MALL + PROX_URA_GROWTH_AREA + PROX_MRT + PROX_BUS_STOP + FAMILY_FRIENDLY + NO_Of_UNITS + PROX_CHILDCARE 
-R2        =&gt; 0.649 
-
-                        Selection Metrics Table                          
-------------------------------------------------------------------------
-Predictor           Pr(&gt;|t|)    R-Squared    Adj. R-Squared       AIC    
-------------------------------------------------------------------------
-PROX_PRIMARY_SCH     0.00805        0.651             0.647    42966.758 
-LEASEHOLD_99YR       0.32104        0.649             0.646    42972.863 
-------------------------------------------------------------------------
-
-Step      =&gt; 14 
-Selected  =&gt; PROX_PRIMARY_SCH 
-Model     =&gt; SELLING_PRICE ~ AREA_SQM + PROX_CBD + PROX_PARK + FREEHOLD + AGE + PROX_ELDERLYCARE + PROX_SHOPPING_MALL + PROX_URA_GROWTH_AREA + PROX_MRT + PROX_BUS_STOP + FAMILY_FRIENDLY + NO_Of_UNITS + PROX_CHILDCARE + PROX_PRIMARY_SCH 
-R2        =&gt; 0.651 
-
-                       Selection Metrics Table                         
-----------------------------------------------------------------------
-Predictor         Pr(&gt;|t|)    R-Squared    Adj. R-Squared       AIC    
-----------------------------------------------------------------------
-LEASEHOLD_99YR     0.24093        0.651             0.647    42967.367 
-----------------------------------------------------------------------
-
-
-No more variables to be added.
-
-Variables Selected: 
-
-=&gt; AREA_SQM 
-=&gt; PROX_CBD 
-=&gt; PROX_PARK 
-=&gt; FREEHOLD 
-=&gt; AGE 
-=&gt; PROX_ELDERLYCARE 
-=&gt; PROX_SHOPPING_MALL 
-=&gt; PROX_URA_GROWTH_AREA 
-=&gt; PROX_MRT 
-=&gt; PROX_BUS_STOP 
-=&gt; FAMILY_FRIENDLY 
-=&gt; NO_Of_UNITS 
-=&gt; PROX_CHILDCARE 
-=&gt; PROX_PRIMARY_SCH </code></pre>
-</div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(condo_fw_mlr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(condo_fw_mlr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -745,7 +416,7 @@ Variables Selected:
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ols_plot_resid_fit</span>(condo_fw_mlr<span class="sc">$</span>model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ols_plot_resid_fit</span>(condo_fw_mlr<span class="sc">$</span>model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -755,7 +426,7 @@ Variables Selected:
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ols_plot_resid_hist</span>(condo_fw_mlr<span class="sc">$</span>model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ols_plot_resid_hist</span>(condo_fw_mlr<span class="sc">$</span>model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -765,7 +436,7 @@ Variables Selected:
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ols_test_normality</span>(condo_fw_mlr<span class="sc">$</span>model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ols_test_normality</span>(condo_fw_mlr<span class="sc">$</span>model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning in ks.test.default(y, "pnorm", mean(y), sd(y)): ties should not be
 present for the one-sample Kolmogorov-Smirnov test</code></pre>
@@ -782,27 +453,27 @@ Anderson-Darling         67.9551         0.0000
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>mlr_output <span class="ot">=</span> <span class="fu">as.data.frame</span>(condo_fw_mlr<span class="sc">$</span>model<span class="sc">$</span>residuals)<span class="sc">%&gt;%</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">'FW_MLR_RES'</span> <span class="ot">=</span> <span class="st">'condo_fw_mlr$model$residuals'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>mlr_output <span class="ot">=</span> <span class="fu">as.data.frame</span>(condo_fw_mlr<span class="sc">$</span>model<span class="sc">$</span>residuals)<span class="sc">%&gt;%</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">'FW_MLR_RES'</span> <span class="ot">=</span> <span class="st">'condo_fw_mlr$model$residuals'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>condo_resale_sf <span class="ot">=</span> <span class="fu">cbind</span>(condo_resale.sf,</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>                        mlr_output<span class="sc">$</span>FW_MLR_RES) <span class="sc">%&gt;%</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">'MLR_RES'</span> <span class="ot">=</span> <span class="st">'mlr_output.FW_MLR_RES'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>condo_resale_sf <span class="ot">=</span> <span class="fu">cbind</span>(condo_resale.sf,</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>                        mlr_output<span class="sc">$</span>FW_MLR_RES) <span class="sc">%&gt;%</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">'MLR_RES'</span> <span class="ot">=</span> <span class="st">'mlr_output.FW_MLR_RES'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>tmap mode set to plotting</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_options</span>(<span class="at">check.and.fix =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(mpsz)<span class="sc">+</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tmap_options</span>(<span class="at">check.and.fix =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(condo_resale_sf) <span class="sc">+</span></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">col =</span> <span class="st">"MLR_RES"</span>,</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">alpha =</span> <span class="fl">0.6</span>,</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_options</span>(<span class="at">check.and.fix =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(mpsz)<span class="sc">+</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tmap_options</span>(<span class="at">check.and.fix =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(condo_resale_sf) <span class="sc">+</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">col =</span> <span class="st">"MLR_RES"</span>,</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">alpha =</span> <span class="fl">0.6</span>,</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: The shape mpsz is invalid. See sf::st_is_valid</code></pre>
 </div>
@@ -818,25 +489,25 @@ Anderson-Darling         67.9551         0.0000
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>tmap mode set to plotting</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>condo_resale_sf <span class="ot">=</span> condo_resale_sf <span class="sc">%&gt;%</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_knn</span>(geometry, <span class="at">k=</span><span class="dv">6</span>,</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">longlat =</span> <span class="cn">FALSE</span>),</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">wt =</span> <span class="fu">st_weights</span>(nb,</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>                         <span class="at">style =</span> <span class="st">"W"</span>),</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>condo_resale_sf <span class="ot">=</span> condo_resale_sf <span class="sc">%&gt;%</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_knn</span>(geometry, <span class="at">k=</span><span class="dv">6</span>,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">longlat =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">wt =</span> <span class="fu">st_weights</span>(nb,</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>                         <span class="at">style =</span> <span class="st">"W"</span>),</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">global_moran_perm</span>(condo_resale_sf<span class="sc">$</span>MLR_RES,</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>                  condo_resale_sf<span class="sc">$</span>nb,</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>                  condo_resale_sf<span class="sc">$</span>wt,</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">alternative =</span> <span class="st">"two.sided"</span>,</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">nsim =</span> <span class="dv">99</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">global_moran_perm</span>(condo_resale_sf<span class="sc">$</span>MLR_RES,</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>                  condo_resale_sf<span class="sc">$</span>nb,</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>                  condo_resale_sf<span class="sc">$</span>wt,</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">alternative =</span> <span class="st">"two.sided"</span>,</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">nsim =</span> <span class="dv">99</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Monte-Carlo simulation of Moran I
@@ -851,12 +522,12 @@ alternative hypothesis: two.sided</code></pre>
 </div>
 <p>Null hypothesis that its random is rejected so there is clustering</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>bw_fixed <span class="ot">=</span> <span class="fu">bw.gwr</span>(<span class="at">formula =</span> SELLING_PRICE <span class="sc">~</span> AREA_SQM <span class="sc">+</span> AGE <span class="sc">+</span> PROX_CBD <span class="sc">+</span> PROX_CHILDCARE <span class="sc">+</span> PROX_ELDERLYCARE <span class="sc">+</span> PROX_URA_GROWTH_AREA <span class="sc">+</span> PROX_MRT <span class="sc">+</span> PROX_PARK <span class="sc">+</span> PROX_PRIMARY_SCH <span class="sc">+</span> PROX_SHOPPING_MALL <span class="sc">+</span> PROX_BUS_STOP <span class="sc">+</span> NO_Of_UNITS <span class="sc">+</span> FAMILY_FRIENDLY <span class="sc">+</span> FREEHOLD,</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>condo_resale_sf,</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">approach =</span> <span class="st">"CV"</span>,</span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">kernel =</span> <span class="st">"gaussian"</span>,</span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">adaptive =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">longlat =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>bw_fixed <span class="ot">=</span> <span class="fu">bw.gwr</span>(<span class="at">formula =</span> SELLING_PRICE <span class="sc">~</span> AREA_SQM <span class="sc">+</span> AGE <span class="sc">+</span> PROX_CBD <span class="sc">+</span> PROX_CHILDCARE <span class="sc">+</span> PROX_ELDERLYCARE <span class="sc">+</span> PROX_URA_GROWTH_AREA <span class="sc">+</span> PROX_MRT <span class="sc">+</span> PROX_PARK <span class="sc">+</span> PROX_PRIMARY_SCH <span class="sc">+</span> PROX_SHOPPING_MALL <span class="sc">+</span> PROX_BUS_STOP <span class="sc">+</span> NO_Of_UNITS <span class="sc">+</span> FAMILY_FRIENDLY <span class="sc">+</span> FREEHOLD,</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>condo_resale_sf,</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">approach =</span> <span class="st">"CV"</span>,</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">kernel =</span> <span class="st">"gaussian"</span>,</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">adaptive =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">longlat =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Fixed bandwidth: 17660.96 CV score: 8.259118e+14 
 Fixed bandwidth: 10917.26 CV score: 7.970454e+14 
@@ -904,19 +575,19 @@ Fixed bandwidth: 971.3405 CV score: 4.721292e+14 </code></pre>
 </div>
 <p>use the bandwith in the calibration</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>gwr_fixed <span class="ot">=</span> <span class="fu">gwr.basic</span>(<span class="at">formula =</span> SELLING_PRICE <span class="sc">~</span> AREA_SQM <span class="sc">+</span> AGE <span class="sc">+</span> PROX_CBD <span class="sc">+</span> PROX_CHILDCARE <span class="sc">+</span> PROX_ELDERLYCARE <span class="sc">+</span> PROX_URA_GROWTH_AREA <span class="sc">+</span> PROX_MRT <span class="sc">+</span> PROX_PARK <span class="sc">+</span> PROX_PRIMARY_SCH <span class="sc">+</span> PROX_SHOPPING_MALL <span class="sc">+</span> PROX_BUS_STOP <span class="sc">+</span> NO_Of_UNITS <span class="sc">+</span> FAMILY_FRIENDLY <span class="sc">+</span> FREEHOLD,</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>condo_resale_sf,</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">bw=</span>bw_fixed,</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">kernel =</span> <span class="st">"gaussian"</span>,</span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">longlat =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>gwr_fixed <span class="ot">=</span> <span class="fu">gwr.basic</span>(<span class="at">formula =</span> SELLING_PRICE <span class="sc">~</span> AREA_SQM <span class="sc">+</span> AGE <span class="sc">+</span> PROX_CBD <span class="sc">+</span> PROX_CHILDCARE <span class="sc">+</span> PROX_ELDERLYCARE <span class="sc">+</span> PROX_URA_GROWTH_AREA <span class="sc">+</span> PROX_MRT <span class="sc">+</span> PROX_PARK <span class="sc">+</span> PROX_PRIMARY_SCH <span class="sc">+</span> PROX_SHOPPING_MALL <span class="sc">+</span> PROX_BUS_STOP <span class="sc">+</span> NO_Of_UNITS <span class="sc">+</span> FAMILY_FRIENDLY <span class="sc">+</span> FREEHOLD,</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>condo_resale_sf,</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">bw=</span>bw_fixed,</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">kernel =</span> <span class="st">"gaussian"</span>,</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">longlat =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>gwr_fixed</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>gwr_fixed</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   ***********************************************************************
    *                       Package   GWmodel                             *
    ***********************************************************************
-   Program starts at: 2024-10-14 22:34:50.086652 
+   Program starts at: 2024-10-14 23:38:31.25526 
    Call:
    gwr.basic(formula = SELLING_PRICE ~ AREA_SQM + AGE + PROX_CBD + 
     PROX_CHILDCARE + PROX_ELDERLYCARE + PROX_URA_GROWTH_AREA + 
@@ -1024,7 +695,7 @@ Fixed bandwidth: 971.3405 CV score: 4.721292e+14 </code></pre>
    Adjusted R-square value:  0.8430417 
 
    ***********************************************************************
-   Program stops at: 2024-10-14 22:34:52.168079 </code></pre>
+   Program stops at: 2024-10-14 23:38:33.26274 </code></pre>
 </div>
 </div>
 
