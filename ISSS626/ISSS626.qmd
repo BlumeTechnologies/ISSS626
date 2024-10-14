@@ -47,7 +47,7 @@ In-class Exercise 5:[Global and Local Measures of Spatial Association](In-Class_
 
 In-class Exercise 6:[Global and Local Measures of Spatial Association](In-Class_Exercises/In-Class_Exercise06/In-Class_Exercise06.html)
 
-In-class Exercise 7:[PLACEHOLDER](In-Class_Exercises/In-Class_Exercise07/In-Class_Exercise07.html)
+In-class Exercise 7:[PLACEHOLDER](In-Class_Exercises/In-Class_Exersice07/In-Class_Exercise07.html)
 
 
 ## Take-home Exercises
