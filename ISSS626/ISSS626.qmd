@@ -29,9 +29,9 @@ To access each weekly lesson please click on the topic. These pages also contain
 | 5    | 23/9/2024  | [Global and Local Measures of Spatial Association](Weekly-Lessons/Week05/Lesson05.html) |
 | 6    | 30/9/2024  | [Geographic Segmentation](Weekly-Lessons/Week06/Lesson06.html)                          |
 | 7    | 14/10/2024 | [Geographically Weighted Explanatory Models](Weekly-Lessons/Week07/Lesson07.html)       |
-| 8    | 21/10/2024 | [Geographically Weighted Predictive Models]()        |
-| 9    | 28/10/2024 | [Spatial Interaction Models]()                       |
-| 10   | 4/11/2024  | [Modelling Geographic of Accessibility]()            |
+| 8    | 21/10/2024 | [Geographically Weighted Predictive Models](Weekly-Lessons/Week08/Lesson08.html)        |
+| 9    | 28/10/2024 | [Spatial Interaction Models](Weekly-Lessons/Week09/Lesson09.html)                       |
+| 10   | 4/11/2024  | [Modelling Geographic of Accessibility](Weekly-Lessons/Week10/Lesson10.html)            |
 
 ## In-class Exercises
 
@@ -47,7 +47,7 @@ In-class Exercise 5:[Global and Local Measures of Spatial Association](In-Class_
 
 In-class Exercise 6:[Global and Local Measures of Spatial Association](In-Class_Exercises/In-Class_Exercise06/In-Class_Exercise06.html)
 
-In-class Exercise 7:[PLACEHOLDER](In-Class_Exercises/In-Class_Exersice07/In-Class_Exercise07.html)
+In-class Exercise 7:[Calibrating Hedonic Pricing Model for Private Highrise Property with GWR Method](In-Class_Exercises/In-Class_Exersice07/In-Class_Exercise07.html)
 
 
 ## Take-home Exercises
@@ -55,3 +55,5 @@ In-class Exercise 7:[PLACEHOLDER](In-Class_Exercises/In-Class_Exersice07/In-Clas
 Take-home Exercise 1: [Geospatial Analytics for Public Good](Take-Home_Exercises/Take-Home_Exercise01/Take-Home_Exercise01.html)
 
 Take-home Exercise 2: [Discovering impacts of COVID-19 on Thailand tourism economy at the province level using spatial and spatio-temporal statistics](Take-Home_Exercises/Take-Home_Exercise02/Take-Home_Exercise02.html)
+
+Take-home Exercise 3b: [Predicting HDB Resale Prices with Geographically Weighted Machine Learning Methods](Take-Home_Exercises/Take-Home_Exercise03/Take-Home_Exercise03.html)

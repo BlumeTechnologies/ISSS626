@@ -1,5 +1,5 @@
 ---
-title: "In-Class Exercise 07"
+title: "In-Class Exercise 07: Calibrating Hedonic Pricing Model for Private Highrise Property with GWR Method"
 author: "Pelle Knegjes"
 format: html
 editor: visual
@@ -11,6 +11,32 @@ execute:
   message: false
   freeze: true
 ---
+
+*LESSON NOTE*
+
+To turn multi into single poly
+
+TMSHAPE
+
+sf_polygon = prov_sf
+
+st(cast (polygon
+
+mutate area = st_area(.))
+
+prov_vleaned = sfpolygon
+
+groupby province
+
+filter area == max(area
+
+ungroup()
+
+select(-area)
+
+select(province)
+
+------------------------------------------------------------------------
 
 ```{r}
 pacman::p_load(olsrr, corrplot, performance, ggpubr, sf, spdep, sfdep, GWmodel, tmap, tidyverse, glue, gtsummary, ggstatsplot)
@@ -38,28 +64,6 @@ condo_resale.sf <- st_as_sf(condo_resale,
                             crs=4326) %>%
   st_transform(crs=3414)
 ```
-
-To turn multi into single poly
-
-TMSHAPE
-
-sf_polygon = prov_sf
-
-st(cast (polygon
-
-mutate area = st_area(.))
-
-prov_vleaned = sfpolygon
-
-groupby province
-
-filter area == max(area
-
-ungroup()
-
-select(-area)
-
-select(province)
 
 ```{r}
 corrplot(cor(condo_resale[, 5:23]), diag = FALSE, order = "AOE",
@@ -109,6 +113,11 @@ condo_fw_mlr = ols_step_forward_p(
 
 ```{r}
 plot(condo_fw_mlr)
+```
+
+```{r}
+ggcoefstats(condo.mlr,
+            sort = "ascending")
 ```
 
 ```{r}
@@ -193,6 +202,138 @@ gwr_fixed = gwr.basic(formula = SELLING_PRICE ~ AREA_SQM + AGE + PROX_CBD + PROX
 
 ```{r}
 gwr_fixed
+```
+
+```{r}
+bw_adaptive <- bw.gwr(formula = SELLING_PRICE ~ AREA_SQM + AGE  + 
+                        PROX_CBD + PROX_CHILDCARE + PROX_ELDERLYCARE    + 
+                        PROX_URA_GROWTH_AREA + PROX_MRT + PROX_PARK + 
+                        PROX_PRIMARY_SCH + PROX_SHOPPING_MALL   + PROX_BUS_STOP + 
+                        NO_Of_UNITS + FAMILY_FRIENDLY + FREEHOLD, 
+                      data=condo_resale_sf, 
+                      approach="CV", 
+                      kernel="gaussian", 
+                      adaptive=TRUE, 
+                      longlat=FALSE)
+```
+
+```{r}
+gwr_adaptive <- gwr.basic(formula = SELLING_PRICE ~ AREA_SQM + AGE + 
+                            PROX_CBD + PROX_CHILDCARE + PROX_ELDERLYCARE + 
+                            PROX_URA_GROWTH_AREA + PROX_MRT + PROX_PARK + 
+                            PROX_PRIMARY_SCH + PROX_SHOPPING_MALL + PROX_BUS_STOP + 
+                            NO_Of_UNITS + FAMILY_FRIENDLY + FREEHOLD, 
+                          data=condo_resale_sf, 
+                          bw=bw_adaptive, 
+                          kernel = 'gaussian', 
+                          adaptive=TRUE, 
+                          longlat = FALSE)
+```
+
+```{r}
+gwr_adaptive
+```
+
+```{r}
+gwr_adaptive_output <- as.data.frame(
+  gwr_adaptive$SDF) %>%
+  select(-c(2:15))
+```
+
+```{r}
+gwr_sf_adaptive <- cbind(condo_resale_sf,
+                         gwr_adaptive_output)
+```
+
+```{r}
+glimpse(gwr_sf_adaptive)
+```
+
+```{r}
+summary(gwr_adaptive$SDF$yhat)
+```
+
+```{r}
+tmap_mode("plot")
+tmap_options(check.and.fix = TRUE)
+tm_shape(mpsz)+
+  tm_polygons(alpha = 0.1) +
+tm_shape(gwr_sf_adaptive) +  
+  tm_dots(col = "Local_R2",
+          border.col = "gray60",
+          border.lwd = 1) +
+  tm_view(set.zoom.limits = c(11,14))
+```
+
+```{r}
+tmap_options(check.and.fix = TRUE)
+tmap_mode("plot")
+AREA_SQM_SE <- tm_shape(mpsz)+
+  tm_polygons(alpha = 0.1) +
+tm_shape(gwr_sf_adaptive) +  
+  tm_dots(col = "AREA_SQM_SE",
+          border.col = "gray60",
+          border.lwd = 1) +
+  tm_view(set.zoom.limits = c(11,14))
+
+AREA_SQM_TV <- tm_shape(mpsz)+
+  tm_polygons(alpha = 0.1) +
+tm_shape(gwr_sf_adaptive) +  
+  tm_dots(col = "AREA_SQM_TV",
+          border.col = "gray60",
+          border.lwd = 1) +
+  tm_view(set.zoom.limits = c(11,14))
+
+tmap_arrange(AREA_SQM_SE, AREA_SQM_TV, 
+             asp=1, ncol=2,
+             sync = TRUE)
+
+```
+
+```{r}
+tmap_mode("plot")
+```
+
+```{r}
+tm_shape(mpsz[mpsz$REGION_N=="CENTRAL REGION", ])+
+  tm_polygons()+
+tm_shape(gwr_sf_adaptive) + 
+  tm_bubbles(col = "Local_R2",
+           size = 0.15,
+           border.col = "gray60",
+           border.lwd = 1)
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
 ```
 
 ```{r}
