@@ -7,9 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Pelle Knegjes">
-<meta name="dcterms.date" content="2024-08-26">
 
-<title>Portfolio: Pelle Knegjes - ISSS626 Geospatial Analytics and Applications</title>
+<title>Portfolio: Pelle Knegjes - Lesson 8: Geographically Weighted Predictive Models</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -25,22 +24,22 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<script src="../site_libs/quarto-html/quarto.js"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,7 +69,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../../../styles.css">
 </head>
 
 <body class="nav-fixed">
@@ -80,7 +79,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../index.html">
+    <a class="navbar-brand" href="../../../index.html">
     <span class="navbar-title">Portfolio: Pelle Knegjes</span>
     </a>
   </div>
@@ -91,25 +90,25 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../Master-Thesis/MasterThesis.html"> 
+    <a class="nav-link" href="../../../Master-Thesis/MasterThesis.html"> 
 <span class="menu-text">Master Thesis</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../ISSS626/ISSS626.html" aria-current="page"> 
+    <a class="nav-link" href="../../../ISSS626/ISSS626.html"> 
 <span class="menu-text">Geospatial Analytics and Applications</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../IS620/IS620.html"> 
+    <a class="nav-link" href="../../../IS620/IS620.html"> 
 <span class="menu-text">Digital Organization and Change Management</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html"> 
+    <a class="nav-link" href="../../../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../about.html"> 
+    <a class="nav-link" href="../../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
@@ -138,11 +137,12 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#welcome-to-isss626-geospatial-analytics-and-applications" id="toc-welcome-to-isss626-geospatial-analytics-and-applications" class="nav-link active" data-scroll-target="#welcome-to-isss626-geospatial-analytics-and-applications">Welcome to ISSS626 Geospatial Analytics and Applications</a>
+  <li><a href="#content" id="toc-content" class="nav-link active" data-scroll-target="#content"><strong>Content</strong></a></li>
+  <li><a href="#lesson-slides-and-hands-on-notes" id="toc-lesson-slides-and-hands-on-notes" class="nav-link" data-scroll-target="#lesson-slides-and-hands-on-notes"><strong>Lesson Slides and Hands-on Notes</strong></a>
   <ul class="collapse">
-  <li><a href="#weekly-lesson-plan" id="toc-weekly-lesson-plan" class="nav-link" data-scroll-target="#weekly-lesson-plan">Weekly Lesson Plan</a></li>
-  <li><a href="#in-class-exercises" id="toc-in-class-exercises" class="nav-link" data-scroll-target="#in-class-exercises">In-class Exercises</a></li>
-  <li><a href="#take-home-exercises" id="toc-take-home-exercises" class="nav-link" data-scroll-target="#take-home-exercises">Take-home Exercises</a></li>
+  <li><a href="#self-reading-before-meet-up" id="toc-self-reading-before-meet-up" class="nav-link" data-scroll-target="#self-reading-before-meet-up"><strong>Self-reading Before Meet-up</strong></a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><strong>References</strong></a></li>
+  <li><a href="#all-about-r" id="toc-all-about-r" class="nav-link" data-scroll-target="#all-about-r"><strong>All About R</strong></a></li>
   </ul></li>
   </ul>
 </nav>
@@ -152,7 +152,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">ISSS626 Geospatial Analytics and Applications</h1>
+<h1 class="title">Lesson 8: Geographically Weighted Predictive Models</h1>
 </div>
 
 
@@ -169,7 +169,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">August 26, 2024</p>
+      <p class="date">Invalid Date</p>
     </div>
   </div>
   
@@ -187,90 +187,43 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="welcome-to-isss626-geospatial-analytics-and-applications" class="level1">
-<h1>Welcome to ISSS626 Geospatial Analytics and Applications</h1>
-<p>From this page, everything on the course will be accessible.</p>
-<p>Instructor:&nbsp;<a href="https://www.smu.edu.sg/faculty/profile/9618/KAM-Tin-Seong">Dr.&nbsp;Kam Tin Seong</a>, Associate Professor of Information Systems (Practice)</p>
-<section id="weekly-lesson-plan" class="level2">
-<h2 class="anchored" data-anchor-id="weekly-lesson-plan">Weekly Lesson Plan</h2>
-<p>To access each weekly lesson please click on the topic. These pages also contain the “Hands-on Exercises.”</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Week</th>
-<th>Date</th>
-<th>Topic</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>1</td>
-<td>26/8/2024</td>
-<td><a href="Weekly-Lessons/Week01/Lesson01.html">Introduction to Geospatial Analytics</a></td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>2/9/2024</td>
-<td><a href="Weekly-Lessons/Week02/Lesson02.html">Spatial Point Patterns Analysis (SPAA)</a></td>
-</tr>
-<tr class="odd">
-<td>3</td>
-<td>9/9/2024</td>
-<td><a href="Weekly-Lessons/Week03/Lesson03.html">Advanced SPAA</a></td>
-</tr>
-<tr class="even">
-<td>4</td>
-<td>16/9/2024</td>
-<td><a href="Weekly-Lessons/Week04/Lesson04.html">Spatial Weights and Applications</a></td>
-</tr>
-<tr class="odd">
-<td>5</td>
-<td>23/9/2024</td>
-<td><a href="Weekly-Lessons/Week05/Lesson05.html">Global and Local Measures of Spatial Association</a></td>
-</tr>
-<tr class="even">
-<td>6</td>
-<td>30/9/2024</td>
-<td><a href="Weekly-Lessons/Week06/Lesson06.html">Geographic Segmentation</a></td>
-</tr>
-<tr class="odd">
-<td>7</td>
-<td>14/10/2024</td>
-<td><a href="Weekly-Lessons/Week07/Lesson07.html">Geographically Weighted Explanatory Models</a></td>
-</tr>
-<tr class="even">
-<td>8</td>
-<td>21/10/2024</td>
-<td><a href="Weekly-Lessons/Week08/Lesson08.html">Geographically Weighted Predictive Models</a></td>
-</tr>
-<tr class="odd">
-<td>9</td>
-<td>28/10/2024</td>
-<td><a href="Weekly-Lessons/Week09/Lesson09.html">Spatial Interaction Models</a></td>
-</tr>
-<tr class="even">
-<td>10</td>
-<td>4/11/2024</td>
-<td><a href="Weekly-Lessons/Week10/Lesson10.html">Modelling Geographic of Accessibility</a></td>
-</tr>
-</tbody>
-</table>
+<section id="content" class="level2">
+<h2 class="anchored" data-anchor-id="content"><strong>Content</strong></h2>
+<ul>
+<li><p>What is Predictive Modelling?</p></li>
+<li><p>What is Geospatial Predictive Modelling</p></li>
+<li><p>Introducing Recursive Partitioning</p></li>
+<li><p>Advanced Recursive Partitioning: Random Forest</p></li>
+<li><p>Introducing Geographically Weighted Random Forest</p></li>
+</ul>
 </section>
-<section id="in-class-exercises" class="level2">
-<h2 class="anchored" data-anchor-id="in-class-exercises">In-class Exercises</h2>
-<p>In-class Exercise 1: <a href="In-Class_Exercises/In-Class_Exercise01/In-Class_Ex01.html">Geospatial Data Science with R</a></p>
-<p>In-class Exercise 2:</p>
-<p>In-class Exercise 3: <a href="Weekly-Lessons/Week03/Lesson03.html">Advanced SPAA</a></p>
-<p>In-class Exercise 4: <a href="In-Class_Exercises/In-Class_Exercise04/In-Class_Ex04.html">Geographically Weighted Summary Statistics</a></p>
-<p>In-class Exercise 5:<a href="In-Class_Exercises/In-Class_Exercise05/In-Class_Exercise05.html">Global and Local Measures of Spatial Association</a></p>
-<p>In-class Exercise 6:<a href="In-Class_Exercises/In-Class_Exercise06/In-Class_Exercise06.html">Global and Local Measures of Spatial Association</a></p>
-<p>In-class Exercise 7:<a href="In-Class_Exercises/In-Class_Exersice07/In-Class_Exercise07.html">Calibrating Hedonic Pricing Model for Private Highrise Property with GWR Method</a></p>
+<section id="lesson-slides-and-hands-on-notes" class="level2">
+<h2 class="anchored" data-anchor-id="lesson-slides-and-hands-on-notes"><strong>Lesson Slides and Hands-on Notes</strong></h2>
+<ul>
+<li><p><a href="https://isss626-ay2024-25aug.netlify.app/lesson/lesson08/lesson08-gwrf">Lesson 8</a> slides.</p></li>
+<li><p>Handout of <a href="GeographicallyWeightedPredictiveModels.html">Hands-on Exercise 8</a>.</p></li>
+</ul>
+<section id="self-reading-before-meet-up" class="level3">
+<h3 class="anchored" data-anchor-id="self-reading-before-meet-up"><strong>Self-reading Before Meet-up</strong></h3>
+<p>To read before class:</p>
+<ul>
+<li><p>Stefanos Georganos et. al.&nbsp;(2019) <a href="https://www.tandfonline.com/doi/full/10.1080/10106049.2019.1595177">“Geographical Random Forests: A Spatial Extension of the Random Forest Algorithm to Address Spatial Heterogeneity in Remote Sensing and Population Modelling”</a>, <em>Geocarto International</em>, DOI: 10.1080/10106049.2019.1595177.</p></li>
+<li><p>Georganos, S. and Kalogirou, S. (2022) <a href="https://www.mdpi.com/2220-9964/11/9/471">“A Forest of Forests: A Spatially Weighted and Computationally Efficient Formulation of Geographical Random Forests”</a>. <strong>ISPRS, International Journal of Geo-Information</strong>, 2022, 11, 471. <a href="https://www.mdpi.com/2220-9964/11/9/471" class="uri">https://www.mdpi.com/2220-9964/11/9/471</a></p></li>
+</ul>
 </section>
-<section id="take-home-exercises" class="level2">
-<h2 class="anchored" data-anchor-id="take-home-exercises">Take-home Exercises</h2>
-<p>Take-home Exercise 1: <a href="Take-Home_Exercises/Take-Home_Exercise01/Take-Home_Exercise01.html">Geospatial Analytics for Public Good</a></p>
-<p>Take-home Exercise 2: <a href="Take-Home_Exercises/Take-Home_Exercise02/Take-Home_Exercise02.html">Discovering impacts of COVID-19 on Thailand tourism economy at the province level using spatial and spatio-temporal statistics</a></p>
-<p>Take-home Exercise 3b: <a href="Take-Home_Exercises/Take-Home_Exercise03/Take-Home_Exercise03.html">Predicting HDB Resale Prices with Geographically Weighted Machine Learning Methods</a></p>
+<section id="references" class="level3">
+<h3 class="anchored" data-anchor-id="references"><strong>References</strong></h3>
+<ul>
+<li><p>George Grekousis et. al.&nbsp;(2022) <a href="https://doi.org/10.1016/j.healthplace.2022.102744">“Ranking the importance of demographic, socioeconomic, and underlying health factors on US COVID-19 deaths: A geographical random forest approach”</a>, <em>Health and Place</em>, vol.&nbsp;74, pp.&nbsp;1-12.</p></li>
+<li><p>Yaowen Luo, Jianguo Yan &amp; Stephen McClure. (2020) “<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7527667/pdf/11356_2020_Article_10962.pdf">Distribution of the environmental and socioeconomic risk factors on COVID-19 death rate across continental USA: a spatial nonlinear analysis</a>”, <em>Environmental Science and Pollution Research</em>, 28:6587–6599.</p></li>
+<li><p>Eun-Hee Koh, Eunhee Lee, &amp; Kang-Kun Lee (2020) “<a href="https://www.sciencedirect.com/science/article/pii/S0301479720305788">Application of geographically weighted regression models to predict spatial characteristics of nitrate contamination: Implications for an effective groundwater management strategy</a>”, <em>Journal of Environmental Management</em>. Vol. 268</p></li>
+</ul>
+</section>
+<section id="all-about-r" class="level3">
+<h3 class="anchored" data-anchor-id="all-about-r"><strong>All About R</strong></h3>
+<ul>
+<li><a href="https://cran.r-project.org/web/packages/SpatialML/index.html">SpatialML</a></li>
+</ul>
 
 
 </section>
