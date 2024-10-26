@@ -13,8 +13,6 @@ website:
         href: "Master-Thesis/MasterThesis.html"
       - text: "Geospatial Analytics and Applications"
         href: "ISSS626/ISSS626.html"
-      - text: "Digital Organization and Change Management"
-        href: "IS620/IS620.html"
     right:      
       - href: index.qmd
         text: Home
