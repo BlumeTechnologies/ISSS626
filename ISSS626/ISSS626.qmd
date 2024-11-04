@@ -20,10 +20,10 @@ Instructor: [Dr. Kam Tin Seong](https://www.smu.edu.sg/faculty/profile/9618/KA
 
 To access each weekly lesson please click on the topic. These pages also contain the "Hands-on Exercises."
 
-| Week | Date       | Topic                                            |
-|------|------------|--------------------------------------------------|
+| Week | Date       | Topic                                                                                   |
+|-------------|-------------|----------------------------------------------|
 | 1    | 26/8/2024  | [Introduction to Geospatial Analytics](Weekly-Lessons/Week01/Lesson01.html)             |
-| 2    | 2/9/2024   | [Spatial Point Patterns Analysis (SPAA)](Weekly-Lessons/Week02/Lesson02.html)          |
+| 2    | 2/9/2024   | [Spatial Point Patterns Analysis (SPAA)](Weekly-Lessons/Week02/Lesson02.html)           |
 | 3    | 9/9/2024   | [Advanced SPAA](Weekly-Lessons/Week03/Lesson03.html)                                    |
 | 4    | 16/9/2024  | [Spatial Weights and Applications](Weekly-Lessons/Week04/Lesson04.html)                 |
 | 5    | 23/9/2024  | [Global and Local Measures of Spatial Association](Weekly-Lessons/Week05/Lesson05.html) |
@@ -49,6 +49,11 @@ In-class Exercise 6:[Global and Local Measures of Spatial Association](In-Class_
 
 In-class Exercise 7:[Calibrating Hedonic Pricing Model for Private Highrise Property with GWR Method](In-Class_Exercises/In-Class_Exersice07/In-Class_Exercise07.html)
 
+In-class Exercise 8:[Supplement to Hands-on Exercise 8](In-Class_Exercises/In-Class_Exersice08/In-Class_Exercise08.html)
+
+In-class Exercise 9:[Geography of Accessibility](In-Class_Exercises/In-Class_Exersice09/In-Class_Exercise09.html)
+
+In-class Exercise 10:[PLACEHOLDER](In-Class_Exercises/In-Class_Exersice10/In-Class_Exercise10.html)
 
 ## Take-home Exercises
 

@@ -337,4 +337,3 @@ ggplot(data=hexagon_SAM,
              colour ="red", 
              size=2)
 ```
-

@@ -32,59 +32,138 @@ ST_Union()
 sg_sf = mpsz_sf %\>% st_union()
 
 ```{r}
+pacman::p_load(sf, raster, spatstat, tmap, tidyverse)
+```
+```{r}
+childcare_sf <- st_read("data/child-care-services-geojson.geojson") %>%
+  st_transform(crs = 3414)
 
 ```
 
 ```{r}
-
+sg_sf <- st_read(dsn = "data", layer="CostalOutline")
 ```
 
 ```{r}
-
+mpsz_sf <- st_read(dsn = "data", 
+                layer = "MP14_SUBZONE_WEB_PL")
+```
+```{r}
+sg_sf <- mpsz_sf %>%
+  st_union()
 ```
 
 ```{r}
-
+childcare_ppp <- as.ppp(childcare_sf)
+plot(childcare_ppp)
 ```
 
 ```{r}
-
+summary(childcare_ppp)
 ```
 
 ```{r}
-
+sg_owin <- as.owin(sg_sf)
+plot(sg_owin)
 ```
 
 ```{r}
-
+summary(sg_owin)
+```
+Combining point events object and owin object
+```{r}
+childcareSG_ppp = childcare_ppp[sg_owin]
 ```
 
 ```{r}
+childcareSG_ppp.km <- rescale.ppp(childcareSG_ppp, 
+                                  1000, 
+                                  "km")
 
+kde_childcareSG_adaptive <- adaptive.density(
+  childcareSG_ppp.km, 
+  method="kernel")
+plot(kde_childcareSG_adaptive)
+```
+
+## maptools method
+```{r}
+par(bg = '#E4D5C9')
+
+gridded_kde_childcareSG_ad <- maptools::as.SpatialGridDataFrame.im(
+  kde_childcareSG_adaptive)
+spplot(gridded_kde_childcareSG_ad)
+```
+
+## spatstat method
+```{r}
+gridded_kde_childcareSG_ad <- as(
+  kde_childcareSG_adaptive,
+  "SpatialGridDataFrame")
+spplot(gridded_kde_childcareSG_ad)
+```
+## Visualising KDE using tmap
+```{r}
+#| eval: false
+tm_shape(kde_childcareSG_ad_raster) + 
+  tm_raster(palette = "viridis") +
+  tm_layout(legend.position = c("right", "bottom"), 
+            frame = FALSE,
+            bg.color = "#E4D5C9")
+```
+## Extracting study area using sf objects
+```{r}
+pg_owin <- mpsz_sf %>%
+  filter(PLN_AREA_N == "PUNGGOL") %>%
+  as.owin()
+
+childcare_pg = childcare_ppp[pg_owin]
+
+plot(childcare_pg)  
 ```
 
 ```{r}
-
+set.seed(1234)
 ```
 
 ```{r}
+rdacc_sf <- read_csv("data/thai_road_accident_2019_2022.csv") %>%
+  filter(!is.na(longitude) & longitude != "", 
+         !is.na(latitude) & latitude != "") %>%
+  st_as_sf(coords = c(
+    "longitude", "latitude"),
+    crs=4326) %>%
+  st_transform(crs = 32647) 
+```
+```{r}
+#| eval: false
+adm = st_read(dsn = "data/", 
+                  layer = "tha_admbnda_adm3_rtsd_20220121")
+```
 
+And we transform the data to the right CRS
+
+```{r}
+#| eval: false
+adm = st_transform(adm, 32647)
+```
+
+Here we show the dataset
+
+```{r}
+#| eval: false
+adm
 ```
 
 ```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
+#| eval: false
+tmap_mode("plot")
+adm %>%
+  filter(year == 2023 | 
+           event_type == "Political violence") %>%
+  tm_shape()+
+  tm_dots()
+tmap_mode("plot")
 ```
 
 ```{r}
