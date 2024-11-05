@@ -81,24 +81,41 @@ First we want to load the following packages to achieve our task:
 ```{r}
 pacman::p_load(sf, spdep, GWmodel, SpatialML, 
                tmap, rsample, Metrics, tidyverse, ClustGeo, 
-               ggpubr, cluster, factoextra, NbClust,
-               heatmaply, corrplot, psych, GGally, spdep, tmap, sfdep, plotly, Kendall, SpatialAcc, ggstatsplot, reshape2,httr, jsonlite, rvest)
+               ggpubr, cluster, factoextra, NbClust, heatmaply, corrplot, psych, GGally, spdep, tmap, sfdep, plotly, Kendall, SpatialAcc, ggstatsplot, reshape2,httr, jsonlite, rvest, olsrr, gtsummary, performance, see)
+```
+
+# setting seed
+```{r}
+set.seed(1234)
 ```
 
 
+```{r}
+mpsz = st_read(dsn = "data/geospatial", layer = "MP14_SUBZONE_WEB_PL")%>%
+  st_transform(crs = 3414)
+
+```
+
 
 ```{r}
+#| eval: false
 resale <- read_csv("data/aspatial/ResaleflatpricesbasedonregistrationdatefromJan-2017onwards.csv") %>%
   filter(month >= "2023-01" & month <= "2024-09")
 ```
 
 ```{r}
+#| eval: false
 resale_tidy <- resale %>%
   mutate(address = paste(block,street_name)) %>%
   mutate(remaining_lease_yr = as.integer(
     str_sub(remaining_lease, 0, 2)))%>%
   mutate(remaining_lease_mth = as.integer(
     str_sub(remaining_lease, 9, 11)))
+```
+
+```{r}
+#| eval: false
+write_rds(resale_tidy, "data/rds/resale_tidy.rds")
 ```
 
 ```{r}
@@ -193,10 +210,14 @@ coords <- get_coords(add_list)
 write_rds(coords, "data/rds/coords.rds")
 ```
 
+
 ```{r}
 coords <- read_rds("data/rds/coords.rds")
 ```
 
+```{r}
+resale_tidy <- read_rds("data/rds/resale_tidy.rds")
+```
 
 ```{r}
 resaleRAW <- left_join(resale_tidy, coords)
@@ -205,28 +226,51 @@ resaleRAW <- left_join(resale_tidy, coords)
 
 
 ```{r}
+#| eval: false
 resale <- st_as_sf(resaleRAW, 
                        coords = c("longitude", "latitude"),
                        crs=4326) %>%
   st_transform(crs = 3414)%>%
   st_jitter(amount = 0.5)
-  
 
+```
 
-tmap_mode("plot")
-#tm_shape(resale)+
- # tm_dots()
+```{r}
+#| eval: false
+assign_dummy <- function(range) {
+  if (range %in% c("01 TO 03", "04 TO 06", "07 TO 09", "10 TO 12", 
+                   "13 TO 15", "16 TO 18")) {
+    return(1)  # Low
+  } else if (range %in% c("19 TO 21", "22 TO 24", "25 TO 27", 
+                          "28 TO 30", "31 TO 33", "34 TO 36")) {
+    return(2)  # Medium
+  } else {
+    return(3)  # High
+  }
+}
+
+# Apply the function to create a new column in the resale data frame
+resale$floor_level <- sapply(resale$storey_range, assign_dummy)
 
 
 ```
 
 ```{r}
-buffer350 = st_buffer(resale, dist = 350)
-buffer1000 = st_buffer(resale, dist = 1000)
+#| eval: false
+write_rds(resale, "data/rds/resale.rds")
+```
+
+```{r}
+resale <- read_rds("data/rds/resale.rds")
 ```
 
 
-
+# Creating Buffer Zones
+```{r}
+#| eval: false
+buffer350 = st_buffer(resale, dist = 350)
+buffer1000 = st_buffer(resale, dist = 1000)
+```
 
 
 
@@ -235,6 +279,7 @@ buffer1000 = st_buffer(resale, dist = 1000)
 
 ## Proximity to CBD
 ```{r}
+#| eval: false
 CBD <- data.frame(
   longitude = c(103.8503),  # Example longitudes
   latitude = c(1.2812)      # Example latitudes
@@ -248,16 +293,16 @@ CBD <- st_as_sf(CBD,
 ```
 
 ```{r}
+#| eval: false
 distances = st_distance(resale, CBD)
 min_distances <- apply(distances, 1, min)
 resale$PROX_CBD = min_distances
-
-
 
 ```
 
 ## Proximity to Eldercare
 ```{r}
+#| eval: false
 eldercare <- st_read(dsn = "data/geospatial", layer = "ELDERCARE") %>%
   st_transform(crs = 3414) 
 
@@ -271,6 +316,7 @@ resale$PROX_ELDERLYCARE = min_distances
 
 ## Proximity to Hawker centres
 ```{r}
+#| eval: false
 hawker <- st_read("data/geospatial/HawkerCentresGEOJSON.geojson") %>%
   st_transform(crs = 3414) 
 
@@ -284,10 +330,12 @@ resale$PROX_HAWKER = min_distances
 ## Proximity to MRT
 
 ```{r}
+#| eval: false
 mrt <- read_csv("data/aspatial/MRT.csv")
 
 ```
 ```{r}
+#| eval: false
 mrt <- st_as_sf(mrt, 
                        coords = c("Longitude", "Latitude"),
                        crs=4326) %>%
@@ -296,6 +344,7 @@ mrt <- st_as_sf(mrt,
 ```
 
 ```{r}
+#| eval: false
 distances = st_distance(resale, mrt)
 
 min_distances <- apply(distances, 1, min)
@@ -306,6 +355,7 @@ resale$PROX_MRT = min_distances
 
 ## Proximity to Park
 ```{r}
+#| eval: false
 park <- st_read("data/geospatial/Parks.geojson")  %>%
   st_transform(crs = 3414)
 
@@ -319,10 +369,12 @@ resale$PROX_PARK = min_distances
 ##Proximity to Shopping Mall
 
 ```{r}
+#| eval: false
 malls <- read_csv("data/aspatial/shopping_mall_coordinates.csv")
 
 ```
 ```{r}
+#| eval: false
 malls <- st_as_sf(malls, 
                        coords = c("LONGITUDE", "LATITUDE"),
                        crs=4326) %>%
@@ -341,6 +393,7 @@ resale$PROX_MALL = min_distances
 
 ## Proximity to Supermarket
 ```{r}
+#| eval: false
 supermarket <- st_read("data/geospatial/SupermarketsGEOJSON.geojson") %>%
   st_transform(crs = 3414) 
 
@@ -354,6 +407,7 @@ resale$PROX_SUPERMARKET = min_distances
 
 ## Number of Kidergartens within 350m
 ```{r}
+#| eval: false
 kindergarten <- st_read("data/geospatial/Kindergartens.geojson") %>%
   st_transform(crs = 3414)
 
@@ -366,6 +420,7 @@ resale$WITHIN_350M_KINDERGARTEN = lengths(
 
 ## Number of childcare centres within 350m
 ```{r}
+#| eval: false
 childcare <- st_read("data/geospatial/ChildCareServices.geojson") %>%
   st_transform(crs = 3414) 
 
@@ -379,6 +434,7 @@ resale$WITHIN_350M_CHILDCARE = lengths(
 
 ## Numbers of bus stop within 350m
 ```{r}
+#| eval: false
 busstop <- st_read(dsn = "data/geospatial", layer = "BusStop") %>%
   st_transform(crs = 3414) 
 
@@ -391,6 +447,7 @@ resale$WITHIN_350M_BUS = lengths(
 
 ## Numbers of primary school within 1km
 ```{r}
+#| eval: false
 schools <- read_csv("data/aspatial/Generalinformationofschools.csv") %>%
   filter(mainlevel_code == "PRIMARY")
 ```
@@ -481,15 +538,18 @@ coordsschool <- get_coords(add_list1)
 write_rds(coordsschool, "data/rds/coordsschool.rds")
 ```
 ```{r}
+#| eval: false
 coordsschool <- read_rds("data/rds/coordsschool.rds")
 ```
 
 
 ```{r}
+#| eval: false
 schools <- left_join(schools, coordsschool)
 
 ```
 ```{r}
+#| eval: false
 schools <- st_as_sf(schools, 
                        coords = c("longitude", "latitude"),
                        crs=4326) %>%
@@ -497,6 +557,7 @@ schools <- st_as_sf(schools,
 ```
 
 ```{r}
+#| eval: false
 resale$WITHIN_1KM_SCHOOL = lengths(
   st_intersects(buffer1000, schools)
 )
@@ -505,6 +566,7 @@ resale$WITHIN_1KM_SCHOOL = lengths(
 
 ## Proximity to Good Primary School
 ```{r}
+#| eval: false
 goodschools = c("AI TONG SCHOOL", "ANGLO-CHINESE SCHOOL (JUNIOR)", "ANGLO-CHINESE SCHOOL (PRIMARY)","CATHOLIC HIGH SCHOOL (PRIMARY SECTION)", "CHIJ ST. NICHOLAS GIRLS’ SCHOOL (PRIMARY SECTION)", "CHONGFU SCHOOL",
 "FAIRFIELD METHODIST SCHOOL (PRIMARY)", "GONGSHANG PRIMARY SCHOOL",
 "HENRY PARK PRIMARY SCHOOL", "HOLY INNOCENTS' PRIMARY SCHOOL",
@@ -527,40 +589,24 @@ resale$PROX_GOOD_PRISCH = min_distances
 
 :::
 
-GOtta use st_distance for the proximity
-
-using buffering for within 350
-
-how to count point features wihtin a certain distance?
-
-USE SPACIAL ML random forrests use 50 trees
-if we wanna make own os map r5r pack
 
 
 
-```{r}
-mpsz = st_read(dsn = "data/geospatial", layer = "MP14_SUBZONE_WEB_PL")%>%
-  st_transform(crs = 3414)
-
-```
 
 # tidiy-ing data
 ```{r}
+#| eval: false
 resale_tidy = resale %>%
-  select(floor_area_sqm,  resale_price, remaining_lease_yr,PROX_CBD, PROX_ELDERLYCARE, PROX_HAWKER, PROX_MRT, PROX_PARK, PROX_GOOD_PRISCH, PROX_MALL, PROX_SUPERMARKET, WITHIN_350M_KINDERGARTEN, WITHIN_350M_CHILDCARE, WITHIN_350M_BUS, WITHIN_1KM_SCHOOL,month, flat_type,flat_model, storey_range, lease_commence_date, remaining_lease_mth, address, remaining_lease, ,postal, geometry)
-
-
+  select(resale_price, floor_area_sqm, floor_level,  remaining_lease_yr,PROX_CBD, PROX_ELDERLYCARE, PROX_HAWKER, PROX_MRT, PROX_PARK, PROX_GOOD_PRISCH, PROX_MALL, PROX_SUPERMARKET, WITHIN_350M_KINDERGARTEN, WITHIN_350M_CHILDCARE, WITHIN_350M_BUS, WITHIN_1KM_SCHOOL,month, flat_type,flat_model, storey_range, lease_commence_date, remaining_lease_mth, address, remaining_lease, ,postal, geometry)
 
 ```
-
-
-
 
 
 # Data Sampling
 
 ## Creating subsets
 ```{r}
+#| eval: false
 # Filter for data from the year 2023
 subset_2023 <- resale_tidy %>%
   filter(grepl("^2023-", month) & flat_type %in% c("3 ROOM", "4 ROOM", "5 ROOM"))
@@ -571,22 +617,48 @@ subset_jul_sep_2024 <- resale_tidy %>%
   
 ```
 
-##splitting the training data
-Since we will train the model based on 2023 data we will split this data into a training and test data sets with 65% and 35% respectively by using initial_split() of the rsample package.
+```{r}
+#| eval: false
+write_rds(subset_jul_sep_2024, "data/rds/test_data.rds")
+```
+```{r}
+test_data <- read_rds("data/rds/test_data.rds")
+```
+
+
+## creating training data
+
+Due to processing limitations we will need to reduce the number of observations in our training dataset.
+```{r}
+#| eval: false
+original_size <- nrow(subset_2023)
+original_size
+```
 
 ```{r}
+#| eval: false
+sample_size <- 5000
+```
+
+Random Sampling: The sample_n() function is used to randomly select 5000 observations from the dataset.
+
+```{r}
+#| eval: false
 set.seed(1234)
-resale_split <- initial_split(subset_2023, 
-                              prop = 6.5/10,)
-train_data <- training(resale_split)
-test_data <- testing(resale_split)
-```
+train_data <- subset_2023 %>%
+    sample_n(size = sample_size, replace = FALSE)
 
+```
 
 ```{r}
+#| eval: false
 write_rds(train_data, "data/rds/train_data.rds")
-write_rds(test_data, "data/rds/test_data.rds")
 ```
+```{r}
+train_data <- read_rds("data/rds/train_data.rds")
+```
+
+
 
 # Computing Correlation Matrix
 Before loading the predictors into a predictive model, it is always a good practice to use correlation matrix to examine if there is sign of multicolinearity.
@@ -594,9 +666,9 @@ Before loading the predictors into a predictive model, it is always a good pract
 ```{r}
 #| fig-width: 12
 #| fig-height: 10
-nogeo_2023 <- subset_2023 %>%
+nogeo_2023 <- train_data %>%
   st_drop_geometry()
-corrplot::corrplot(cor(nogeo_2023[, 1:15]), 
+corrplot::corrplot(cor(nogeo_2023[, 1:16]), 
                    diag = FALSE, 
                    order = "AOE",
                    tl.pos = "td", 
@@ -607,37 +679,172 @@ corrplot::corrplot(cor(nogeo_2023[, 1:15]),
 
 The correlation matrix above shows that all the correlation values are below 0.8. Hence, there is no sign of multicolinearity.
 
-# Retriving the Stored Data
 
-```{r}
-train_data <- read_rds("data/rds/train_data.rds")
-test_data <- read_rds("data/rds/test_data.rds")
-```
 
+# Building a Hedonic Pricing Model by using Multiple Linear Regression Method
 # Building a non-spatial multiple linear regression
 
-```{r}
-#| eval: false
-price_mlr <- lm(resale_price ~ floor_area_sqm + remaining_lease_yr +
-                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
-                  PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH +PROX_MALL +                   PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
-                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
-                  WITHIN_1KM_SCHOOL,
-                data=train_data)
-summary(price_mlr)
-```
 
 
+The code chunk below using lm() to calibrate the multiple linear regression model.
 
 ```{r}
 #| eval: false
-write_rds(price_mlr, "data/rds/price_mlr.rds" ) 
+resale_mlr <- lm(formula = resale_price ~ floor_area_sqm + floor_level + remaining_lease_yr + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_SCHOOL,
+                  data=train_data)
+summary(resale_mlr)
+
 ```
+
+```{r}
+#| eval: false
+write_rds(resale_mlr, "data/rds/resale_mlr.rds" ) 
+```
+
+```{r}
+resale_mlr <- read_rds("data/rds/resale_mlr.rds")
+```
+# Model Assessment: olsrr method
+
+In this section, we would like to introduce you a fantastic R package specially programmed for performing OLS regression. It is called olsrr. It provides a collection of very useful methods for building better multiple linear regression models:
+
+- comprehensive regression output
+- residual diagnostics
+- measures of influence
+- heteroskedasticity tests
+- model fit assessment
+- variable contribution assessment
+- variable selection procedures
+
+# Generating tidy linear regression report
+```{r}
+ols_regress(resale_mlr)
+```
+
+
+# Multicolinearuty
+```{r}
+ols_vif_tol(resale_mlr)
+```
+
+# Variable Selection
+```{r}
+resale_fw_mlr <- ols_step_forward_p(
+  resale_mlr,
+  p_val = 0.05,
+  details = FALSE)
+```
+
+```{r}
+plot(resale_fw_mlr)
+```
+
+# Visualising model parameters
+```{r}
+ggcoefstats(resale_mlr,
+            sort = "ascending")
+```
+# Test for Non-Linearity
+In multiple linear regression, it is important for us to test the assumption that linearity and additivity of the relationship between dependent and independent variables.
+
+In the code chunk below, the ols_plot_resid_fit() of olsrr package is used to perform linearity assumption test.
+
+```{r}
+ols_plot_resid_fit(resale_fw_mlr$model)
+```
+The figure above reveals that most of the data poitns are scattered around the 0 line, hence we can safely conclude that the relationships between the dependent variable and independent variables are linear.
+
+# Test for Normality Assumption
+Lastly, the code chunk below uses ols_plot_resid_hist() of olsrr package to perform normality assumption test.
+
+```{r}
+ols_plot_resid_hist(resale_fw_mlr$model)
+```
+The figure reveals that the residual of the multiple linear regression model (i.e. condo.mlr1) is resemble normal distribution.
+
+If you prefer formal statistical test methods, the ols_test_normality() of olsrr package can be used as shown in the code chun below.
+
+```{r}
+ols_test_normality(resale_fw_mlr$model)
+```
+The summary table above reveals that the p-values of the four tests are way smaller than the alpha value of 0.05. Hence we will reject the null hypothesis and infer that there is statistical evidence that the residual are not normally distributed.
+
+# Testing for Spatial Autocorrelation
+The hedonic model we try to build are using geographically referenced attributes, hence it is also important for us to visual the residual of the hedonic pricing model.
+
+First, we will export the residual of the hedonic pricing model and save it as a data frame.
+
+```{r}
+mlr_output <- as.data.frame(resale_fw_mlr$model$residuals) %>%
+  rename(`FW_MLR_RES` = `resale_fw_mlr$model$residuals`)
+
+```
+
+Next, we will join the newly created data frame with condo_resale_sf object.
+
+```{r}
+condo_resale_sf <- cbind(train_data, 
+                        mlr_output$FW_MLR_RES) %>%
+  rename(`MLR_RES` = `mlr_output.FW_MLR_RES`)
+
+```
+
+Next, we will use tmap package to display the distribution of the residuals on an interactive map.
+
+The code churn below will turn on the interactive mode of tmap.
+
+```{r}
+tmap_mode("plot")
+tm_shape(mpsz)+
+  tmap_options(check.and.fix = TRUE) +
+  tm_polygons(alpha = 0.4) +
+tm_shape(condo_resale_sf) +  
+  tm_dots(col = "MLR_RES",
+          alpha = 0.6,
+          style="quantile")
+
+```
+
+The figure above reveal that there is sign of spatial autocorrelation.
+
+# Spatial stationary test
+To proof that our observation is indeed true, the Moran’s I test will be performed
+
+Ho: The residuals are randomly distributed (also known as spatial stationary) 
+
+H1: The residuals are spatially non-stationary
+
+First, we will compute the distance-based weight matrix by using dnearneigh() function of spdep.
+
+```{r}
+condo_resale_sf <- condo_resale_sf %>%
+  mutate(nb = st_knn(geometry, k=6,
+                     longlat = FALSE),
+         wt = st_weights(nb,
+                         style = "W"),
+         .before = 1)
+```
+
+Next, global_moran_perm() of sfdep is used to perform global Moran permutation test.
+
+```{r}
+global_moran_perm(condo_resale_sf$MLR_RES, 
+                  condo_resale_sf$nb, 
+                  condo_resale_sf$wt, 
+                  alternative = "two.sided", 
+                  nsim = 99)
+```
+The Global Moran’s I test for residual spatial autocorrelation shows that it’s p-value is less than 0.00000000000000022 which is less than the alpha value of 0.05. Hence, we will reject the null hypothesis that the residuals are randomly distributed.
+
+Since the Observed Global Moran I = 0.54398 which is greater than 0, we can infer than the residuals resemble cluster distribution.
+
 
 # gwr predictive method
 In this section, we will calibrate a model to predict the resale price by using geographically weighted regression methods of the GWmodel package.
 
 ## Converting the sf data.frame to SpatialPointDataFrame
+
+
 ```{r}
 train_data_sp <- as_Spatial(train_data)
 train_data_sp
@@ -648,12 +855,7 @@ train_data_sp
 Next, bw.gwr() of GWmodel package will be used to determine the optimal bandwidth to be used.
 ```{r}
 #| eval: false
-bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
-                  remaining_lease_yr +
-                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
-                  PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL                 + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
-                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
-                  WITHIN_1KM_SCHOOL,
+bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm + floor_level + remaining_lease_yr + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_SCHOOL,
                   data=train_data_sp,
                   approach="CV",
                   kernel="gaussian",
@@ -669,45 +871,11 @@ write_rds(bw_adaptive, "data/rds/bw_adaptive.rds")
 ```
 
 
-## Constructing the adaptive bandwidth gwr model
 ```{r}
 bw_adaptive <- read_rds("data/rds/bw_adaptive.rds")
 ```
-
-
-
-
 ```{r}
-#| eval: false
-gwr_adaptive <- gwr.basic(formula = resale_price ~
-                            floor_area_sqm +
-                            remaining_lease_yr + PROX_CBD + 
-                            PROX_ELDERLYCARE + PROX_HAWKER +
-                            PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH+ PROX_MALL + 
-                            PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +  WITHIN_1KM_SCHOOL+                           WITHIN_350M_CHILDCARE + WITHIN_350M_BUS,
-                          data=train_data_sp,
-                          bw=bw_adaptive, 
-                          kernel = 'gaussian', 
-                          adaptive=TRUE,
-                          longlat = FALSE)
-```
-
-
-```{r}
-#| eval: false
-write_rds(gwr_adaptive, "data/rds/gwr_adaptive.rds")
-```
-
-
-```{r}
-gwr_adaptive <- read_rds("data/rds/gwr_adaptive.rds")
-
-```
-
-
-```{r}
-gwr_adaptive
-
+bw_adaptive
 ```
 
 ## Converting the test data from sf data.frame to SpatialPointDataFrame
@@ -722,12 +890,7 @@ test_data_sp
 
 ```{r}
 #| eval: false
-gwr_bw_test_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
-                  remaining_lease_yr +
-                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
-                  PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL                 + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
-                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
-                  WITHIN_1KM_SCHOOL,
+gwr_bw_test_adaptive <- bw.gwr(resale_price ~ floor_area_sqm + floor_level + remaining_lease_yr + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_SCHOOL,
                   data=test_data_sp,
                   approach="CV",
                   kernel="gaussian",
@@ -740,28 +903,9 @@ gwr_bw_test_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
 write_rds(gwr_bw_test_adaptive, "data/rds/gwr_bw_test_adaptive.rds")
 ```
 
-```{r}
-#| eval: false
-gwr_pred <- gwr.predict(formula = resale_price ~
-                          floor_area_sqm +
-                  remaining_lease_yr +
-                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
-                  PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL                 + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
-                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
-                  WITHIN_1KM_SCHOOL, 
-                        data=train_data_sp, 
-                        predictdata = test_data_sp, 
-                        bw=40, 
-                        kernel = 'gaussian', 
-                        adaptive=TRUE, 
-                        longlat = FALSE)
-
-```
-
 # Preparing coordinates data
 ## Extracting coordinates data
 ```{r}
-coords <- st_coordinates(subset_2023)
 coords_train <- st_coordinates(train_data)
 coords_test <- st_coordinates(test_data)
 
@@ -773,6 +917,7 @@ coords_test <- st_coordinates(test_data)
 coords_train <- write_rds(coords_train, "data/rds/coords_train.rds" )
 coords_test <- write_rds(coords_test, "data/rds/coords_test.rds" )
 ```
+
 ```{r}
 coords_train = read_rds("data/rds/coords_train.rds")
 coords_test <- read_rds("data/rds/coords_test.rds")
@@ -787,47 +932,29 @@ train_data <- train_data %>%
 
 # Calibrating Random Forest Model
 
-```{r}
-set.seed(1234)
-rf <- ranger(resale_price ~ floor_area_sqm +
-                  remaining_lease_yr +
-                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
-                  PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL                 + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
-                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
-                  WITHIN_1KM_SCHOOL,
-             data=train_data,
-             num.trees = 50)
-rf
+Geographically Weighted Random Forest (GRF) is a spatial analysis method using a local version of the famous Machine Learning algorithm.
 
-```
+This technique adopts the idea of the Geographically Weighted Regression.
+
+The main difference between a tradition (linear) GWR and GRF is that we can model non-stationarity coupled with a flexible non-linear model which is very hard to overfit due to its bootstrapping nature, thus relaxing the assumptions of traditional Gaussian statistics.
 
 
-```{r}
-#| eval: false
-write_rds(rf, "data/rds/rf.rds")
-
-```
-
-
-```{r}
-rf <- read_rds("data/rds/rf.rds")
-rf
-
-```
 # Calibrating Geographical Random Forest Model
-
+In this section, we will calibrate a model to predict resale price by using grf() of SpatialML package.
 
 ## Calibrating using training data
 ```{r}
+#| eval: false
+
 set.seed(1234)
-gwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm +
+gwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm + floor_level + 
                   remaining_lease_yr +
                   PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
                   PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL                 + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
                   WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
                   WITHIN_1KM_SCHOOL,
                      dframe=train_data, 
-                     bw=55,
+                     bw=bw_adaptive,
                      kernel="adaptive",
                      coords=coords_train,
                   ntree = 50)
@@ -835,19 +962,25 @@ gwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm +
 ```
 
 
+Let’s save the model output by using the code chunk below.
+
 ```{r}
+#| eval: false
 write_rds(gwRF_adaptive, "data/rds/gwRF_adaptive.rds")
 
 ```
 
+The code chunk below can be used to retrieve the save model in future.
 
 ```{r}
 gwRF_adaptive <- read_rds("data/rds/gwRF_adaptive.rds")
-
 ```
 
+
+
+
 ## Predicting by using test data
-Preparing the test data
+### Preparing the test data
 ```{r}
 test_data <- cbind(test_data, coords_test) %>%
   st_drop_geometry()
@@ -856,6 +989,7 @@ test_data <- cbind(test_data, coords_test) %>%
 
 ###  Predicting with test data
 ```{r}
+#| eval: false
 gwRF_pred <- predict.grf(gwRF_adaptive, 
                            test_data, 
                            x.var.name="X",
@@ -866,6 +1000,7 @@ gwRF_pred <- predict.grf(gwRF_adaptive,
 ```
 
 ```{r}
+#| eval: false
 GRF_pred <- write_rds(gwRF_pred, "data/rds/GRF_pred.rds")
 
 ```
@@ -886,284 +1021,57 @@ test_data_p <- cbind(test_data, GRF_pred_df)
 
 
 ```{r}
-
+#| eval: false
 write_rds(test_data_p, "data/rds/test_data_p.rds")
 ```
 
-## Calculating Root Mean Square Error
-
 ```{r}
-rmse(test_data_p$resale_price, 
-     test_data_p$GRF_pred)
+test_data_p <- read_rds("data/rds/test_data_p.rds")
+```
 
+## Calculating Mean Errors and R2
+```{r}
+
+actual_prices <- test_data_p$resale_price
+predicted_prices <- test_data_p$GRF_pred 
+
+# Calculate Mean Absolute Error (MAE)
+mae <- mean(abs(actual_prices - predicted_prices))
+
+# Calculate Mean Squared Error (MSE)
+mse <- mean((actual_prices - predicted_prices)^2)
+
+# Calculate Root Mean Squared Error (RMSE)
+rmse <- sqrt(mse)
+
+# Calculate R-squared (R²)
+ss_total <- sum((actual_prices - mean(actual_prices))^2)
+ss_residual <- sum((actual_prices - predicted_prices)^2)
+r_squared <- 1 - (ss_residual / ss_total)
+
+# Print the results
+cat("Mean Absolute Error (MAE):", mae, "\n")
+cat("Mean Squared Error (MSE):", mse, "\n")
+cat("Root Mean Squared Error (RMSE):", rmse, "\n")
+cat("R-squared (R²):", r_squared, "\n")
 ```
 
 ## Visualising the predicted values
-```{r}
-ggplot(data = test_data_p,
-       aes(x = GRF_pred,
-           y = resale_price)) +
-  geom_point()
 
+```{r}
+
+ggplot(data = test_data_p, aes(x = GRF_pred, y = resale_price))  +
+  geom_point() +  # Add scatter plot points
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +  # Add regression line
+  labs(title = "Scatter Plot with Regression Line",
+       x = "Predicted Price",
+       y = "Actual Price") +  # Add labels
+  theme_minimal()  # Optional: use a minimal theme
 ```
+
 A better predictive model should have the scatter point close to the diagonal line. The scatter plot can be also used to detect if any outliers in the model.
 
 
-
-
-# Building Fixed Bandwidth GWR Model
-```{r}
-#|eval: false
-bw_fixed <- bw.gwr(formula = resale_price ~ floor_area_sqm +
-                  remaining_lease_yr +
-                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
-                  PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL                 + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
-                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
-                  WITHIN_1KM_SCHOOL, 
-                   data=train_data_sp, 
-                   approach="CV", 
-                   kernel="gaussian", 
-                   adaptive=FALSE, 
-                   longlat=FALSE)
-
-```
-```{r}
-#|eval: false
-write_rds(bw_fixed, "data/rds/bw_fixed.rds")
-```
-```{r}
-bw_fixed <- read_rds("data/rds/bw_fixed.rds")
-
-```
-
-# GWModel method - fixed bandwith
-
-Now we can use the code chunk below to calibrate the gwr model using fixed bandwidth and gaussian kernel.
-
-```{r}
-#|eval: false
-gwr_fixed <- gwr.basic(formula = resale_price ~ floor_area_sqm +
-                  remaining_lease_yr +
-                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
-                  PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL                 + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
-                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
-                  WITHIN_1KM_SCHOOL, 
-                       data=train_data_sp, 
-                       bw=bw_fixed, 
-                       kernel = 'gaussian', 
-                       longlat = FALSE)
-```
-
-The output is saved in a list of class “gwrm”. The code below can be used to display the model output.
-
-
-```{r}
-#|eval: false
-write_rds(gwr_fixed, "data/rds/gwr_fixed.rds")
-```
-
-```{r}
-gwr_fixed <- read_rds("data/rds/gwr_fixed.rds")
-
-```
-
-```{r}
-#|eval: false
-gwr_fixed
-```
-# Building Adaptive Bandwidth GWR Model
-
-## Computing the adaptive bandwidth
-Similar to the earlier section, we will first use bw.gwr() to determine the recommended data point to use.
-```{r}
-#|eval: false
-bw_adaptive <- bw.gwr(formula = resale_price ~ floor_area_sqm +
-                  remaining_lease_yr +
-                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
-                  PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL                 + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
-                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
-                  WITHIN_1KM_SCHOOL, 
-                      data=train_data_sp, 
-                      approach="CV", 
-                      kernel="gaussian", 
-                      adaptive=TRUE, 
-                      longlat=FALSE)
-```
-
-```{r}
-#|eval: false
-write_rds(bw_adaptive, "data/rds/bw_adaptive.rds")
-```
-
-```{r}
-bw_adaptive <- read_rds("data/rds/bw_adaptive.rds")
-
-```
-
-```{r}
-
-bw_adaptive
-```
-
-## Constructing the adaptive bandwidth gwr model
-Now, we can go ahead to calibrate the gwr-based model by using adaptive bandwidth and gaussian kernel as shown in the code chunk below.
-
-```{r}
-#|eval: false
-gwr_adaptive <- gwr.basic(formula = resale_price ~ floor_area_sqm +
-                  remaining_lease_yr +
-                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
-                  PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL                 + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
-                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
-                  WITHIN_1KM_SCHOOL, 
-                      data=train_data_sp, 
-                          bw=bw_adaptive, 
-                          kernel = 'gaussian', 
-                          adaptive=TRUE, 
-                          longlat = FALSE)
-```
-
-```{r}
-#|eval: false
-write_rds(gwr_adaptive, "data/rds/gwr_adaptive.rds")
-```
-
-```{r}
-gwr_adaptive <- read_rds("data/rds/gwr_adaptive.rds")
-
-```
-
-The code below can be used to display the model output.
-```{r}
-gwr_adaptive
-```
-
-LOOK HERE
-The report shows that the AICc the adaptive distance gwr is 87329.3 which is even smaller than the AICc of the fixed distance gwr of *42263.61******
-
-# Visualising GWR Output
-
-## Converting SDF into sf data.frame
-To visualise the fields in SDF, we need to first covert it into sf data.frame by using the code chunk below.
-
-```{r}
-gwr_adaptive_output <- as.data.frame(
-  gwr_adaptive$SDF) %>%
-  select(-c(2:15))
-```
-
-
-```{r}
-gwr_sf_adaptive <- cbind(train_data_sp,
-                         gwr_adaptive_output)
-```
-
-
-```{r}
-glimpse(gwr_sf_adaptive)
-```
-
-```{r}
-summary(gwr_adaptive$SDF$yhat)
-```
-
-## Visualising local R2
-```{r}
-tmap_mode("plot")
-tmap_options(check.and.fix = TRUE)
-tm_shape(mpsz)+
-  tm_polygons(alpha = 0.1) +
-tm_shape(gwr_sf_adaptive) +  
-  tm_dots(col = "Local_R2",
-          border.col = "gray60",
-          border.lwd = 1) +
-  tm_view(set.zoom.limits = c(11,14))
-```
-
-
-## Visualising coefficient estimates
-The code chunks below is used to create an interactive point symbol map.
-
-```{r}
-tmap_options(check.and.fix = TRUE)
-tmap_mode("plot")
-#AREA_SQM_SE <- 
-tm_shape(mpsz)+
-  tm_polygons(alpha = 0.1) +
-tm_shape(gwr_sf_adaptive) +  
-  tm_dots(col = "AREA_SQM_SE",
-          border.col = "gray",
-          border.lwd = 1) +
-  tm_view(set.zoom.limits = c(11,14))
-
-#AREA_SQM_TV <- 
-  tm_shape(mpsz)+
-  tm_polygons(alpha = 0.1) +
-tm_shape(gwr_sf_adaptive) +  
-  tm_dots(col = "AREA_SQM_TV",
-          border.col = "gray",
-          border.lwd = 1) +
-  tm_view(set.zoom.limits = c(11,14))
-
-#tmap_arrange(AREA_SQM_SE, AREA_SQM_TV, 
- #            asp=1, ncol=2,
-  #           sync = TRUE)
-```
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
 
 
 ```{r}
