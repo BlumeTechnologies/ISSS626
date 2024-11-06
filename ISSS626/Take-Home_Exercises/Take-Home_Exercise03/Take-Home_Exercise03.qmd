@@ -10,17 +10,17 @@ execute:
   freeze: true
 ---
 
-## **Setting the Scene**
+# **Setting the Scene**
 
 Housing is an essential component of household wealth worldwide. Buying a housing has always been a major investment for most people. The price of housing is affected by many factors. Some of them are global in nature such as the general economy of a country or inflation rate. Others can be more specific to the properties themselves. These factors can be further divided to structural and locational factors. Structural factors are variables related to the property themselves such as the size, fitting, and tenure of the property. Locational factors are variables related to the neighbourhood of the properties such as proximity to childcare centre, public transport service and shopping centre.
 
 Conventional, housing resale prices predictive models were built by using Ordinary Least Square (OLS) method. However, this method failed to take into consideration that spatial autocorrelation and spatial heterogeneity exist in geographic data sets such as housing transactions. With the existence of spatial autocorrelation, the OLS estimation of predictive housing resale pricing models could lead to biased, inconsistent, or inefficient results (Anselin 1998). In view of this limitation, **Geographical Weighted Models** were introduced to better calibrate predictive models for housing resale prices.
 
-## **The Task**
+# **The Task**
 
 In this take-home exercise, you are required to calibrate a predictive model to predict HDB resale prices between July-September 2024 by using HDB resale transaction records in 2023.
 
-## **The Data**
+# **The Data**
 
 For the purpose of this take-home exercise, **HDB Resale Flat Prices** provided by [**Data.gov.sg**](https://isss626-ay2024-25aug.netlify.app/take-home_ex03b) should be used as the core data set. The study should focus on either three-room, four-room or five-room flat.
 
@@ -64,19 +64,73 @@ Below is a list of recommended predictors to consider. However, students are fre
 
     -   Numbers of primary school within 1km
 
+# Data Wrangling
 
-## Data Wrangling
+## **Package Descriptions**
 
-First we want to load the following packages to achieve our task:
+First, we will load in the following packages:
 
-- sf
-- spdep
-- GWmodel
-- SpatialML
-- tmap
-- rsample
-- Metrics
-- tidyverse
+1.  **sf**: Provides support for simple features, enabling the handling of spatial data in R. It allows for easy manipulation and analysis of spatial objects.
+
+2.  **spdep**: Contains functions for spatial dependence and spatial autocorrelation analysis. It is useful for working with spatial data and understanding spatial relationships.
+
+3.  **GWmodel**: Implements geographically weighted regression (GWR) and other geographically weighted models, allowing for the analysis of spatially varying relationships.
+
+4.  **SpatialML**: Provides tools for spatial machine learning, including methods for spatial data analysis and modeling.
+
+5.  **tmap**: A package for thematic mapping in R, allowing for the creation of static and interactive maps.
+
+6.  **rsample**: Provides functions for creating and working with resampling objects, useful for cross-validation and bootstrapping.
+
+7.  **Metrics**: Contains functions for evaluating the performance of regression models, including various metrics like RMSE, MAE, and R-squared.
+
+8.  **tidyverse**: A collection of R packages designed for data science, including tools for data manipulation (dplyr), visualization (ggplot2), and more.
+
+9.  **ClustGeo**: Provides tools for spatial clustering and geostatistical analysis, including methods for clustering spatial data.
+
+10. **ggpubr**: A package that provides easy-to-use functions for creating publication-ready plots with ggplot2, including functions for arranging multiple plots.
+
+11. **cluster**: Contains functions for cluster analysis, including various clustering algorithms and methods for evaluating clustering results.
+
+12. **factoextra**: A package for visualizing and interpreting the results of multivariate data analyses, including clustering and principal component analysis (PCA).
+
+13. **NbClust**: Provides methods for determining the optimal number of clusters in a dataset, offering various indices for cluster validation.
+
+14. **heatmaply**: A package for creating interactive heatmaps in R, useful for visualizing complex data matrices.
+
+15. **corrplot**: Provides functions for visualizing correlation matrices, making it easy to understand relationships between variables.
+
+16. **psych**: Contains functions for psychological research, including tools for descriptive statistics, reliability analysis, and factor analysis.
+
+17. **GGally**: Extends ggplot2 by providing functions for creating a variety of plots, including pair plots and correlation plots.
+
+18. **sfdep**: A package for spatial dependence analysis, providing tools for exploring and modeling spatial relationships.
+
+19. **plotly**: A library for creating interactive plots and dashboards, allowing for dynamic visualizations of data.
+
+20. **Kendall**: Implements functions for calculating Kendall's tau, a measure of correlation between two variables.
+
+21. **SpatialAcc**: Provides tools for assessing the accuracy of spatial predictions, including methods for cross-validation and error analysis.
+
+22. **ggstatsplot**: A package that integrates statistical tests into ggplot2 visualizations, providing informative plots with statistical results.
+
+23. **reshape2**: Provides functions for reshaping data, allowing for easy transformation between wide and long formats.
+
+24. **httr**: A package for working with HTTP requests, making it easier to interact with web APIs and retrieve data from the web.
+
+25. **jsonlite**: Provides functions for converting between R objects and JSON, making it easy to work with JSON data.
+
+26. **rvest**: A package for web scraping, allowing users to extract data from HTML web pages.
+
+27. **olsrr**: Provides tools for building and validating ordinary least squares (OLS) regression models, including stepwise regression and model diagnostics.
+
+28. **gtsummary**: A package for creating summary tables of statistical models, making it easy to present results in a clear format.
+
+29. **performance**: Provides tools for assessing the performance of statistical models, including diagnostics and evaluation metrics.
+
+30. **see**: A package for visualizing statistical results, providing functions for creating informative plots and visual summaries.
+
+These packages collectively provide a robust toolkit for spatial analysis, data manipulation, visualization, and statistical modeling in R. Depending on your specific analysis needs, you can leverage these packages to perform a wide range of tasks, from data cleaning and exploration to advanced spatial modeling and visualization.
 
 ```{r}
 pacman::p_load(sf, spdep, GWmodel, SpatialML, 
@@ -84,11 +138,17 @@ pacman::p_load(sf, spdep, GWmodel, SpatialML,
                ggpubr, cluster, factoextra, NbClust, heatmaply, corrplot, psych, GGally, spdep, tmap, sfdep, plotly, Kendall, SpatialAcc, ggstatsplot, reshape2,httr, jsonlite, rvest, olsrr, gtsummary, performance, see)
 ```
 
-# setting seed
+## Set Seed
+
+Using **`set.seed()`** is a best practice in data analysis and statistical modeling when randomness is involved. It helps ensure that your results can be reproduced and verified, which is essential for scientific rigor and transparency.
+
 ```{r}
 set.seed(1234)
 ```
 
+## More data Wrangling
+
+The next code snippet reads the Singapore subzone dataset, and then transforms the coordinate reference system of that dataset to a new CRS (3414).
 
 ```{r}
 mpsz = st_read(dsn = "data/geospatial", layer = "MP14_SUBZONE_WEB_PL")%>%
@@ -96,12 +156,27 @@ mpsz = st_read(dsn = "data/geospatial", layer = "MP14_SUBZONE_WEB_PL")%>%
 
 ```
 
+**Read CSV File**:
+
+-   First we read a CSV file containing resale flat prices from January 2017 onwards using **`read_csv()`**. The file is located at **`"data/aspatial/ResaleflatpricesbasedonregistrationdatefromJan-2017onwards.csv"`**.
+
+**Filter Data**:
+
+-   Then we filter the dataset to include only records where the **`month`** is between January 2023 (**`"2023-01"`**) and September 2024 (**`"2024-09"`**).
 
 ```{r}
 #| eval: false
 resale <- read_csv("data/aspatial/ResaleflatpricesbasedonregistrationdatefromJan-2017onwards.csv") %>%
   filter(month >= "2023-01" & month <= "2024-09")
 ```
+
+**Data Transformation**:
+
+-   We create a new column **`address`** by concatenating the **`block`** and **`street_name`** columns.
+
+-   We extract the first two characters from the **`remaining_lease`** column to create a new integer column **`remaining_lease_yr`**, representing the remaining lease in years.
+
+-   We extract the characters from positions 9 to 11 of the **`remaining_lease`** column to create another integer column **`remaining_lease_mth`**, representing the remaining lease in months.
 
 ```{r}
 #| eval: false
@@ -113,21 +188,60 @@ resale_tidy <- resale %>%
     str_sub(remaining_lease, 9, 11)))
 ```
 
+**Save Tidy Data**:
+
+-   Finally, we save the transformed dataset (**`resale_tidy`**) as an RDS file at the specified path **`"data/rds/resale_tidy.rds"`** using **`write_rds()`**.
+
 ```{r}
 #| eval: false
 write_rds(resale_tidy, "data/rds/resale_tidy.rds")
 ```
 
+**Select Resale Data**:
+
+-   We start by creating a new variable **`resale_selected`** that holds the data from **`resale_tidy`**. This means we are working with a tidy version of the resale flat price data.
+
 ```{r}
 #| eval: false
-resale_selected <- resale_tidy #%>%
-  #filter(month == "2024-09")
+resale_selected <- resale_tidy
 ```
+
+**Create a Unique Address List**:
+
+-   Next, we generate a sorted list of unique addresses from the **`address`** column in **`resale_selected`**. This list will be used to query the API for geographic coordinates.
 
 ```{r}
 #| eval: false
 add_list <- sort(unique(resale_selected$address))
 ```
+
+**Define a Function to Get Coordinates**:
+
+-   We define a function called **`get_coords`** that takes the list of addresses (**`add_list`**) as input. This function will retrieve the postal codes, latitude, and longitude for each address using the OneMap API.
+
+**Loop Through Each Address**:
+
+-   Inside the function, we loop through each address in **`add_list`**. For each address:
+
+    -   We make a GET request to the OneMap API to search for the address.
+
+    -   We parse the JSON response to check how many results were found.
+
+**Handle API Response**:
+
+-   If one result is found, we extract the postal code, latitude, and longitude and create a new row for the results.
+
+-   If multiple results are found, we filter out any results with "NIL" as the postal code and take the first valid result.
+
+-   If no results are found, we create a row with **`NA`** values for postal code, latitude, and longitude.
+
+**Store Results**:
+
+-   Each new row of results is appended to the **`postal_coords`** data frame, which accumulates the coordinates for all addresses.
+
+**Return Coordinates Data Frame**:
+
+-   After processing all addresses, the function returns the **`postal_coords`** data frame containing the addresses along with their corresponding postal codes, latitudes, and longitudes.
 
 ```{r}
 #| eval: false
@@ -200,30 +314,54 @@ get_coords <- function(add_list){
 }
 ```
 
+**Call the Function**:
+
+-   We call the **`get_coords`** function with **`add_list`** to retrieve the coordinates and store the results in the variable **`coords`**.
+
 ```{r}
 #| eval: false
 coords <- get_coords(add_list)
 ```
+
+**Save Coordinates to RDS File**:
+
+-   We save the **`coords`** data frame to an RDS file at the specified path **`"data/rds/coords.rds"`** for future use.
 
 ```{r}
 #| eval: false
 write_rds(coords, "data/rds/coords.rds")
 ```
 
+**Read Coordinates from RDS File**:
+
+-   We read the saved coordinates from the RDS file back into the variable **`coords`**.
 
 ```{r}
 coords <- read_rds("data/rds/coords.rds")
 ```
 
+**Read Tidy Resale Data from RDS File**:
+
+-   Finally, we read the tidy resale data from the RDS file back into the variable **`resale_tidy`**.
+
 ```{r}
 resale_tidy <- read_rds("data/rds/resale_tidy.rds")
 ```
+
+**Join Resale Data with Coordinates**:
+
+-   We start by merging the **`resale_tidy`** dataset with the **`coords`** dataset using a left join. This combines the resale flat data with the corresponding geographic coordinates (latitude and longitude).
 
 ```{r}
 resaleRAW <- left_join(resale_tidy, coords)
 
 ```
 
+**Convert to Spatial Data Frame**:
+
+-   Next, we convert the merged dataset (**`resaleRAW`**) into a spatial data frame using **`st_as_sf()`**. We specify the columns for longitude and latitude, and set the coordinate reference system (CRS) to WGS 84 (EPSG:4326).
+
+-   After that, we transform the CRS to a different projection (EPSG:3414) and apply a jitter effect to the spatial points to add a small random variation (0.5 units) to their positions. This is often done to avoid overlapping points in visualizations.
 
 ```{r}
 #| eval: false
@@ -234,6 +372,20 @@ resale <- st_as_sf(resaleRAW,
   st_jitter(amount = 0.5)
 
 ```
+
+**Define a Function to Assign Dummy Variables**:
+
+-   We define a function called **`assign_dummy`** that takes a **`range`** as input and assigns a dummy variable based on predefined ranges of storey levels. The function categorizes the ranges into three groups:
+
+    -   1 for "Low" (ranges 01 to 18)
+
+    -   2 for "Medium" (ranges 19 to 36)
+
+    -   3 for "High" (any other range).
+
+**Apply the Function to Create a New Column**:
+
+-   We use the **`sapply()`** function to apply the **`assign_dummy`** function to the **`storey_range`** column of the **`resale`** dataset. This creates a new column called **`floor_level`** that contains the assigned dummy values based on the storey ranges.
 
 ```{r}
 #| eval: false
@@ -255,29 +407,60 @@ resale$floor_level <- sapply(resale$storey_range, assign_dummy)
 
 ```
 
+**Save the Final Resale Data**:
+
+-   We save the final spatial dataset (**`resale`**) with the new **`floor_level`** column to an RDS file at the specified path **`"data/rds/resale.rds"`** for future use.
+
 ```{r}
 #| eval: false
 write_rds(resale, "data/rds/resale.rds")
 ```
 
+**Read the Resale Data from RDS File**:
+
+-   Finally, we read the saved resale data from the RDS file back into the variable **`resale`**.
+
 ```{r}
 resale <- read_rds("data/rds/resale.rds")
 ```
 
+## Creating Buffer Zones
 
-# Creating Buffer Zones
+**Create a 350-Meter Buffer**:
+
+-   We use the **`st_buffer()`** function from the **`sf`** package to create a buffer zone of 350 meters around each spatial point in the **`resale`** dataset. This function generates a new spatial object that represents the area within 350 meters of each point.
+
+**Create a 1000-Meter Buffer**:
+
+-   Similarly, we create another buffer zone of 1000 meters around each spatial point in the **`resale`** dataset using the same **`st_buffer()`** function. This generates a new spatial object that represents the area within 1000 meters of each point.
+
 ```{r}
 #| eval: false
 buffer350 = st_buffer(resale, dist = 350)
 buffer1000 = st_buffer(resale, dist = 1000)
 ```
 
+## Loading in location predictor variables
 
+In this section we load in the location predictor variables aswell as calculating and finding distances
 
-# Loading in locational predictor variables
+-   We use the **`st_distance()`** function from the **`sf`** package to compute the distances between each point in the **`resale`** dataset and the points in the **`CBD`** dataset. This function returns a distance matrix where each entry represents the distance between a point in **`resale`** and a point in the predictor value.
+
+-   We apply the **`apply()`** function to the distance matrix to find the minimum distance for each point in the **`resale`** dataset. The **`1`** argument indicates that we are applying the function across rows (i.e., for each point in **`resale`**). The result is a vector of minimum distances.
+
+```{=html}
+<!-- -->
+```
+-   The **`st_intersects()`** function from the **`sf`** package is used to determine which which locations fall within the 350 or 1000-meter buffer zones created earlier (stored in **`buffer350/1000`**). This function returns a list where each element corresponds to a buffer zone and contains the indices of locations that intersect with that zone.
+
+```{=html}
+<!-- -->
+```
+-   The **`lengths()`** function is then applied to the list of intersections obtained from **`st_intersects()`**. This function counts the number of locations that intersect with each buffer zone. The result is a vector where each element represents the count of locations within the corresponding buffer zone.
+
 ::: panel-tabset
+### Proximity to CBD
 
-## Proximity to CBD
 ```{r}
 #| eval: false
 CBD <- data.frame(
@@ -300,7 +483,8 @@ resale$PROX_CBD = min_distances
 
 ```
 
-## Proximity to Eldercare
+### Proximity to Eldercare
+
 ```{r}
 #| eval: false
 eldercare <- st_read(dsn = "data/geospatial", layer = "ELDERCARE") %>%
@@ -314,7 +498,8 @@ resale$PROX_ELDERLYCARE = min_distances
 
 ```
 
-## Proximity to Hawker centres
+### Proximity to Hawker centres
+
 ```{r}
 #| eval: false
 hawker <- st_read("data/geospatial/HawkerCentresGEOJSON.geojson") %>%
@@ -327,13 +512,14 @@ resale$PROX_HAWKER = min_distances
 
 ```
 
-## Proximity to MRT
+### Proximity to MRT
 
 ```{r}
 #| eval: false
 mrt <- read_csv("data/aspatial/MRT.csv")
 
 ```
+
 ```{r}
 #| eval: false
 mrt <- st_as_sf(mrt, 
@@ -353,7 +539,8 @@ resale$PROX_MRT = min_distances
 
 ```
 
-## Proximity to Park
+### Proximity to Park
+
 ```{r}
 #| eval: false
 park <- st_read("data/geospatial/Parks.geojson")  %>%
@@ -366,13 +553,14 @@ resale$PROX_PARK = min_distances
 
 ```
 
-##Proximity to Shopping Mall
+### Proximity to Shopping Mall
 
 ```{r}
 #| eval: false
 malls <- read_csv("data/aspatial/shopping_mall_coordinates.csv")
 
 ```
+
 ```{r}
 #| eval: false
 malls <- st_as_sf(malls, 
@@ -390,8 +578,8 @@ resale$PROX_MALL = min_distances
 
 ```
 
+### Proximity to Supermarket
 
-## Proximity to Supermarket
 ```{r}
 #| eval: false
 supermarket <- st_read("data/geospatial/SupermarketsGEOJSON.geojson") %>%
@@ -405,7 +593,8 @@ resale$PROX_SUPERMARKET = min_distances
 
 ```
 
-## Number of Kidergartens within 350m
+### Number of Kidergartens within 350m
+
 ```{r}
 #| eval: false
 kindergarten <- st_read("data/geospatial/Kindergartens.geojson") %>%
@@ -418,7 +607,8 @@ resale$WITHIN_350M_KINDERGARTEN = lengths(
 
 ```
 
-## Number of childcare centres within 350m
+### Number of childcare centres within 350m
+
 ```{r}
 #| eval: false
 childcare <- st_read("data/geospatial/ChildCareServices.geojson") %>%
@@ -432,7 +622,8 @@ resale$WITHIN_350M_CHILDCARE = lengths(
 
 ```
 
-## Numbers of bus stop within 350m
+### Numbers of bus stop within 350m
+
 ```{r}
 #| eval: false
 busstop <- st_read(dsn = "data/geospatial", layer = "BusStop") %>%
@@ -445,7 +636,8 @@ resale$WITHIN_350M_BUS = lengths(
 
 ```
 
-## Numbers of primary school within 1km
+### Numbers of primary school within 1km
+
 ```{r}
 #| eval: false
 schools <- read_csv("data/aspatial/Generalinformationofschools.csv") %>%
@@ -537,17 +729,18 @@ coordsschool <- get_coords(add_list1)
 #| eval: false
 write_rds(coordsschool, "data/rds/coordsschool.rds")
 ```
+
 ```{r}
 #| eval: false
 coordsschool <- read_rds("data/rds/coordsschool.rds")
 ```
-
 
 ```{r}
 #| eval: false
 schools <- left_join(schools, coordsschool)
 
 ```
+
 ```{r}
 #| eval: false
 schools <- st_as_sf(schools, 
@@ -564,7 +757,8 @@ resale$WITHIN_1KM_SCHOOL = lengths(
 
 ```
 
-## Proximity to Good Primary School
+### Proximity to Good Primary School
+
 ```{r}
 #| eval: false
 goodschools = c("AI TONG SCHOOL", "ANGLO-CHINESE SCHOOL (JUNIOR)", "ANGLO-CHINESE SCHOOL (PRIMARY)","CATHOLIC HIGH SCHOOL (PRIMARY SECTION)", "CHIJ ST. NICHOLAS GIRLS’ SCHOOL (PRIMARY SECTION)", "CHONGFU SCHOOL",
@@ -585,15 +779,10 @@ min_distances <- apply(distances, 1, min)
 resale$PROX_GOOD_PRISCH = min_distances
 
 ```
-
-
 :::
 
+## Tidying up dataset
 
-
-
-
-# tidiy-ing data
 ```{r}
 #| eval: false
 resale_tidy = resale %>%
@@ -601,10 +790,18 @@ resale_tidy = resale %>%
 
 ```
 
-
 # Data Sampling
 
 ## Creating subsets
+
+**Filter for Data from the Year 2023**:
+
+-   The first part of the code uses the **`dplyr`** package to filter the **`resale_tidy`** dataset for records from the year 2023. The **`filter()`** function is used in conjunction with **`grepl()`** to match any month that starts with "2023-", and it also filters for specific flat types: "3 ROOM", "4 ROOM", and "5 ROOM".
+
+**Filter for Data Between July and September 2024**:
+
+-   The second part of the code creates another subset of the **`resale_tidy`** dataset, this time filtering for records between July and September of 2024. It uses the **`filter()`** function to select rows where the **`month`** is either "2024-07", "2024-08", or "2024-09", and again filters for the same flat types: "3 ROOM", "4 ROOM", and "5 ROOM".
+
 ```{r}
 #| eval: false
 # Filter for data from the year 2023
@@ -617,30 +814,49 @@ subset_jul_sep_2024 <- resale_tidy %>%
   
 ```
 
+**Save the Subset to an RDS File**:
+
+-   The **`write_rds()`** function from the **`readr`** package is used to save the **`subset_jul_sep_2024`** dataset to a file in RDS format. The file is saved in the "data/rds/" directory with the name "test_data.rds".
+
 ```{r}
 #| eval: false
 write_rds(subset_jul_sep_2024, "data/rds/test_data.rds")
 ```
+
+**Read the RDS File Back into R**:
+
+-   Finally, the **`read_rds()`** function is used to read the saved RDS file back into R, creating a new object called **`test_data`**. This allows you to access the filtered dataset after it has been saved.
+
 ```{r}
 test_data <- read_rds("data/rds/test_data.rds")
 ```
 
-
-## creating training data
+## Creating training data
 
 Due to processing limitations we will need to reduce the number of observations in our training dataset.
+
+**Check Original Size of the Dataset**:
+
+-   First, we calculate the number of rows (observations) in the **`subset_2023`** dataset using the **`nrow()`** function. We store this value in the variable **`original_size`**, which helps us understand the size of the dataset before we proceed with sampling.
+
 ```{r}
 #| eval: false
 original_size <- nrow(subset_2023)
 original_size
 ```
 
+**Define Sample Size**:
+
+-   Next, we define a variable called **`sample_size`** and set it to 5000. This variable indicates the number of observations we want to randomly select from the **`subset_2023`** dataset to create our training dataset.
+
 ```{r}
 #| eval: false
 sample_size <- 5000
 ```
 
-Random Sampling: The sample_n() function is used to randomly select 5000 observations from the dataset.
+**Random Sampling**:
+
+-   We then use the **`sample_n()`** function from the **`dplyr`** package to randomly select 5000 observations from the **`subset_2023`** dataset. To ensure that our random selection is reproducible, we call **`set.seed(1234)`** before sampling. We also specify **`replace = FALSE`** to indicate that we do not want to select the same observation more than once.
 
 ```{r}
 #| eval: false
@@ -650,17 +866,25 @@ train_data <- subset_2023 %>%
 
 ```
 
+**Save the Training Data to an RDS File**:
+
+-   After creating our training dataset, we use the **`write_rds()`** function from the **`readr`** package to save the **`train_data`** dataset to a file in RDS format. We save this file in the "data/rds/" directory with the name "train_data.rds".
+
 ```{r}
 #| eval: false
 write_rds(train_data, "data/rds/train_data.rds")
 ```
+
+**Read the RDS File Back into R**:
+
+-   Finally, we read the saved RDS file back into R using the **`read_rds()`** function, creating a new object called **`train_data`**. This allows us to access the randomly sampled training dataset after it has been saved.
+
 ```{r}
 train_data <- read_rds("data/rds/train_data.rds")
 ```
 
-
-
 # Computing Correlation Matrix
+
 Before loading the predictors into a predictive model, it is always a good practice to use correlation matrix to examine if there is sign of multicolinearity.
 
 ```{r}
@@ -679,12 +903,9 @@ corrplot::corrplot(cor(nogeo_2023[, 1:16]),
 
 The correlation matrix above shows that all the correlation values are below 0.8. Hence, there is no sign of multicolinearity.
 
+# Building a Pricing Model by using Multiple Linear Regression Method
 
-
-# Building a Hedonic Pricing Model by using Multiple Linear Regression Method
-# Building a non-spatial multiple linear regression
-
-
+## Building a non-spatial multiple linear regression
 
 The code chunk below using lm() to calibrate the multiple linear regression model.
 
@@ -704,30 +925,23 @@ write_rds(resale_mlr, "data/rds/resale_mlr.rds" )
 ```{r}
 resale_mlr <- read_rds("data/rds/resale_mlr.rds")
 ```
-# Model Assessment: olsrr method
 
-In this section, we would like to introduce you a fantastic R package specially programmed for performing OLS regression. It is called olsrr. It provides a collection of very useful methods for building better multiple linear regression models:
+## Model Assessment: olsrr method
 
-- comprehensive regression output
-- residual diagnostics
-- measures of influence
-- heteroskedasticity tests
-- model fit assessment
-- variable contribution assessment
-- variable selection procedures
+### Generating tidy linear regression report
 
-# Generating tidy linear regression report
 ```{r}
 ols_regress(resale_mlr)
 ```
 
+## Multicolinarity
 
-# Multicolinearuty
 ```{r}
 ols_vif_tol(resale_mlr)
 ```
 
-# Variable Selection
+## Variable Selection
+
 ```{r}
 resale_fw_mlr <- ols_step_forward_p(
   resale_mlr,
@@ -739,12 +953,15 @@ resale_fw_mlr <- ols_step_forward_p(
 plot(resale_fw_mlr)
 ```
 
-# Visualising model parameters
+## Visualising model parameters
+
 ```{r}
 ggcoefstats(resale_mlr,
             sort = "ascending")
 ```
-# Test for Non-Linearity
+
+## Test for Non-Linearity
+
 In multiple linear regression, it is important for us to test the assumption that linearity and additivity of the relationship between dependent and independent variables.
 
 In the code chunk below, the ols_plot_resid_fit() of olsrr package is used to perform linearity assumption test.
@@ -752,14 +969,17 @@ In the code chunk below, the ols_plot_resid_fit() of olsrr package is used to pe
 ```{r}
 ols_plot_resid_fit(resale_fw_mlr$model)
 ```
+
 The figure above reveals that most of the data poitns are scattered around the 0 line, hence we can safely conclude that the relationships between the dependent variable and independent variables are linear.
 
-# Test for Normality Assumption
+## Test for Normality Assumption
+
 Lastly, the code chunk below uses ols_plot_resid_hist() of olsrr package to perform normality assumption test.
 
 ```{r}
 ols_plot_resid_hist(resale_fw_mlr$model)
 ```
+
 The figure reveals that the residual of the multiple linear regression model (i.e. condo.mlr1) is resemble normal distribution.
 
 If you prefer formal statistical test methods, the ols_test_normality() of olsrr package can be used as shown in the code chun below.
@@ -767,9 +987,11 @@ If you prefer formal statistical test methods, the ols_test_normality() of olsrr
 ```{r}
 ols_test_normality(resale_fw_mlr$model)
 ```
+
 The summary table above reveals that the p-values of the four tests are way smaller than the alpha value of 0.05. Hence we will reject the null hypothesis and infer that there is statistical evidence that the residual are not normally distributed.
 
-# Testing for Spatial Autocorrelation
+## Testing for Spatial Autocorrelation
+
 The hedonic model we try to build are using geographically referenced attributes, hence it is also important for us to visual the residual of the hedonic pricing model.
 
 First, we will export the residual of the hedonic pricing model and save it as a data frame.
@@ -807,10 +1029,11 @@ tm_shape(condo_resale_sf) +
 
 The figure above reveal that there is sign of spatial autocorrelation.
 
-# Spatial stationary test
+## Spatial stationary test
+
 To proof that our observation is indeed true, the Moran’s I test will be performed
 
-Ho: The residuals are randomly distributed (also known as spatial stationary) 
+Ho: The residuals are randomly distributed (also known as spatial stationary)
 
 H1: The residuals are spatially non-stationary
 
@@ -834,25 +1057,26 @@ global_moran_perm(condo_resale_sf$MLR_RES,
                   alternative = "two.sided", 
                   nsim = 99)
 ```
+
 The Global Moran’s I test for residual spatial autocorrelation shows that it’s p-value is less than 0.00000000000000022 which is less than the alpha value of 0.05. Hence, we will reject the null hypothesis that the residuals are randomly distributed.
 
 Since the Observed Global Moran I = 0.54398 which is greater than 0, we can infer than the residuals resemble cluster distribution.
 
+# Building a predictive model
 
-# gwr predictive method
 In this section, we will calibrate a model to predict the resale price by using geographically weighted regression methods of the GWmodel package.
 
 ## Converting the sf data.frame to SpatialPointDataFrame
-
 
 ```{r}
 train_data_sp <- as_Spatial(train_data)
 train_data_sp
 ```
 
-
 ## Computing adaptive bandwidth
+
 Next, bw.gwr() of GWmodel package will be used to determine the optimal bandwidth to be used.
+
 ```{r}
 #| eval: false
 bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm + floor_level + remaining_lease_yr + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_SCHOOL,
@@ -863,17 +1087,15 @@ bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm + floor_level + remaining_le
                   longlat=FALSE)
 ```
 
-
-
 ```{r}
 #| eval: false
 write_rds(bw_adaptive, "data/rds/bw_adaptive.rds")
 ```
 
-
 ```{r}
 bw_adaptive <- read_rds("data/rds/bw_adaptive.rds")
 ```
+
 ```{r}
 bw_adaptive
 ```
@@ -887,7 +1109,6 @@ test_data_sp
 
 ```
 
-
 ```{r}
 #| eval: false
 gwr_bw_test_adaptive <- bw.gwr(resale_price ~ floor_area_sqm + floor_level + remaining_lease_yr + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_SCHOOL,
@@ -898,19 +1119,21 @@ gwr_bw_test_adaptive <- bw.gwr(resale_price ~ floor_area_sqm + floor_level + rem
                   longlat=FALSE)
 
 ```
+
 ```{r}
 #| eval: false
 write_rds(gwr_bw_test_adaptive, "data/rds/gwr_bw_test_adaptive.rds")
 ```
 
-# Preparing coordinates data
-## Extracting coordinates data
+## Preparing coordinates data
+
+### Extracting coordinates data
+
 ```{r}
 coords_train <- st_coordinates(train_data)
 coords_test <- st_coordinates(test_data)
 
 ```
-
 
 ```{r}
 #| eval: false
@@ -923,14 +1146,15 @@ coords_train = read_rds("data/rds/coords_train.rds")
 coords_test <- read_rds("data/rds/coords_test.rds")
 ```
 
-## Droping geometry field
+### Droping geometry field
+
 ```{r}
 train_data <- train_data %>% 
   st_drop_geometry()
 
 ```
 
-# Calibrating Random Forest Model
+## Calibrating Random Forest Model
 
 Geographically Weighted Random Forest (GRF) is a spatial analysis method using a local version of the famous Machine Learning algorithm.
 
@@ -938,11 +1162,12 @@ This technique adopts the idea of the Geographically Weighted Regression.
 
 The main difference between a tradition (linear) GWR and GRF is that we can model non-stationarity coupled with a flexible non-linear model which is very hard to overfit due to its bootstrapping nature, thus relaxing the assumptions of traditional Gaussian statistics.
 
+### Calibrating Geographical Random Forest Model
 
-# Calibrating Geographical Random Forest Model
 In this section, we will calibrate a model to predict resale price by using grf() of SpatialML package.
 
-## Calibrating using training data
+#### Calibrating using training data
+
 ```{r}
 #| eval: false
 
@@ -961,7 +1186,6 @@ gwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm + floor_level +
 
 ```
 
-
 Let’s save the model output by using the code chunk below.
 
 ```{r}
@@ -976,18 +1200,18 @@ The code chunk below can be used to retrieve the save model in future.
 gwRF_adaptive <- read_rds("data/rds/gwRF_adaptive.rds")
 ```
 
-
-
-
 ## Predicting by using test data
+
 ### Preparing the test data
+
 ```{r}
 test_data <- cbind(test_data, coords_test) %>%
   st_drop_geometry()
 
 ```
 
-###  Predicting with test data
+### Predicting with test data
+
 ```{r}
 #| eval: false
 gwRF_pred <- predict.grf(gwRF_adaptive, 
@@ -1012,13 +1236,13 @@ GRF_pred <- read_rds("data/rds/GRF_pred.rds")
 GRF_pred_df <- as.data.frame(GRF_pred)
 
 ```
+
 In the code chunk below, cbind() is used to append the predicted values onto test_datathe
 
 ```{r}
 test_data_p <- cbind(test_data, GRF_pred_df)
 
 ```
-
 
 ```{r}
 #| eval: false
@@ -1030,6 +1254,7 @@ test_data_p <- read_rds("data/rds/test_data_p.rds")
 ```
 
 ## Calculating Mean Errors and R2
+
 ```{r}
 
 actual_prices <- test_data_p$resale_price
@@ -1071,14 +1296,9 @@ ggplot(data = test_data_p, aes(x = GRF_pred, y = resale_price))  +
 
 A better predictive model should have the scatter point close to the diagonal line. The scatter plot can be also used to detect if any outliers in the model.
 
-
-
-
 ```{r}
 
 ```
-
-
 
 ```{r}
 
@@ -1088,79 +1308,13 @@ A better predictive model should have the scatter point close to the diagonal li
 
 ```
 
-
 ```{r}
 
 ```
 
-
-
 ```{r}
 
 ```
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
 
 ```{r}
 
@@ -1170,79 +1324,13 @@ A better predictive model should have the scatter point close to the diagonal li
 
 ```
 
-
 ```{r}
 
 ```
 
-
-
 ```{r}
 
 ```
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
 
 ```{r}
 
@@ -1252,78 +1340,13 @@ A better predictive model should have the scatter point close to the diagonal li
 
 ```
 
-
 ```{r}
 
 ```
 
-
-
 ```{r}
 
 ```
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
 
 ```{r}
 
@@ -1333,40 +1356,161 @@ A better predictive model should have the scatter point close to the diagonal li
 
 ```
 
+```{r}
+
+```
 
 ```{r}
 
 ```
 
+```{r}
 
+```
 
 ```{r}
 
 ```
 
+```{r}
+
+```
 
 ```{r}
 
 ```
 
+```{r}
 
+```
 
 ```{r}
 
 ```
 
+```{r}
 
+```
 
 ```{r}
 
 ```
 
+```{r}
 
+```
 
 ```{r}
 
 ```
 
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
 
 ```{r}
 
