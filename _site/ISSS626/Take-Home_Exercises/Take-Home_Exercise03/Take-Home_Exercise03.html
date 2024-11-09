@@ -243,14 +243,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#model-comparison" id="toc-model-comparison" class="nav-link" data-scroll-target="#model-comparison">Model Comparison</a>
   <ul class="collapse">
-  <li><a href="#model-performance-comparison" id="toc-model-performance-comparison" class="nav-link" data-scroll-target="#model-performance-comparison"><strong>Model Performance Comparison:</strong></a></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><strong>Conclusion:</strong></a></li>
+  <li><a href="#model-performance-comparison" id="toc-model-performance-comparison" class="nav-link" data-scroll-target="#model-performance-comparison"><strong>Model Performance Comparison:</strong></a>
+  <ul class="collapse">
+  <li><a href="#multiple-linear-regression-mlr" id="toc-multiple-linear-regression-mlr" class="nav-link" data-scroll-target="#multiple-linear-regression-mlr"><strong>Multiple Linear Regression (MLR)</strong>:</a></li>
+  <li><a href="#random-forest" id="toc-random-forest" class="nav-link" data-scroll-target="#random-forest"><strong>Random Forest</strong>:</a></li>
+  <li><a href="#geographically-weighted-random-forest-gwrf" id="toc-geographically-weighted-random-forest-gwrf" class="nav-link" data-scroll-target="#geographically-weighted-random-forest-gwrf"><strong>Geographically Weighted Random Forest (GWRF)</strong>:</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><strong>Conclusion:</strong></a>
+  <ul class="collapse">
   <li><a href="#model-complexity-and-overfitting" id="toc-model-complexity-and-overfitting" class="nav-link" data-scroll-target="#model-complexity-and-overfitting"><strong>1. Model Complexity and Overfitting:</strong></a></li>
   <li><a href="#insufficient-number-of-trees" id="toc-insufficient-number-of-trees" class="nav-link" data-scroll-target="#insufficient-number-of-trees"><strong>2. Insufficient Number of Trees:</strong></a></li>
   <li><a href="#geographical-weighting" id="toc-geographical-weighting" class="nav-link" data-scroll-target="#geographical-weighting"><strong>3. Geographical Weighting:</strong></a></li>
   <li><a href="#data-quality-and-feature-selection" id="toc-data-quality-and-feature-selection" class="nav-link" data-scroll-target="#data-quality-and-feature-selection"><strong>4. Data Quality and Feature Selection:</strong></a></li>
-  <li><a href="#conclusion-1" id="toc-conclusion-1" class="nav-link" data-scroll-target="#conclusion-1"><strong>Conclusion:</strong></a></li>
   </ul></li>
+  </ul></li>
+  <li><a href="#conclusion-1" id="toc-conclusion-1" class="nav-link" data-scroll-target="#conclusion-1"><strong>Conclusion:</strong></a></li>
   </ul>
 </nav>
     </div>
@@ -1527,7 +1534,7 @@ WITHIN_350M_KINDERGARTEN       8187.352      1105.089        0.053      7.409   
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Take-Home_Exercise03_files/figure-html/unnamed-chunk-66-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Take-Home_Exercise03_files/figure-html/unnamed-chunk-66-1.png" class="img-fluid figure-img" width="1920"></p>
 </figure>
 </div>
 </div>
@@ -1546,7 +1553,7 @@ WITHIN_350M_KINDERGARTEN       8187.352      1105.089        0.053      7.409   
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Take-Home_Exercise03_files/figure-html/unnamed-chunk-67-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Take-Home_Exercise03_files/figure-html/unnamed-chunk-67-1.png" class="img-fluid figure-img" width="1152"></p>
 </figure>
 </div>
 </div>
@@ -2393,8 +2400,8 @@ sf::st_is_valid</code></pre>
 </div>
 </div>
 <p>These plots help us visually assess how well each model’s predictions align with the actual resale prices. A better predictive model will show points clustered closely around the diagonal line, indicating accurate predictions.</p>
-<section id="model-performance-comparison" class="level3">
-<h3 class="anchored" data-anchor-id="model-performance-comparison"><strong>Model Performance Comparison:</strong></h3>
+<section id="model-performance-comparison" class="level2">
+<h2 class="anchored" data-anchor-id="model-performance-comparison"><strong>Model Performance Comparison:</strong></h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb169"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb169-1"><a href="#cb169-1" aria-hidden="true" tabindex="-1"></a>model_results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2404,33 +2411,36 @@ sf::st_is_valid</code></pre>
 3          GWRF 83165.98 0.7796956</code></pre>
 </div>
 </div>
-<ol type="1">
-<li><p><strong>Multiple Linear Regression (MLR)</strong>:</p>
-<ul>
-<li><p><strong>RMSE</strong>: 93,308.44</p></li>
-<li><p><strong>R-squared</strong>: 0.8079</p></li>
-</ul>
-<p>The MLR model has the highest RMSE among the three models, which indicates that its predictions are, on average, further away from the actual values compared to the other models. However, it has a relatively high R-squared value of 0.8079, meaning that it explains about 80.79% of the variance in the data. This suggests that while the model captures a good amount of the variability, its predictions are not as accurate as those of the other models.</p></li>
-<li><p><strong>Random Forest</strong>:</p>
-<ul>
-<li><p><strong>RMSE</strong>: 79,118.09</p></li>
-<li><p><strong>R-squared</strong>: 0.8006</p></li>
-</ul>
-<p>The Random Forest model has the lowest RMSE of 79,118.09, indicating that it provides the most accurate predictions on average among the three models. Its R-squared value of 0.8006 shows that it explains about 80.06% of the variance in the data, which is slightly lower than that of the MLR model. However, the lower RMSE suggests that the Random Forest model is better at making precise predictions, even if it explains a slightly smaller proportion of the variance.</p></li>
-<li><p><strong>Geographically Weighted Random Forest (GWRF)</strong>:</p>
-<ul>
-<li><p><strong>RMSE</strong>: 83,165.98</p></li>
-<li><p><strong>R-squared</strong>: 0.7797</p></li>
-</ul>
-<p>The GWRF model has an RMSE of 83,165.98, which is higher than that of the Random Forest but lower than that of the MLR. Its R-squared value of 0.7797 indicates that it explains about 77.97% of the variance in the data, which is the lowest among the three models. This suggests that while GWRF incorporates geographical information, it does not perform as well in terms of prediction accuracy or variance explanation compared to the other models.</p></li>
-</ol>
+<section id="multiple-linear-regression-mlr" class="level3">
+<h3 class="anchored" data-anchor-id="multiple-linear-regression-mlr"><strong>Multiple Linear Regression (MLR)</strong>:</h3>
+<pre><code>-   **RMSE**: 93,308.44
+
+-   **R-squared**: 0.8079
+
+The MLR model has the highest RMSE among the three models, which indicates that its predictions are, on average, further away from the actual values compared to the other models. However, it has a relatively high R-squared value of 0.8079, meaning that it explains about 80.79% of the variance in the data. This suggests that while the model captures a good amount of the variability, its predictions are not as accurate as those of the other models.</code></pre>
 </section>
-<section id="conclusion" class="level3">
-<h3 class="anchored" data-anchor-id="conclusion"><strong>Conclusion:</strong></h3>
+<section id="random-forest" class="level3">
+<h3 class="anchored" data-anchor-id="random-forest"><strong>Random Forest</strong>:</h3>
+<pre><code>-   **RMSE**: 79,118.09
+
+-   **R-squared**: 0.8006
+
+The Random Forest model has the lowest RMSE of 79,118.09, indicating that it provides the most accurate predictions on average among the three models. Its R-squared value of 0.8006 shows that it explains about 80.06% of the variance in the data, which is slightly lower than that of the MLR model. However, the lower RMSE suggests that the Random Forest model is better at making precise predictions, even if it explains a slightly smaller proportion of the variance.</code></pre>
+</section>
+<section id="geographically-weighted-random-forest-gwrf" class="level3">
+<h3 class="anchored" data-anchor-id="geographically-weighted-random-forest-gwrf"><strong>Geographically Weighted Random Forest (GWRF)</strong>:</h3>
+<pre><code>-   **RMSE**: 83,165.98
+
+-   **R-squared**: 0.7797
+
+The GWRF model has an RMSE of 83,165.98, which is higher than that of the Random Forest but lower than that of the MLR. Its R-squared value of 0.7797 indicates that it explains about 77.97% of the variance in the data, which is the lowest among the three models. This suggests that while GWRF incorporates geographical information, it does not perform as well in terms of prediction accuracy or variance explanation compared to the other models.</code></pre>
+</section>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion"><strong>Conclusion:</strong></h2>
 <p>In summary, the <strong>Random Forest model</strong> performs the best overall, as it has the lowest RMSE, indicating the most accurate predictions. Although its R-squared value is slightly lower than that of the MLR model, the trade-off for better prediction accuracy makes it the preferred choice. The <strong>Multiple Linear Regression</strong> model, while explaining a higher percentage of variance, has the highest RMSE, which means its predictions are less reliable. The <strong>GWRF model</strong>, despite its geographical considerations, does not outperform the other two models in terms of prediction accuracy or variance explanation.</p>
 <p>Therefore, if we prioritize prediction accuracy, the <strong>Random Forest model</strong> is the best option among the three.</p>
 <p>There are several reasons why the Geographically Weighted Random Forest (GWRF) model might not be performing as well as the other models, such as Multiple Linear Regression (MLR) and Random Forest. Here are some key factors to consider:</p>
-</section>
 <section id="model-complexity-and-overfitting" class="level3">
 <h3 class="anchored" data-anchor-id="model-complexity-and-overfitting"><strong>1. Model Complexity and Overfitting:</strong></h3>
 <p>One possibility is that the GWRF model may be overfitting the training data. Overfitting occurs when a model learns not only the underlying patterns in the data but also the noise. This can lead to excellent performance on the training set but poor generalization to new, unseen data. In the case of GWRF, if the model is too complex or if it has too many trees, it might capture local variations that do not represent the overall trend, resulting in less accurate predictions.</p>
@@ -2447,13 +2457,14 @@ sf::st_is_valid</code></pre>
 <h3 class="anchored" data-anchor-id="data-quality-and-feature-selection"><strong>4. Data Quality and Feature Selection:</strong></h3>
 <p>The performance of any model, including GWRF, heavily depends on the quality of the input data. If there are issues such as missing values, outliers, or irrelevant features in the dataset, these can negatively impact the model’s performance. Additionally, if the features selected for the GWRF model do not adequately capture the underlying relationships in the data, it may struggle to make accurate predictions.</p>
 </section>
-<section id="conclusion-1" class="level3">
-<h3 class="anchored" data-anchor-id="conclusion-1"><strong>Conclusion:</strong></h3>
+</section>
+</section>
+<section id="conclusion-1" class="level1">
+<h1><strong>Conclusion:</strong></h1>
 <p>In summary, the GWRF model’s underperformance compared to the other models could be due to a combination of factors, including overfitting, insufficient number of trees, challenges with geographical weighting, and data quality issues. Addressing these aspects could help improve the model’s performance and make it more competitive with the other models.</p>
 <p>Though because the asignment was made on a laptop with an Intel core i3 with 8GB of RAM increasing the number of trees or observations in training data was impossible because it would crash the laptop.</p>
 
 
-</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
