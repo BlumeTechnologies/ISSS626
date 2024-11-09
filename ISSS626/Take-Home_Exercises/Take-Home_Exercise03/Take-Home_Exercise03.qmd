@@ -1147,14 +1147,19 @@ resale_fw_mlr <- ols_step_forward_p(
 We visualize the results of the forward selection process, which helps us understand which variables were selected and their contributions to the model.
 
 ```{r}
+#| fig-width: 20
+#| fig-height: 10
 plot(resale_fw_mlr)
 ```
+
 
 ## Visualising model parameters
 
 Finally, we use the ggcoefstats() function to create a plot of the model coefficients, sorted in ascending order. This visualization allows us to easily interpret the effect sizes of the predictors in the MLR model.
 
 ```{r}
+#| fig-width: 12
+#| fig-height: 10
 ggcoefstats(resale_mlr,
             sort = "ascending")
 ```
@@ -1833,13 +1838,13 @@ ggplot(data = test_data_p, aes(x = GRF_pred, y = resale_price)) +
 
 These plots help us visually assess how well each model's predictions align with the actual resale prices. A better predictive model will show points clustered closely around the diagonal line, indicating accurate predictions.
 
-### **Model Performance Comparison:**
+## **Model Performance Comparison:**
 
 ```{r}
 model_results
 ```
 
-1.  **Multiple Linear Regression (MLR)**:
+###  **Multiple Linear Regression (MLR)**:
 
     -   **RMSE**: 93,308.44
 
@@ -1847,7 +1852,7 @@ model_results
 
     The MLR model has the highest RMSE among the three models, which indicates that its predictions are, on average, further away from the actual values compared to the other models. However, it has a relatively high R-squared value of 0.8079, meaning that it explains about 80.79% of the variance in the data. This suggests that while the model captures a good amount of the variability, its predictions are not as accurate as those of the other models.
 
-2.  **Random Forest**:
+###  **Random Forest**:
 
     -   **RMSE**: 79,118.09
 
@@ -1855,7 +1860,7 @@ model_results
 
     The Random Forest model has the lowest RMSE of 79,118.09, indicating that it provides the most accurate predictions on average among the three models. Its R-squared value of 0.8006 shows that it explains about 80.06% of the variance in the data, which is slightly lower than that of the MLR model. However, the lower RMSE suggests that the Random Forest model is better at making precise predictions, even if it explains a slightly smaller proportion of the variance.
 
-3.  **Geographically Weighted Random Forest (GWRF)**:
+###  **Geographically Weighted Random Forest (GWRF)**:
 
     -   **RMSE**: 83,165.98
 
@@ -1863,7 +1868,7 @@ model_results
 
     The GWRF model has an RMSE of 83,165.98, which is higher than that of the Random Forest but lower than that of the MLR. Its R-squared value of 0.7797 indicates that it explains about 77.97% of the variance in the data, which is the lowest among the three models. This suggests that while GWRF incorporates geographical information, it does not perform as well in terms of prediction accuracy or variance explanation compared to the other models.
 
-### **Conclusion:**
+## **Conclusion:**
 
 In summary, the **Random Forest model** performs the best overall, as it has the lowest RMSE, indicating the most accurate predictions. Although its R-squared value is slightly lower than that of the MLR model, the trade-off for better prediction accuracy makes it the preferred choice. The **Multiple Linear Regression** model, while explaining a higher percentage of variance, has the highest RMSE, which means its predictions are less reliable. The **GWRF model**, despite its geographical considerations, does not outperform the other two models in terms of prediction accuracy or variance explanation.
 
@@ -1887,7 +1892,7 @@ GWRF incorporates geographical information, which can be a double-edged sword. W
 
 The performance of any model, including GWRF, heavily depends on the quality of the input data. If there are issues such as missing values, outliers, or irrelevant features in the dataset, these can negatively impact the model's performance. Additionally, if the features selected for the GWRF model do not adequately capture the underlying relationships in the data, it may struggle to make accurate predictions.
 
-### **Conclusion:**
+# **Conclusion:**
 
 In summary, the GWRF model's underperformance compared to the other models could be due to a combination of factors, including overfitting, insufficient number of trees, challenges with geographical weighting, and data quality issues. Addressing these aspects could help improve the model's performance and make it more competitive with the other models.
 
