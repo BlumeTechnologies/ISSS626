@@ -1,7 +1,7 @@
 ---
 title: "Take Home Exercise 3b: Predicting HDB Resale Prices with Geographically Weighted Machine Learning Methods"
 author: "Pelle Knegjes"
-date: "Aug 26 2024"
+date: "Nov 10 2024"
 date-modified: "last-modified"
 execute: 
   eval: true
@@ -35,8 +35,6 @@ Below is a list of recommended predictors to consider. However, students are fre
     -   Remaining lease
 
     -   Age of the unit
-
-    -   Main Upgrading Program (MUP) completed (optional)
 
 -   Locational factors
 
@@ -135,7 +133,7 @@ These packages collectively provide a robust toolkit for spatial analysis, data 
 ```{r}
 pacman::p_load(sf, spdep, GWmodel, SpatialML, 
                tmap, rsample, Metrics, tidyverse, ClustGeo, 
-               ggpubr, cluster, factoextra, NbClust, heatmaply, corrplot, psych, GGally, spdep, tmap, sfdep, plotly, Kendall, SpatialAcc, ggstatsplot, reshape2,httr, jsonlite, rvest, olsrr, gtsummary, performance, see)
+               ggpubr, cluster, factoextra, NbClust, heatmaply, corrplot, psych, GGally, spdep, tmap, sfdep, plotly, Kendall, SpatialAcc, ggstatsplot, reshape2,httr, jsonlite, rvest, olsrr, gtsummary, performance, see, kableExtra, knitr)
 ```
 
 ## Set Seed
@@ -158,11 +156,11 @@ mpsz = st_read(dsn = "data/geospatial", layer = "MP14_SUBZONE_WEB_PL")%>%
 
 **Read CSV File**:
 
--   First we read a CSV file containing resale flat prices from January 2017 onwards using **`read_csv()`**. The file is located at **`"data/aspatial/ResaleflatpricesbasedonregistrationdatefromJan-2017onwards.csv"`**.
+First we read a CSV file containing resale flat prices from January 2017 onwards using **`read_csv()`**. The file is located at **`"data/aspatial/ResaleflatpricesbasedonregistrationdatefromJan-2017onwards.csv"`**.
 
 **Filter Data**:
 
--   Then we filter the dataset to include only records where the **`month`** is between January 2023 (**`"2023-01"`**) and September 2024 (**`"2024-09"`**).
+Then we filter the dataset to include only records where the **`month`** is between January 2023 (**`"2023-01"`**) and September 2024 (**`"2024-09"`**).
 
 ```{r}
 #| eval: false
@@ -172,11 +170,11 @@ resale <- read_csv("data/aspatial/ResaleflatpricesbasedonregistrationdatefromJan
 
 **Data Transformation**:
 
--   We create a new column **`address`** by concatenating the **`block`** and **`street_name`** columns.
+We create a new column **`address`** by concatenating the **`block`** and **`street_name`** columns.
 
--   We extract the first two characters from the **`remaining_lease`** column to create a new integer column **`remaining_lease_yr`**, representing the remaining lease in years.
+We extract the first two characters from the **`remaining_lease`** column to create a new integer column **`remaining_lease_yr`**, representing the remaining lease in years.
 
--   We extract the characters from positions 9 to 11 of the **`remaining_lease`** column to create another integer column **`remaining_lease_mth`**, representing the remaining lease in months.
+We extract the characters from positions 9 to 11 of the **`remaining_lease`** column to create another integer column **`remaining_lease_mth`**, representing the remaining lease in months.
 
 ```{r}
 #| eval: false
@@ -190,16 +188,17 @@ resale_tidy <- resale %>%
 
 **Save Tidy Data**:
 
--   Finally, we save the transformed dataset (**`resale_tidy`**) as an RDS file at the specified path **`"data/rds/resale_tidy.rds"`** using **`write_rds()`**.
+Finally, we save the transformed dataset (**`resale_tidy`**) as an RDS file at the specified path **`"data/rds/resale_tidy.rds"`** using **`write_rds()`**.
 
 ```{r}
 #| eval: false
 write_rds(resale_tidy, "data/rds/resale_tidy.rds")
+
 ```
 
 **Select Resale Data**:
 
--   We start by creating a new variable **`resale_selected`** that holds the data from **`resale_tidy`**. This means we are working with a tidy version of the resale flat price data.
+We start by creating a new variable **`resale_selected`** that holds the data from **`resale_tidy`**. This means we are working with a tidy version of the resale flat price data.
 
 ```{r}
 #| eval: false
@@ -208,7 +207,7 @@ resale_selected <- resale_tidy
 
 **Create a Unique Address List**:
 
--   Next, we generate a sorted list of unique addresses from the **`address`** column in **`resale_selected`**. This list will be used to query the API for geographic coordinates.
+Next, we generate a sorted list of unique addresses from the **`address`** column in **`resale_selected`**. This list will be used to query the API for geographic coordinates.
 
 ```{r}
 #| eval: false
@@ -237,11 +236,11 @@ add_list <- sort(unique(resale_selected$address))
 
 **Store Results**:
 
--   Each new row of results is appended to the **`postal_coords`** data frame, which accumulates the coordinates for all addresses.
+Each new row of results is appended to the **`postal_coords`** data frame, which accumulates the coordinates for all addresses.
 
 **Return Coordinates Data Frame**:
 
--   After processing all addresses, the function returns the **`postal_coords`** data frame containing the addresses along with their corresponding postal codes, latitudes, and longitudes.
+After processing all addresses, the function returns the **`postal_coords`** data frame containing the addresses along with their corresponding postal codes, latitudes, and longitudes.
 
 ```{r}
 #| eval: false
@@ -316,7 +315,7 @@ get_coords <- function(add_list){
 
 **Call the Function**:
 
--   We call the **`get_coords`** function with **`add_list`** to retrieve the coordinates and store the results in the variable **`coords`**.
+We call the **`get_coords`** function with **`add_list`** to retrieve the coordinates and store the results in the variable **`coords`**.
 
 ```{r}
 #| eval: false
@@ -325,7 +324,7 @@ coords <- get_coords(add_list)
 
 **Save Coordinates to RDS File**:
 
--   We save the **`coords`** data frame to an RDS file at the specified path **`"data/rds/coords.rds"`** for future use.
+We save the **`coords`** data frame to an RDS file at the specified path **`"data/rds/coords.rds"`** for future use.
 
 ```{r}
 #| eval: false
@@ -334,7 +333,7 @@ write_rds(coords, "data/rds/coords.rds")
 
 **Read Coordinates from RDS File**:
 
--   We read the saved coordinates from the RDS file back into the variable **`coords`**.
+We read the saved coordinates from the RDS file back into the variable **`coords`**.
 
 ```{r}
 coords <- read_rds("data/rds/coords.rds")
@@ -342,7 +341,7 @@ coords <- read_rds("data/rds/coords.rds")
 
 **Read Tidy Resale Data from RDS File**:
 
--   Finally, we read the tidy resale data from the RDS file back into the variable **`resale_tidy`**.
+Finally, we read the tidy resale data from the RDS file back into the variable **`resale_tidy`**.
 
 ```{r}
 resale_tidy <- read_rds("data/rds/resale_tidy.rds")
@@ -350,7 +349,7 @@ resale_tidy <- read_rds("data/rds/resale_tidy.rds")
 
 **Join Resale Data with Coordinates**:
 
--   We start by merging the **`resale_tidy`** dataset with the **`coords`** dataset using a left join. This combines the resale flat data with the corresponding geographic coordinates (latitude and longitude).
+We start by merging the **`resale_tidy`** dataset with the **`coords`** dataset using a left join. This combines the resale flat data with the corresponding geographic coordinates (latitude and longitude).
 
 ```{r}
 resaleRAW <- left_join(resale_tidy, coords)
@@ -359,9 +358,9 @@ resaleRAW <- left_join(resale_tidy, coords)
 
 **Convert to Spatial Data Frame**:
 
--   Next, we convert the merged dataset (**`resaleRAW`**) into a spatial data frame using **`st_as_sf()`**. We specify the columns for longitude and latitude, and set the coordinate reference system (CRS) to WGS 84 (EPSG:4326).
+Next, we convert the merged dataset (**`resaleRAW`**) into a spatial data frame using **`st_as_sf()`**. We specify the columns for longitude and latitude, and set the coordinate reference system (CRS) to WGS 84 (EPSG:4326).
 
--   After that, we transform the CRS to a different projection (EPSG:3414) and apply a jitter effect to the spatial points to add a small random variation (0.5 units) to their positions. This is often done to avoid overlapping points in visualizations.
+After that, we transform the CRS to a different projection (EPSG:3414) and apply a jitter effect to the spatial points to add a small random variation (0.5 units) to their positions. This is often done to avoid overlapping points in visualizations.
 
 ```{r}
 #| eval: false
@@ -385,7 +384,7 @@ resale <- st_as_sf(resaleRAW,
 
 **Apply the Function to Create a New Column**:
 
--   We use the **`sapply()`** function to apply the **`assign_dummy`** function to the **`storey_range`** column of the **`resale`** dataset. This creates a new column called **`floor_level`** that contains the assigned dummy values based on the storey ranges.
+We use the **`sapply()`** function to apply the **`assign_dummy`** function to the **`storey_range`** column of the **`resale`** dataset. This creates a new column called **`floor_level`** that contains the assigned dummy values based on the storey ranges.
 
 ```{r}
 #| eval: false
@@ -409,7 +408,7 @@ resale$floor_level <- sapply(resale$storey_range, assign_dummy)
 
 **Save the Final Resale Data**:
 
--   We save the final spatial dataset (**`resale`**) with the new **`floor_level`** column to an RDS file at the specified path **`"data/rds/resale.rds"`** for future use.
+We save the final spatial dataset (**`resale`**) with the new **`floor_level`** column to an RDS file at the specified path **`"data/rds/resale.rds"`** for future use.
 
 ```{r}
 #| eval: false
@@ -418,7 +417,7 @@ write_rds(resale, "data/rds/resale.rds")
 
 **Read the Resale Data from RDS File**:
 
--   Finally, we read the saved resale data from the RDS file back into the variable **`resale`**.
+Finally, we read the saved resale data from the RDS file back into the variable **`resale`**.
 
 ```{r}
 resale <- read_rds("data/rds/resale.rds")
@@ -428,11 +427,11 @@ resale <- read_rds("data/rds/resale.rds")
 
 **Create a 350-Meter Buffer**:
 
--   We use the **`st_buffer()`** function from the **`sf`** package to create a buffer zone of 350 meters around each spatial point in the **`resale`** dataset. This function generates a new spatial object that represents the area within 350 meters of each point.
+We use the **`st_buffer()`** function from the **`sf`** package to create a buffer zone of 350 meters around each spatial point in the **`resale`** dataset. This function generates a new spatial object that represents the area within 350 meters of each point.
 
 **Create a 1000-Meter Buffer**:
 
--   Similarly, we create another buffer zone of 1000 meters around each spatial point in the **`resale`** dataset using the same **`st_buffer()`** function. This generates a new spatial object that represents the area within 1000 meters of each point.
+Similarly, we create another buffer zone of 1000 meters around each spatial point in the **`resale`** dataset using the same **`st_buffer()`** function. This generates a new spatial object that represents the area within 1000 meters of each point.
 
 ```{r}
 #| eval: false
@@ -444,19 +443,17 @@ buffer1000 = st_buffer(resale, dist = 1000)
 
 In this section we load in the location predictor variables aswell as calculating and finding distances
 
--   We use the **`st_distance()`** function from the **`sf`** package to compute the distances between each point in the **`resale`** dataset and the points in the **`CBD`** dataset. This function returns a distance matrix where each entry represents the distance between a point in **`resale`** and a point in the predictor value.
+We use the **`st_distance()`** function from the **`sf`** package to compute the distances between each point in the **`resale`** dataset and the points in the **`CBD`** dataset. This function returns a distance matrix where each entry represents the distance between a point in **`resale`** and a point in the predictor value.
 
--   We apply the **`apply()`** function to the distance matrix to find the minimum distance for each point in the **`resale`** dataset. The **`1`** argument indicates that we are applying the function across rows (i.e., for each point in **`resale`**). The result is a vector of minimum distances.
+We apply the **`apply()`** function to the distance matrix to find the minimum distance for each point in the **`resale`** dataset. The **`1`** argument indicates that we are applying the function across rows (i.e., for each point in **`resale`**). The result is a vector of minimum distances.
 
-```{=html}
 <!-- -->
-```
--   The **`st_intersects()`** function from the **`sf`** package is used to determine which which locations fall within the 350 or 1000-meter buffer zones created earlier (stored in **`buffer350/1000`**). This function returns a list where each element corresponds to a buffer zone and contains the indices of locations that intersect with that zone.
 
-```{=html}
+The **`st_intersects()`** function from the **`sf`** package is used to determine which which locations fall within the 350 or 1000-meter buffer zones created earlier (stored in **`buffer350/1000`**). This function returns a list where each element corresponds to a buffer zone and contains the indices of locations that intersect with that zone.
+
 <!-- -->
-```
--   The **`lengths()`** function is then applied to the list of intersections obtained from **`st_intersects()`**. This function counts the number of locations that intersect with each buffer zone. The result is a vector where each element represents the count of locations within the corresponding buffer zone.
+
+The **`lengths()`** function is then applied to the list of intersections obtained from **`st_intersects()`**. This function counts the number of locations that intersect with each buffer zone. The result is a vector where each element represents the count of locations within the corresponding buffer zone.
 
 ::: panel-tabset
 ### Proximity to CBD
@@ -783,11 +780,153 @@ resale$PROX_GOOD_PRISCH = min_distances
 
 ## Tidying up dataset
 
+In this section, we are tidying the resale dataset by selecting specific columns of interest from the original **`resale`** dataset. The **`select()`** function from the **`dplyr`** package allows us to choose only the relevant variables that we want to keep for our analysis. The selected columns include:
+
+-   **resale_price**: The price at which the property was resold.
+
+-   **floor_area_sqm**: The area of the property in square meters.
+
+-   **floor_level**: The level of the floor on which the property is located.
+
+-   **remaining_lease_yr**: The number of years remaining on the lease.
+
+-   **PROX_CBD**: Proximity to the Central Business District.
+
+-   **PROX_ELDERLYCARE**: Proximity to elderly care facilities.
+
+-   **PROX_HAWKER**: Proximity to hawker centers.
+
+-   **PROX_MRT**: Proximity to Mass Rapid Transit stations.
+
+-   **PROX_PARK**: Proximity to parks.
+
+-   **PROX_GOOD_PRISCH**: Proximity to good primary schools.
+
+-   **PROX_MALL**: Proximity to shopping malls.
+
+-   **PROX_SUPERMARKET**: Proximity to supermarkets.
+
+-   **WITHIN_350M_KINDERGARTEN**: Indicator for being within 350 meters of a kindergarten.
+
+-   **WITHIN_350M_CHILDCARE**: Indicator for being within 350 meters of childcare facilities.
+
+-   **WITHIN_350M_BUS**: Indicator for being within 350 meters of a bus stop.
+
+-   **WITHIN_1KM_SCHOOL**: Indicator for being within 1 kilometer of a school.
+
+-   **month**: The month of the transaction.
+
+-   **flat_type**: The type of flat (e.g., HDB, private).
+
+-   **flat_model**: The model of the flat.
+
+-   **storey_range**: The range of storeys for the flat.
+
+-   **lease_commence_date**: The date when the lease commenced.
+
+-   **remaining_lease_mth**: The number of months remaining on the lease.
+
+-   **address**: The address of the property.
+
+-   **remaining_lease**: The remaining lease period.
+
+-   **postal**: The postal code.
+
+-   **geometry**: The spatial geometry of the property.
+
+By selecting these columns, we ensure that our dataset is focused on the variables that are relevant for our analysis, particularly for modeling resale prices.
+
 ```{r}
 #| eval: false
 resale_tidy = resale %>%
   select(resale_price, floor_area_sqm, floor_level,  remaining_lease_yr,PROX_CBD, PROX_ELDERLYCARE, PROX_HAWKER, PROX_MRT, PROX_PARK, PROX_GOOD_PRISCH, PROX_MALL, PROX_SUPERMARKET, WITHIN_350M_KINDERGARTEN, WITHIN_350M_CHILDCARE, WITHIN_350M_BUS, WITHIN_1KM_SCHOOL,month, flat_type,flat_model, storey_range, lease_commence_date, remaining_lease_mth, address, remaining_lease, ,postal, geometry)
 
+```
+
+In this line, we save the tidied dataset (**`resale_tidy`**) to an RDS file using the **`write_rds()`** function. This allows us to store the cleaned and selected data for future use without needing to repeat the tidying process. The **`eval: false`** comment indicates that this code should not be executed in the current context, possibly to avoid overwriting existing files.
+
+```{r}
+#| eval: false
+write_rds(resale_tidy, "data/rds/resale_tidy.rds")
+
+```
+
+Here, we load the previously saved tidied dataset from the RDS file back into our R environment using the **`read_rds()`** function. This allows us to access the cleaned data for further analysis or modeling.
+
+```{r}
+resale_tidy <- read_rds("data/rds/resale_tidy.rds")
+```
+
+In this final step, we generate a summary of the **`resale_tidy`** dataset using the **`summary()`** function.
+
+```{r}
+summary(resale_tidy)
+```
+
+# Exploratory Data Analysis (EDA)
+
+## EDA using Statistical Graphics
+
+```{r}
+ggplot(data=resale_tidy, aes(x=`resale_price`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+```
+
+The figure above reveals a slight right skewed distribution. \## Multiple Histogram Plots Distribution of Variables
+
+```{r}
+floor_area_sqm <- ggplot(data=resale_tidy, aes(x= `floor_area_sqm`)) + 
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+floor_level <- ggplot(data=resale_tidy, aes(x= `floor_level`)) +
+  geom_histogram(bins=3, color="black", fill="light blue")
+
+remaining_lease_yr <- ggplot(data=resale_tidy, aes(x= `remaining_lease_yr`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+PROX_CBD <- ggplot(data=resale_tidy, aes(x= `PROX_CBD`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+PROX_ELDERLYCARE <- ggplot(data=resale_tidy, aes(x= `PROX_ELDERLYCARE`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+PROX_HAWKER <- ggplot(data=resale_tidy, aes(x= `PROX_HAWKER`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+PROX_MRT <- ggplot(data=resale_tidy, aes(x= `PROX_MRT`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+PROX_PARK <- ggplot(data=resale_tidy, aes(x= `PROX_PARK`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+
+PROX_GOOD_PRISCH <- ggplot(data=resale_tidy, aes(x= `PROX_GOOD_PRISCH`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+
+PROX_MALL <- ggplot(data=resale_tidy, aes(x= `PROX_MALL`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+PROX_SUPERMARKET <- ggplot(data=resale_tidy, aes(x= `PROX_SUPERMARKET`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+
+WITHIN_350M_KINDERGARTEN <- ggplot(data=resale_tidy, aes(x= `WITHIN_350M_KINDERGARTEN`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+WITHIN_350M_CHILDCARE <- ggplot(data=resale_tidy, aes(x= `WITHIN_350M_CHILDCARE`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+WITHIN_350M_BUS <- ggplot(data=resale_tidy, aes(x= `WITHIN_350M_BUS`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+WITHIN_1KM_SCHOOL <- ggplot(data=resale_tidy, aes(x= `WITHIN_1KM_SCHOOL`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+
+
+
+ggarrange(floor_area_sqm,floor_level,remaining_lease_yr,PROX_CBD,PROX_ELDERLYCARE,PROX_HAWKER,PROX_MRT,PROX_PARK,PROX_GOOD_PRISCH,PROX_MALL,PROX_SUPERMARKET,WITHIN_350M_KINDERGARTEN,WITHIN_350M_CHILDCARE,WITHIN_350M_BUS,WITHIN_1KM_SCHOOL,ncol = 3, nrow = 4)
 ```
 
 # Data Sampling
@@ -899,6 +1038,10 @@ corrplot::corrplot(cor(nogeo_2023[, 1:16]),
                    tl.cex = 0.5, 
                    method = "number", 
                    type = "upper")
+
+data_nogeo <- train_data %>%
+  st_drop_geometry()
+ggstatsplot::ggcorrmat(data_nogeo[, 2:17])
 ```
 
 The correlation matrix above shows that all the correlation values are below 0.8. Hence, there is no sign of multicolinearity.
@@ -909,38 +1052,90 @@ The correlation matrix above shows that all the correlation values are below 0.8
 
 The code chunk below using lm() to calibrate the multiple linear regression model.
 
+In this section, we fit a Multiple Linear Regression (MLR) model to predict the resale_price based on various predictors, including floor_area_sqm, floor_level, and proximity to various amenities. We use the lm() function to create the model and then call summary(resale_mlr) to display the model's summary statistics, which helps us understand the model's performance and the significance of the predictors.
+
 ```{r}
 #| eval: false
 resale_mlr <- lm(formula = resale_price ~ floor_area_sqm + floor_level + remaining_lease_yr + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_SCHOOL,
                   data=train_data)
 summary(resale_mlr)
 
+
 ```
+
+Here, we save the fitted MLR model to a file in RDS format using the write_rds() function. This allows us to easily load the model later without needing to refit it.
 
 ```{r}
 #| eval: false
 write_rds(resale_mlr, "data/rds/resale_mlr.rds" ) 
 ```
 
+In this step, we load the previously saved MLR model from the RDS file using the read_rds() function. This enables us to use the model for making predictions without having to refit it.
+
 ```{r}
 resale_mlr <- read_rds("data/rds/resale_mlr.rds")
 ```
+
+We use the fitted MLR model to make predictions on a new dataset, test_data, by calling the predict() function. This generates predicted resale prices based on the features in the test dataset.
+
+We calculate the Root Mean Square Error (RMSE) to assess the model's prediction accuracy. We first extract the actual resale prices from the test data, then compute the RMSE by taking the square root of the average of the squared differences between the predicted and actual values. Finally, we print the RMSE value.
+
+```{r}
+# Make predictions on the test data
+predictions_mlr <- predict(resale_mlr, newdata=test_data)
+
+# Calculate RMSE
+actuals_mlr <- test_data$resale_price
+rmse_mlr <- sqrt(mean((predictions_mlr - actuals_mlr)^2))
+
+# Print RMSE
+print(paste("Root Mean Square Error:", rmse_mlr))
+
+# Get the summary of the model
+summary_mlr <- summary(resale_mlr)
+
+# Extract R-squared
+r_squared_mlr <- summary_mlr$r.squared
+
+# Print R-squared
+print(paste("R-squared for MLR:", r_squared_mlr))
+
+combined_df_mlr <- data.frame(predictions_mlr,
+                           actuals_mlr)
+
+```
+
+We obtain the summary of the fitted MLR model again to extract the R-squared value, which indicates the proportion of variance in the resale prices explained by the model. We then print this value.And we create a new data frame that combines the predicted resale prices and the actual resale prices. This can be useful for further analysis or visualization.
 
 ## Model Assessment: olsrr method
 
 ### Generating tidy linear regression report
 
+We use the olsrr package to generate a tidy report of the linear regression results, which provides a comprehensive overview of the model's performance and statistics.
+
 ```{r}
-ols_regress(resale_mlr)
+olsrr::ols_regress(resale_mlr)
 ```
 
 ## Multicolinarity
 
+We assess multicollinearity among the predictors using the Variance Inflation Factor (VIF). High VIF values indicate multicollinearity, which can affect the stability of the regression coefficients. We display the VIF results in a table and create a plot to visualize the VIF values.
+
 ```{r}
 ols_vif_tol(resale_mlr)
+
+vif <- performance::check_collinearity(resale_mlr)
+kable(vif, 
+      caption = "Variance Inflation Factor (VIF) Results") %>%
+  kable_styling(font_size = 18) 
+
+plot(vif) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ## Variable Selection
+
+In this part, we perform variable selection using forward selection, which adds predictors to the model one at a time based on their statistical significance. We set a p-value threshold of 0.05 to determine which variables to include in the final model.
 
 ```{r}
 resale_fw_mlr <- ols_step_forward_p(
@@ -949,11 +1144,15 @@ resale_fw_mlr <- ols_step_forward_p(
   details = FALSE)
 ```
 
+We visualize the results of the forward selection process, which helps us understand which variables were selected and their contributions to the model.
+
 ```{r}
 plot(resale_fw_mlr)
 ```
 
 ## Visualising model parameters
+
+Finally, we use the ggcoefstats() function to create a plot of the model coefficients, sorted in ascending order. This visualization allows us to easily interpret the effect sizes of the predictors in the MLR model.
 
 ```{r}
 ggcoefstats(resale_mlr,
@@ -1062,11 +1261,80 @@ The Global Moran’s I test for residual spatial autocorrelation shows that it�
 
 Since the Observed Global Moran I = 0.54398 which is greater than 0, we can infer than the residuals resemble cluster distribution.
 
-# Building a predictive model
+# Calibrating Conventional Random Forest Model
+
+First, we load the training dataset from an RDS file using the read_rds() function. This dataset will be used to train our Random Forest model.
+
+```{r}
+train_data <- read_rds("data/rds/train_data.rds")
+```
+
+Here, we remove any geometric information from the training dataset using the st_drop_geometry() function. This is important because the Random Forest model does not require spatial data for its predictions, and we want to focus solely on the relevant predictor variables.
+
+```{r}
+train_data_nogeom <- train_data %>%
+  st_drop_geometry()
+
+```
+
+In this section, we fit a Random Forest model using the ranger() function. We specify the formula to predict resale_price based on various predictors, including floor_area_sqm, floor_level, and proximity to various amenities. We set a random seed for reproducibility, ensuring that the results can be consistently replicated.
+
+```{r}
+#|eval: false 
+set.seed(1234)
+rf <- ranger(resale_price ~ floor_area_sqm + floor_level + remaining_lease_yr + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_SCHOOL,
+             data=train_data_nogeom)
+```
+
+Here, we save the fitted Random Forest model to an RDS file using the write_rds() function. This allows us to easily load the model later without needing to refit it.
+
+```{r}
+#| eval: false
+write_rds(rf, "data/rds/rf.rds")
+```
+
+In this step, we load the previously saved Random Forest model from the RDS file using the read_rds() function. We can then print the model object to confirm that it has been loaded successfully.
+
+```{r}
+rf <- read_rds("data/rds/rf.rds")
+rf
+```
+
+We apply the same process to the test dataset, removing any geometric information using st_drop_geometry(). This prepares the test data for making predictions with the Random Forest model. We use the fitted Random Forest model to make predictions on the test dataset by calling the predict() function. The predictions are extracted from the resulting object. We calculate the Root Mean Square Error (RMSE) to assess the model's prediction accuracy. We first extract the actual resale prices from the test data, then compute the RMSE by taking the square root of the average of the squared differences between the predicted and actual values. Finally, we print the RMSE value. We calculate the R-squared value to evaluate the proportion of variance in the resale prices explained by the model. We use the formula for R-squared, which compares the sum of squared errors from our predictions to the total sum of squares. We then print the R-squared value. Finally, We create a new data frame that combines the predicted resale prices and the actual resale prices. This can be useful for further analysis or visualization
+
+```{r}
+test_data_nogeom <- test_data %>%
+  st_drop_geometry()
+
+# Make predictions on the test data
+predictions_rf <- predict(rf, data=test_data_nogeom)$predictions
+
+# Calculate RMSE
+actuals_rf <- test_data$resale_price
+rmse_rf <- sqrt(mean((predictions_rf - actuals_rf)^2))
+
+# Print RMSE
+print(paste("Root Mean Square Error:", rmse_rf))
+
+# Calculate R-squared
+actuals_rf <- test_data$resale_price
+r_squared_rf <- 1 - (sum((predictions_rf - actuals_rf)^2) / sum((actuals_rf - mean(actuals_rf))^2))
+
+# Print R-squared
+print(paste("R-squared for Random Forest:", r_squared_rf))
+
+combined_df_rf <- data.frame(predictions_rf,
+                           actuals_rf)
+
+```
+
+# Geographically Weighted Regrssion Model
 
 In this section, we will calibrate a model to predict the resale price by using geographically weighted regression methods of the GWmodel package.
 
 ## Converting the sf data.frame to SpatialPointDataFrame
+
+First, we convert the sf (simple features) data frame train_data into a SpatialPointDataFrame using the as_Spatial() function. This conversion is necessary because the Geographically Weighted Regression (GWR) methods in the GWmodel package require spatial data in this format.
 
 ```{r}
 train_data_sp <- as_Spatial(train_data)
@@ -1075,7 +1343,7 @@ train_data_sp
 
 ## Computing adaptive bandwidth
 
-Next, bw.gwr() of GWmodel package will be used to determine the optimal bandwidth to be used.
+Here, we compute the optimal bandwidth for the GWR model using the bw.gwr() function from the GWmodel package. We specify the formula to predict resale_price based on various predictors, and we set the approach to "CV" (cross-validation) to determine the best bandwidth. We also choose a Gaussian kernel and indicate that we want an adaptive bandwidth.
 
 ```{r}
 #| eval: false
@@ -1087,53 +1355,160 @@ bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm + floor_level + remaining_le
                   longlat=FALSE)
 ```
 
+In this step, we save the computed adaptive bandwidth object to an RDS file using the write_rds() function. This allows us to easily load the bandwidth later without needing to recompute it.
+
 ```{r}
 #| eval: false
 write_rds(bw_adaptive, "data/rds/bw_adaptive.rds")
 ```
 
+We load the previously saved adaptive bandwidth object from the RDS file using the read_rds() function. This enables us to use the bandwidth in the subsequent GWR model.
+
 ```{r}
 bw_adaptive <- read_rds("data/rds/bw_adaptive.rds")
 ```
+
+Here, we print the adaptive bandwidth object to the console to review its contents and confirm that it has been loaded correctly.
 
 ```{r}
 bw_adaptive
 ```
 
-## Converting the test data from sf data.frame to SpatialPointDataFrame
+## Constructing the adaptive bandwidth gwr model
 
-```{r}
-test_data_sp <- test_data %>%
-  as_Spatial()
-test_data_sp
-
-```
+In this section, we fit the GWR model using the gwr.basic() function. We specify the same formula for predicting resale_price and use the adaptive bandwidth we computed earlier. We also choose a Gaussian kernel for the model.
 
 ```{r}
 #| eval: false
-gwr_bw_test_adaptive <- bw.gwr(resale_price ~ floor_area_sqm + floor_level + remaining_lease_yr + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_SCHOOL,
-                  data=test_data_sp,
-                  approach="CV",
-                  kernel="gaussian",
-                  adaptive=TRUE,
-                  longlat=FALSE)
-
+gwr_adaptive <- gwr.basic(formula = resale_price ~ floor_area_sqm + floor_level + remaining_lease_yr + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_SCHOOL,
+                          data=train_data_sp,
+                          bw=bw_adaptive, 
+                          kernel = 'gaussian', 
+                          adaptive=TRUE,
+                          longlat = FALSE)
 ```
+
+Here, we save the fitted GWR model to an RDS file using the write_rds() function. This allows us to easily load the model later for analysis or visualization.
 
 ```{r}
 #| eval: false
-write_rds(gwr_bw_test_adaptive, "data/rds/gwr_bw_test_adaptive.rds")
+write_rds(gwr_adaptive, "data/rds/gwr_adaptive.rds")
 ```
+
+## Retrieve gwr output object
+
+We load the previously saved GWR model from the RDS file using the read_rds() function. This enables us to access the model output for further analysis.
+
+```{r}
+gwr_adaptive <- read_rds("data/rds/gwr_adaptive.rds")
+```
+
+In this step, we print the GWR model output to the console to review the results and coefficients of the model.
+
+```{r}
+gwr_adaptive
+```
+
+### Converting SDF into sf data.frame
+
+We convert the spatial data frame (SDF) from the GWR model output into a regular data frame using as.data.frame(). We also select specific columns to keep, excluding columns 2 to 15. Then, we combine the original training data with the GWR output to create a new spatial data frame gwr_sf_adaptive.
+
+```{r}
+gwr_adaptive_output <- as.data.frame(
+  gwr_adaptive$SDF) %>%
+  select(-c(2:15))
+
+gwr_sf_adaptive <- cbind(train_data_sp,
+                         gwr_adaptive_output)
+```
+
+Here, we summarize the predicted values (yhat) from the GWR model output. This provides an overview of the predicted resale prices across the spatial data.
+
+```{r}
+
+summary(gwr_adaptive$SDF$yhat)
+
+```
+
+### Visualising local R2
+
+In this section, we create an interactive point symbol map to visualize the local R-squared values from the GWR model. We use the tmap package to plot the base map (mpsz) with a specified transparency and overlay the points from gwr_sf_adaptive, colored by the local R-squared values.
+
+```{r}
+tmap_mode("plot")
+tmap_options(check.and.fix = TRUE)
+tm_shape(mpsz)+
+  tm_polygons(alpha = 0.1) +
+tm_shape(gwr_sf_adaptive) +  
+  tm_dots(col = "Local_R2",
+          border.col = "gray60",
+          border.lwd = 1) +
+  tm_view(set.zoom.limits = c(11,14))
+```
+
+### Visualising coefficient estimates
+
+We create two separate interactive point symbol maps to visualize the coefficient estimates for floor_area_sqm_SE and floor_area_sqm_TV. We arrange these maps side by side for comparison, ensuring they share the same aspect ratio and zoom level.
+
+```{r}
+tmap_options(check.and.fix = TRUE)
+tmap_mode("plot")
+AREA_SQM_SE <- tm_shape(mpsz)+
+  tm_polygons(alpha = 0.1) +
+tm_shape(gwr_sf_adaptive) +  
+  tm_dots(col = "floor_area_sqm_SE",
+          border.col = "gray60",
+          border.lwd = 1) +
+  tm_view(set.zoom.limits = c(11,14))
+
+AREA_SQM_TV <- tm_shape(mpsz)+
+  tm_polygons(alpha = 0.1) +
+tm_shape(gwr_sf_adaptive) +  
+  tm_dots(col = "floor_area_sqm_TV",
+          border.col = "gray60",
+          border.lwd = 1) +
+  tm_view(set.zoom.limits = c(11,14))
+
+tmap_arrange(AREA_SQM_SE, AREA_SQM_TV, 
+             asp=1, ncol=2,
+             sync = TRUE)
+
+```
+
+Finally, we create a bubble map to visualize the local R-squared values specifically for the "CENTRAL REGION". The bubbles represent the local R-squared values, with their size indicating the magnitude of the values.
+
+```{r}
+tm_shape(mpsz[mpsz$REGION_N=="CENTRAL REGION", ])+
+  tm_polygons()+
+tm_shape(gwr_sf_adaptive) + 
+  tm_bubbles(col = "Local_R2",
+           size = 0.15,
+           border.col = "gray60",
+           border.lwd = 1)
+```
+
+# Calibrating Geographical Random Forest Model
 
 ## Preparing coordinates data
 
 ### Extracting coordinates data
 
+In this section, we are extracting the spatial coordinates from our datasets. The **`st_coordinates()`** function is used to obtain the coordinates (latitude and longitude) from spatial objects. Here, we extract coordinates for three datasets:
+
+-   **`resale_tidy`**: This might be our complete dataset.
+
+-   **`train_data`**: The dataset we will use for training our model.
+
+-   **`test_data`**: The dataset we will use for testing our model.
+
 ```{r}
+coords <- st_coordinates(resale_tidy)
 coords_train <- st_coordinates(train_data)
 coords_test <- st_coordinates(test_data)
 
 ```
+
+In this part, we save the extracted coordinates for both the training and testing datasets to RDS files. The **`write_rds()`** function is used to write R objects to a file in R's native format. The **`eval: false`** comment indicates that this code should not be executed in the current context, possibly to avoid overwriting existing files.
 
 ```{r}
 #| eval: false
@@ -1141,50 +1516,138 @@ coords_train <- write_rds(coords_train, "data/rds/coords_train.rds" )
 coords_test <- write_rds(coords_test, "data/rds/coords_test.rds" )
 ```
 
+Here, we load the previously saved coordinates from the RDS files back into our R environment using the **`read_rds()`** function. This allows us to use the coordinates later in our analysis without needing to extract them again.
+
 ```{r}
 coords_train = read_rds("data/rds/coords_train.rds")
 coords_test <- read_rds("data/rds/coords_test.rds")
 ```
 
-### Droping geometry field
+## Droping geometry field
+
+In this line, we load the training dataset from an RDS file.
 
 ```{r}
-train_data <- train_data %>% 
+train_data <- read_rds("data/rds/train_data.rds")
+```
+
+We then drop the geometry field from the training dataset using the **`st_drop_geometry()`** function. This is necessary because the GRF model requires only the attribute data (predictors) and not the spatial geometry itself.
+
+```{r}
+train_data_nogeom <- train_data %>% 
   st_drop_geometry()
 
 ```
 
-## Calibrating Random Forest Model
+## Calibrating Geographically Random Forest Model
 
-Geographically Weighted Random Forest (GRF) is a spatial analysis method using a local version of the famous Machine Learning algorithm.
+**Geographically Weighted Random Forest (GRF)** is a spatial analysis method that combines the principles of Random Forest with the concept of Geographically Weighted Regression (GWR). Unlike traditional GWR, which assumes a linear relationship, GRF can model non-linear relationships and is less prone to overfitting due to its bootstrapping nature.
 
-This technique adopts the idea of the Geographically Weighted Regression.
+### GRF bandwidth
 
-The main difference between a tradition (linear) GWR and GRF is that we can model non-stationarity coupled with a flexible non-linear model which is very hard to overfit due to its bootstrapping nature, thus relaxing the assumptions of traditional Gaussian statistics.
+In this section, we calculate the bandwidth for the GRF model using the **`grf.bw()`** function. The bandwidth determines how much local information is used when making predictions. We specify the formula for the model, the training data without geometry, the coordinates, the number of trees to use (50), and the kernel type (adaptive). The adaptive kernel allows the model to adjust the influence of nearby points based on their distance.
 
-### Calibrating Geographical Random Forest Model
+```{r}
+#| eval: false
+grf_bw <- grf.bw(resale_price ~ floor_area_sqm + floor_level + remaining_lease_yr + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_SCHOOL,
+                  data=train_data_nogeom,
+                  coords= coords_train,
+                  trees = 50  ,
+                  kernel="adaptive"                 )
+```
 
-In this section, we will calibrate a model to predict resale price by using grf() of SpatialML package.
+With a bandwidth of 270 in the GRF model indicates that the model will consider observations within a 270-unit radius when making predictions.
+
+Here, we save the calculated bandwidth object to an RDS file for later use.
+
+```{r}
+#| eval: false
+write_rds(grf_bw, "data/rds/grf_bw.rds")
+
+```
+
+We load the saved bandwidth object back into our R environment.
+
+```{r}
+grf_bw <- read_rds("data/rds/grf_bw.rds")
+```
 
 #### Calibrating using training data
+
+In this final section, we calibrate the Geographically Weighted Random Forest model using the **`grf()`** function. We set a seed for reproducibility with **`set.seed(1234)`**, ensuring that our results can be replicated. The formula specifies the response variable (**`resale_price`**) and the predictor variables. We provide the training data without geometry, the previously calculated bandwidth (**`grf_bw`**), the kernel type (adaptive), the coordinates, and the number of trees to use (100). This model will now be trained to predict resale prices based on the specified features while accounting for spatial relationships.
+
+By following these steps, we effectively prepare our data, calculate necessary parameters, and calibrate a Geographically Weighted Random Forest model to analyze the spatial dynamics of resale prices.
 
 ```{r}
 #| eval: false
 
 set.seed(1234)
-gwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm + floor_level + 
-                  remaining_lease_yr +
-                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
-                  PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL                 + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
-                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
-                  WITHIN_1KM_SCHOOL,
-                     dframe=train_data, 
-                     bw=bw_adaptive,
+gwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm + floor_level + remaining_lease_yr + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +PROX_MRT + PROX_PARK + PROX_GOOD_PRISCH + PROX_MALL + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_SCHOOL,
+                     dframe=train_data_nogeom, 
+                     bw=grf_bw,
                      kernel="adaptive",
                      coords=coords_train,
-                  ntree = 50)
+                  ntree = 100)
 
 ```
+
+#### **1. Residuals OOB (Out-Of-Bag):**
+
+-   **Min., 1st Qu., Median, Mean, 3rd Qu., Max.**: These statistics describe the distribution of the residuals (the differences between the observed and predicted values) for the out-of-bag samples.
+
+    -   **Min.**: The minimum residual value is -319,000, indicating that some predictions were significantly lower than the actual values.
+
+    -   **1st Qu.**: The first quartile (25th percentile) is -28,225.3, meaning that 25% of the residuals are below this value.
+
+    -   **Median**: The median residual is -1,837.4, suggesting that half of the predictions are below this value and half are above.
+
+    -   **Mean**: The mean residual is 173.6, indicating that, on average, the model slightly overestimates the actual values.
+
+    -   **3rd Qu.**: The third quartile (75th percentile) is 25,668.4, meaning that 75% of the residuals are below this value.
+
+    -   **Max.**: The maximum residual is 510,000, indicating that some predictions were significantly higher than the actual values.
+
+#### **2. Residuals Predicted (Not OOB):**
+
+-   This section provides similar statistics for the residuals calculated from the predictions made on the entire dataset (not just the out-of-bag samples).
+
+    -   The values here are generally smaller in magnitude compared to the OOB residuals, indicating that the model fits the training data better than it does the out-of-bag samples.
+
+#### **3. Local Variable Importance:**
+
+-   This section would typically provide insights into which variables were most important in making predictions. However, it seems that specific details are not included in your output. Variable importance can help you understand which predictors have the most influence on the model's predictions.
+
+#### **4. Mean Squared Error (MSE):**
+
+-   **MSE (OOB)**: 3,370,726,309.413
+
+    -   This is the average of the squared differences between the predicted and actual values for the out-of-bag samples. A lower MSE indicates a better fit.
+
+-   **Mean Squared Error Predicted (Not OOB)**: 67,831,868.939
+
+    -   This is the MSE for the predictions made on the entire dataset. The significantly lower value compared to the OOB MSE suggests that the model fits the training data very well.
+
+#### **5. R-squared:**
+
+-   **R-squared (OOB)**: 86.394%
+
+    -   This indicates that approximately 86.4% of the variance in the out-of-bag data can be explained by the model. This is a relatively high value, suggesting a good fit.
+
+-   **R-squared Predicted (Not OOB)**: 99.726%
+
+    -   This very high R-squared value indicates that the model explains almost all the variance in the training data. However, such a high value can sometimes indicate overfitting, where the model performs well on the training data but may not generalize well to unseen data.
+
+#### **6. AIC and AICc:**
+
+-   **AIC (OOB)**: 109,723.97
+
+-   **AICc (OOB)**: 109,724.08
+
+-   **AIC Predicted (Not OOB)**: 90,194.713
+
+-   **AICc Predicted (Not OOB)**: 90,194.823
+
+    -   The Akaike Information Criterion (AIC) and its corrected version (AICc) are measures of model quality. Lower values indicate a better model fit when comparing multiple models. The AIC values for the out-of-bag samples are higher than those for the predictions on the entire dataset, which is expected.
 
 Let’s save the model output by using the code chunk below.
 
@@ -1204,24 +1667,42 @@ gwRF_adaptive <- read_rds("data/rds/gwRF_adaptive.rds")
 
 ### Preparing the test data
 
+In this section, we prepare the test dataset for predictions. We use the cbind() function to combine the test data with the extracted coordinates (coords_test). After that, we drop the geometry field using st_drop_geometry(), as the GRF model requires only the attribute data (predictors) and not the spatial geometry itself. The resulting test_data_nogeom will contain the necessary features for making predictions.
+
 ```{r}
-test_data <- cbind(test_data, coords_test) %>%
+test_data_nogeom <- cbind(test_data, coords_test) %>%
   st_drop_geometry()
 
 ```
 
 ### Predicting with test data
 
+Next, we use the predict.grf() function from the SpatialML package to predict resale values using the test data and the previously calibrated GRF model (gwRF_adaptive).
+
+In this line, we call the **`predict.grf()`** function to generate predictions. We pass the following arguments:
+
+-   **`gwRF_adaptive`**: The calibrated GRF model we created earlier.
+
+-   **`test_data_nogeom`**: The test dataset without geometry.
+
+-   **`x.var.name`** and **`y.var.name`**: These specify the names of the variables representing the X and Y coordinates, respectively. This is important for the spatial aspect of the predictions.
+
+-   **`local.w=1`**: This indicates that we want to use local weights for the predictions, meaning that the model will consider nearby observations more heavily.
+
+-   **`global.w=0`**: This indicates that we do not want to use global weights, focusing solely on local influences.
+
 ```{r}
 #| eval: false
 gwRF_pred <- predict.grf(gwRF_adaptive, 
-                           test_data, 
+                           test_data_nogeom, 
                            x.var.name="X",
                            y.var.name="Y", 
                            local.w=1,
                            global.w=0)
 
 ```
+
+Here, we save the predictions generated by the GRF model to an RDS file using the **`write_rds()`** function. The **`eval: false`** comment indicates that this code should not be executed in the current context, possibly to avoid overwriting existing files.
 
 ```{r}
 #| eval: false
@@ -1231,18 +1712,22 @@ GRF_pred <- write_rds(gwRF_pred, "data/rds/GRF_pred.rds")
 
 ### Converting the predicting output into a data frame
 
+In this section, we load the saved predictions from the RDS file back into our R environment. We then convert the predictions into a data frame using **`as.data.frame()`**, which allows us to work with the predictions more easily in subsequent steps.
+
 ```{r}
 GRF_pred <- read_rds("data/rds/GRF_pred.rds")
 GRF_pred_df <- as.data.frame(GRF_pred)
 
 ```
 
-In the code chunk below, cbind() is used to append the predicted values onto test_datathe
+Here, we use **`cbind()`** again to append the predicted values from **`GRF_pred_df`** onto the **`test_data_nogeom`**. The resulting **`test_data_p`** will contain both the original test data (without geometry) and the predicted resale prices.
 
 ```{r}
-test_data_p <- cbind(test_data, GRF_pred_df)
+test_data_p <- cbind(test_data_nogeom, GRF_pred_df)
 
 ```
+
+In this line, we save the combined test dataset (which now includes the predicted values) to an RDS file for future use.
 
 ```{r}
 #| eval: false
@@ -1254,6 +1739,16 @@ test_data_p <- read_rds("data/rds/test_data_p.rds")
 ```
 
 ## Calculating Mean Errors and R2
+
+In this section, we calculate various error metrics to evaluate the performance of our GRF model:
+
+-   **Mean Absolute Error (MAE)**: This metric gives us the average absolute difference between the actual and predicted resale prices, providing a straightforward measure of prediction accuracy.
+
+-   **Mean Squared Error (MSE)**: This metric squares the differences between actual and predicted values, penalizing larger errors more heavily.
+
+-   **Root Mean Squared Error (RMSE)**: This is the square root of the MSE, bringing the error metric back to the original units of the resale prices, making it easier to interpret.
+
+-   **R-squared (R²)**: This statistic indicates the proportion of variance in the actual resale prices that can be explained by the model. A higher R² value suggests a better fit.
 
 ```{r}
 
@@ -1267,46 +1762,136 @@ mae <- mean(abs(actual_prices - predicted_prices))
 mse <- mean((actual_prices - predicted_prices)^2)
 
 # Calculate Root Mean Squared Error (RMSE)
-rmse <- sqrt(mse)
+rmse_gwRF <- sqrt(mse)
 
 # Calculate R-squared (R²)
 ss_total <- sum((actual_prices - mean(actual_prices))^2)
 ss_residual <- sum((actual_prices - predicted_prices)^2)
-r_squared <- 1 - (ss_residual / ss_total)
+r_squared_gwRF <- 1 - (ss_residual / ss_total)
 
 # Print the results
 cat("Mean Absolute Error (MAE):", mae, "\n")
 cat("Mean Squared Error (MSE):", mse, "\n")
-cat("Root Mean Squared Error (RMSE):", rmse, "\n")
-cat("R-squared (R²):", r_squared, "\n")
+cat("Root Mean Squared Error (RMSE):", rmse_gwRF, "\n")
+cat("R-squared (R²):", r_squared_gwRF, "\n")
 ```
 
-## Visualising the predicted values
+# Model Comparison
+
+In this part, we create a data frame to compare the performance of different models (Multiple Linear Regression, Random Forest, and Geographically Weighted Random Forest) based on their RMSE and R² values.
+
+```{r}
+# Model Comparison
+model_results <- data.frame(
+  Model = c("MLR", "Random Forest", "GWRF"),
+  RMSE = c(rmse_mlr, rmse_rf, rmse_gwRF),
+  R_squared = c(r_squared_mlr, r_squared_rf, r_squared_gwRF)
+)
+```
+
+We use **`ggplot2`** to create a bar plot that visually compares the RMSE values of the different models. This helps us quickly assess which model performed best in terms of prediction accuracy.
+
+```{r}
+ggplot(model_results, aes(x = Model, y = RMSE)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Model Comparison: RMSE", y = "Root Mean Squared Error (RMSE)")
+```
+
+For each model, we create scatter plots to visualize the relationship between predicted and actual resale prices.
 
 ```{r}
 
-ggplot(data = test_data_p, aes(x = GRF_pred, y = resale_price))  +
-  geom_point() +  # Add scatter plot points
-  geom_smooth(method = "lm", se = FALSE, color = "blue") +  # Add regression line
-  labs(title = "Scatter Plot with Regression Line",
+# Enhanced Visualization MLR
+ggplot(data = combined_df_mlr, aes(x = predictions_mlr, y = actuals_mlr)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", color = "blue", se = FALSE) +
+  labs(title = "Predicted vs Actual Resale Prices MLR",
        x = "Predicted Price",
-       y = "Actual Price") +  # Add labels
-  theme_minimal()  # Optional: use a minimal theme
+       y = "Actual Price") +
+  theme_minimal()
+
+# Enhanced Visualization RF
+ggplot(data = combined_df_rf, aes(x = predictions_rf, y = actuals_rf)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", color = "blue", se = FALSE) +
+  labs(title = "Predicted vs Actual Resale Prices RF",
+       x = "Predicted Price",
+       y = "Actual Price") +
+  theme_minimal()
+
+# Enhanced Visualization GWRF
+ggplot(data = test_data_p, aes(x = GRF_pred, y = resale_price)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", color = "blue", se = FALSE) +
+  labs(title = "Predicted vs Actual Resale Prices GRF",
+       x = "Predicted Price",
+       y = "Actual Price") +
+  theme_minimal()
+
+
 ```
 
-A better predictive model should have the scatter point close to the diagonal line. The scatter plot can be also used to detect if any outliers in the model.
+These plots help us visually assess how well each model's predictions align with the actual resale prices. A better predictive model will show points clustered closely around the diagonal line, indicating accurate predictions.
+
+### **Model Performance Comparison:**
 
 ```{r}
-
+model_results
 ```
 
-```{r}
+1.  **Multiple Linear Regression (MLR)**:
 
-```
+    -   **RMSE**: 93,308.44
 
-```{r}
+    -   **R-squared**: 0.8079
 
-```
+    The MLR model has the highest RMSE among the three models, which indicates that its predictions are, on average, further away from the actual values compared to the other models. However, it has a relatively high R-squared value of 0.8079, meaning that it explains about 80.79% of the variance in the data. This suggests that while the model captures a good amount of the variability, its predictions are not as accurate as those of the other models.
+
+2.  **Random Forest**:
+
+    -   **RMSE**: 79,118.09
+
+    -   **R-squared**: 0.8006
+
+    The Random Forest model has the lowest RMSE of 79,118.09, indicating that it provides the most accurate predictions on average among the three models. Its R-squared value of 0.8006 shows that it explains about 80.06% of the variance in the data, which is slightly lower than that of the MLR model. However, the lower RMSE suggests that the Random Forest model is better at making precise predictions, even if it explains a slightly smaller proportion of the variance.
+
+3.  **Geographically Weighted Random Forest (GWRF)**:
+
+    -   **RMSE**: 83,165.98
+
+    -   **R-squared**: 0.7797
+
+    The GWRF model has an RMSE of 83,165.98, which is higher than that of the Random Forest but lower than that of the MLR. Its R-squared value of 0.7797 indicates that it explains about 77.97% of the variance in the data, which is the lowest among the three models. This suggests that while GWRF incorporates geographical information, it does not perform as well in terms of prediction accuracy or variance explanation compared to the other models.
+
+### **Conclusion:**
+
+In summary, the **Random Forest model** performs the best overall, as it has the lowest RMSE, indicating the most accurate predictions. Although its R-squared value is slightly lower than that of the MLR model, the trade-off for better prediction accuracy makes it the preferred choice. The **Multiple Linear Regression** model, while explaining a higher percentage of variance, has the highest RMSE, which means its predictions are less reliable. The **GWRF model**, despite its geographical considerations, does not outperform the other two models in terms of prediction accuracy or variance explanation.
+
+Therefore, if we prioritize prediction accuracy, the **Random Forest model** is the best option among the three.
+
+There are several reasons why the Geographically Weighted Random Forest (GWRF) model might not be performing as well as the other models, such as Multiple Linear Regression (MLR) and Random Forest. Here are some key factors to consider:
+
+### **1. Model Complexity and Overfitting:**
+
+One possibility is that the GWRF model may be overfitting the training data. Overfitting occurs when a model learns not only the underlying patterns in the data but also the noise. This can lead to excellent performance on the training set but poor generalization to new, unseen data. In the case of GWRF, if the model is too complex or if it has too many trees, it might capture local variations that do not represent the overall trend, resulting in less accurate predictions.
+
+### **2. Insufficient Number of Trees:**
+
+Another reason could be related to the number of trees used in the GWRF model. If the model has too few trees, it may not be able to capture the complexity of the data adequately. Random Forest models generally benefit from having a larger number of trees, as this helps to average out predictions and reduce variance. If the GWRF model is using a lower number of trees compared to the Random Forest model, it might not be leveraging the full potential of the ensemble learning approach, leading to poorer performance.
+
+### **3. Geographical Weighting:**
+
+GWRF incorporates geographical information, which can be a double-edged sword. While it aims to capture spatial variations in the data, if the geographical weighting is not appropriately tuned or if the spatial relationships are not strong enough, it may introduce noise rather than useful information. This could lead to less reliable predictions, especially if the geographical factors do not significantly influence the target variable.
+
+### **4. Data Quality and Feature Selection:**
+
+The performance of any model, including GWRF, heavily depends on the quality of the input data. If there are issues such as missing values, outliers, or irrelevant features in the dataset, these can negatively impact the model's performance. Additionally, if the features selected for the GWRF model do not adequately capture the underlying relationships in the data, it may struggle to make accurate predictions.
+
+### **Conclusion:**
+
+In summary, the GWRF model's underperformance compared to the other models could be due to a combination of factors, including overfitting, insufficient number of trees, challenges with geographical weighting, and data quality issues. Addressing these aspects could help improve the model's performance and make it more competitive with the other models.
+
+Though because the asignment was made on a laptop with an Intel core i3 with 8GB of RAM increasing the number of trees or observations in training data was impossible because it would crash the laptop.
 
 ```{r}
 
