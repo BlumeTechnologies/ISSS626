@@ -37,7 +37,7 @@ To access each weekly lesson please click on the topic. These pages also contain
 
 In-class Exercise 1: [Geospatial Data Science with R](In-Class_Exercises/In-Class_Exercise01/In-Class_Ex01.html)
 
-In-class Exercise 2:
+In-class Exercise 2: [Spatial Point Patterns Analysis: spatstat methods](In-Class_Exercises/In-Class_Exercise02/In-Class_Ex02.html)
 
 In-class Exercise 3: [Advanced SPAA](Weekly-Lessons/Week03/Lesson03.html)
 
